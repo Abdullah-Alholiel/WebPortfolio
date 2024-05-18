@@ -1,0 +1,125 @@
+// Achievements.jsx
+import React, { useState, useEffect } from 'react';
+import { achievementsData } from '@/lib/data';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+
+const AchievementCard = ({ title, description, Icon, certificateUrl }: typeof achievementsData[number]) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (isFlipped) {
+      timeout = setTimeout(() => {
+        setIsFlipped(false);
+      }, 4000);
+    }
+    return () => clearTimeout(timeout);
+  }, [isFlipped]);
+
+  const handleCardClick = () => {
+    setIsFlipped(!isFlipped);
+  };
+
+  return (
+    <motion.div
+      className="rounded-lg p-8 bg-white shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105 cursor-pointer"
+      initial={{ opacity: 0, scale: 0.9 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ scale: 1.05 }}
+      onClick={handleCardClick}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      {/* Front Side */}
+      <motion.div
+        className={`flex flex-col items-center space-y-6 ${isFlipped ? 'hidden' : ''}`}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Icon className="text-5xl text-blue-500 transition-transform duration-500 group-hover:rotate-12" />
+        <div className="text-center">
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">{title}</h3>
+          <p className="text-base text-gray-600">{description}</p>
+        </div>
+        {showTooltip && (
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-800 text-white text-sm px-2 py-1 rounded-md">
+            Click to show Certificate
+          </div>
+        )}
+      </motion.div>
+
+      {/* Back Side */}
+      <motion.div
+        className={`${isFlipped ? '' : 'hidden'}`}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Image src={certificateUrl} alt={`${title} certificate`} width={600} height={400} className="object-contain" />
+      </motion.div>
+    </motion.div>
+  );
+};
+
+export default function Achievements() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToPrevious = () => {
+    setCurrentIndex((prevIndex) => (prevIndex === 0 ? achievementsData.length - 2 : prevIndex - 2));
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex >= achievementsData.length - 2 ? 0 : prevIndex + 2));
+  };
+
+  const cardVariants = {
+    initial: { opacity: 0, x: '-100%' },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: '100%' },
+  };
+
+  return (
+    <section className="py-12 px-5">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-bold text-center mb-8">Achievements</h2>
+        <div className="relative">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            key={`${achievementsData[currentIndex]?.title}-${achievementsData[currentIndex + 1]?.title}`}
+            variants={cardVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.5 }}
+          >
+            <AchievementCard {...achievementsData[currentIndex]} />
+            {achievementsData[currentIndex + 1] && (
+              <AchievementCard {...achievementsData[currentIndex + 1]} />
+            )}
+          </motion.div>
+          <button
+            className="absolute top-1/2 -left-12 transform -translate-y-1/2 px-4 py-2 rounded-full focus:outline-none text-2xl transition-colors duration-300"
+            onClick={goToPrevious}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 hover:text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            className="absolute top-1/2 -right-12 transform -translate-y-1/2 px-4 py-2 rounded-full focus:outline-none text-2xl transition-colors duration-300"
+            onClick={goToNext}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 hover:text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
