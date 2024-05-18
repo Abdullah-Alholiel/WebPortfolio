@@ -9,7 +9,7 @@ const AboutMe = () => {
     animate: {
       opacity: 1,
       y: 0,
-      transition: { delay: 4, duration: 1.5 }
+      transition: { delay: 2, duration: 1.5 }
     }
   };
 
