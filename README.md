@@ -1,30 +1,43 @@
-[![Watch tutorial here](https://img.youtube.com/vi/sUKptmUVIBM/0.jpg)](https://youtu.be/sUKptmUVIBM)
+# Abdullah Alholaiel's Portfolio Website
 
-# [Watch video here](https://youtu.be/sUKptmUVIBM)
+Welcome to my portfolio website! This site showcases my skills, projects, and professional journey as an innovative Digital Strategist, Consultant, and System Developer. Built with modern web technologies, it provides an engaging overview of my capabilities and achievements.
 
-## What you will learn
+## Features
 
-- Latest Next.js 13 features
-- Next.js App Router
-- Next.js Server Actions
-- Client & Server Components
-- TypeScript (Beginner & Intermediate)
+- Responsive design for optimal viewing on various devices
+- Light and dark mode for enhanced user experience
+- Smooth animations powered by Framer Motion
+- Interactive timeline displaying professional experience
+- Detailed project showcases with descriptions, tags, and images
+- Skills section highlighting technical expertise
+- Achievements and certifications gallery
+- Mentorship experiences from industry simulations
+- Contact form for easy communication, powered by React Email and Resend
+
+## Technologies Used
+
+- Next.js 13 (App Router & Server Actions)
+- TypeScript
 - Tailwind CSS
-- Context API
-- Advanced Animations with Framer Motion
-- React.Email & Resend
-- Custom React hooks
-- Fresh, modern UI design
-- Light & Dark mode
-- Responsive website
+- Framer Motion
+- React Email & Resend
+- Vercel hosting
 
-## Important
+## Getting Started
 
-If you want to be a professional developer, you have to know the fundamentals like JavaScript and CSS really well. I highly recommend you go through my [Professional JavaScript](https://bytegrad.com/courses/professional-javascript) and [Professional CSS](https://bytegrad.com/courses/professional-css) courses.
+1. Clone the repository
+2. Install dependencies with `npm install`
+3. Add your RESEND_API_KEY in the .env.local file
+4. Update the "to" email in the send-email.ts action file
+5. Run the development server with `npm run dev`
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-I'm close to releasing a complete React & Next.js course. Get on the email list to receive early-bird pricing: [link](https://email.bytegrad.com/).
+## Deployment
 
-## Setup
+This website will be deployed on vercel
 
-1. Add RESEND_API_KEY environment variable in .env.local
-2. In the send-email.ts action file, change the "to" email to your own email
+## Contact
+
+Feel free to reach out to me at [a.alholaiel@gmail.com](mailto:a.alholaiel@gmail.com) or through the contact form on the website. I'm always open to new opportunities and collaborations!
+
+Thank you for visiting my portfolio. I hope you find it informative and engaging!
