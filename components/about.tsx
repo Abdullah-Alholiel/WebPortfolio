@@ -2,32 +2,34 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from '@/context/theme-context'; // Import useTheme to access the current theme
 
 const AboutMe = () => {
+  const { theme } = useTheme(); // Use the theme context
   const containerVariants = {
     initial: { opacity: 0, y: 50 },
     animate: {
       opacity: 1,
       y: 0,
-      transition: { delay: 2, duration: 1.5 }
+      transition: { delay: 0, duration: 0 }
     }
   };
 
-  const highlightStyle = "text-indigo-600 dark:text-indigo-400 font-semibold";
+  const highlightStyle = `text-indigo-600 ${theme === 'dark' ? 'dark:text-indigo-400' : ''} font-semibold`;
 
   return (
     <motion.section
-      className="py-10 px-5 text-gray-800 dark:text-gray-200"
+      className={`py-10 px-6 `}
       variants={containerVariants}
       initial="initial"
       animate="animate"
     >
-      <div className="max-w-4xl mx-auto rounded-xl p-10  bg-white shadow-lg text-center">
+      <div className={`max-w-4xl mx-auto rounded-xl p-10 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-lg text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
         <motion.h1
           className="text-4xl font-bold mb-6"
-          initial={{ scale: 0.95 }}
+          initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 4 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0 }}
         >
           About Me
         </motion.h1>
@@ -35,7 +37,7 @@ const AboutMe = () => {
           className="text-lg leading-relaxed"
           initial={{ x: -100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 4.5, duration: 0.7 }}
+          transition={{ delay: 0, duration: 0 }}
         >
           I'm <span className={highlightStyle}>Abdullah Alholaiel</span>, an <span className={highlightStyle}>innovative Digital Strategist, Consultant and System Developer</span> with a proven track record in leading digital transformation projects, enhancing operational efficiency, and driving revenue growth across diverse sectors. My background spans <span className={highlightStyle}>Aerospace Engineering and a Master's in Applied Computing</span>, providing me with a unique blend of technical expertise and problem-solving abilities.
         </motion.p>
@@ -43,7 +45,7 @@ const AboutMe = () => {
           className="text-lg leading-relaxed mt-4"
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 4.7, duration: 0.7 }}
+          transition={{ delay: 0, duration: 0 }}
         >
           Leveraging skills in <span className={highlightStyle}>software development, cloud computing, and data analytics</span>, I build and implement solutions that optimize business operations and drive growth. I value collaboration and am eager to tackle complex challenges, learn new skills, and advance technology.
         </motion.p>

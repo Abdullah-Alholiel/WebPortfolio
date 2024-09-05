@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { achievementsData } from '@/lib/data';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useTheme } from '@/context/theme-context'; // Import useTheme to access the current theme
 
 const AchievementCard = ({ title, description, Icon, certificateUrl }: typeof achievementsData[number]) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const { theme } = useTheme(); // Use the theme context
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -24,7 +26,7 @@ const AchievementCard = ({ title, description, Icon, certificateUrl }: typeof ac
 
   return (
     <motion.div
-      className="rounded-lg p-8 bg-white shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105 cursor-pointer"
+      className={`rounded-lg p-8 ${theme === 'dark' ? 'bg-gray-800' : 'bg-transparent'} shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105 cursor-pointer`}
       initial={{ opacity: 0, scale: 0.9 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
@@ -43,11 +45,11 @@ const AchievementCard = ({ title, description, Icon, certificateUrl }: typeof ac
       >
         <Icon className="text-5xl text-blue-500 transition-transform duration-500 group-hover:rotate-12" />
         <div className="text-center">
-          <h3 className="text-2xl font-bold text-gray-800 mb-2">{title}</h3>
-          <p className="text-base text-gray-600">{description}</p>
+          <h3 className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'} mb-2`}>{title}</h3>
+          <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{description}</p>
         </div>
         {showTooltip && (
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-800 text-white text-sm px-2 py-1 rounded-md">
+          <div className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-800'} text-white text-sm px-2 py-1 rounded-md`}>
             Click to show Certificate
           </div>
         )}

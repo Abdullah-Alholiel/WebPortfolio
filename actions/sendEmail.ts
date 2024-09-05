@@ -11,7 +11,7 @@ export const sendEmail = async (formData: FormData) => {
   const senderEmail = formData.get("senderEmail");
   const message = formData.get("message");
 
-  // simple server-side validation
+  // Validation
   if (!validateString(senderEmail, 500)) {
     return {
       error: "Invalid sender email",
@@ -27,8 +27,8 @@ export const sendEmail = async (formData: FormData) => {
   try {
     data = await resend.emails.send({
       from: "Contact Form <onboarding@resend.dev>",
-      to: "bytegrad@gmail.com",
-      subject: "Message from contact form",
+      to: "albertcatsby@gmail.com", // Make sure this is correct
+      subject: "Message from WebPortfolio contact form",
       reply_to: senderEmail,
       react: React.createElement(ContactFormEmail, {
         message: message,
@@ -36,6 +36,7 @@ export const sendEmail = async (formData: FormData) => {
       }),
     });
   } catch (error: unknown) {
+    console.log("Error sending email:", error); // Log the error for debugging
     return {
       error: getErrorMessage(error),
     };
