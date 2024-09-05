@@ -1,6 +1,6 @@
 import React from "react";
 import { CgWorkAlt } from "react-icons/cg";
-import { FaReact, FaCloud, FaDatabase, FaCode, FaBrain, FaLightbulb, FaBalanceScale, FaPaperPlane, FaSitemap, FaTruck } from "react-icons/fa";
+import { FaReact, FaCloud, FaDatabase, FaCode, FaBrain, FaLightbulb, FaBalanceScale, FaPaperPlane, FaSitemap, FaTruck, FaChalkboardTeacher } from "react-icons/fa";
 import cloudOfThingsImg from "@/public/cloud-of-things.png";
 import digitalMigrationImg from "@/public/digital-migration.png";
 import azureHybridImg from "@/public/azure-hybrid.jpeg";
@@ -36,6 +36,14 @@ export const links = [
 ] as const;
 
 export const experiencesData = [
+  {
+    title: "AI Tutor",
+    location: "Remote, Freelance, UK",
+    description:
+      "Served as an AI Tutor for Outlier AI and DataAnnotation, providing human evaluation of AI-generated responses for task-based improvements in LLM (Large Language Models) performance. Responsibilities included evaluating response verbosity, relevance, and accuracy, and providing detailed human feedback to enhance chatbot and specialized LLM models for targeted applications. Played a key role in refining LLM responses for better alignment with specific business needs and user expectations, contributing to the iterative improvement of AI models deployed in customer-facing applications.",
+    icon: React.createElement(FaBrain),
+    date: "01/2024 - Present",
+  },
   {
     title: "Digital Strategist",
     location: "EndUp, Manchester, UK",
