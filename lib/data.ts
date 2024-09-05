@@ -40,7 +40,7 @@ export const experiencesData = [
     title: "AI Tutor",
     location: "Remote, Freelance, UK",
     description:
-      "Served as an AI Tutor for Outlier AI and DataAnnotation, providing human evaluation of AI-generated responses for task-based improvements in LLM (Large Language Models) performance. Responsibilities included evaluating response verbosity, relevance, and accuracy, and providing detailed human feedback to enhance chatbot and specialized LLM models for targeted applications. Played a key role in refining LLM responses for better alignment with specific business needs and user expectations, contributing to the iterative improvement of AI models deployed in customer-facing applications.",
+      "Reviewed AI-generated responses for Outlier AI and DataAnnotation to enhance LLM performance. Delivered feedback on accuracy, relevance, and verbosity, helping refine chatbot models and improve user interactions.",
     icon: React.createElement(FaBrain),
     date: "01/2024 - Present",
   },
