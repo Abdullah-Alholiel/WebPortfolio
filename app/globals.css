@@ -14,7 +14,6 @@ html.dark {
   @apply border border-black/10;
 }
 
-
 .progress-bar {
   position: fixed;
   top: 0;
@@ -24,4 +23,10 @@ html.dark {
   background: #c8a2c8; /* Light purple color */
   transform-origin: 0%;
   z-index: 9999;
+}
+
+/* Added to maintain aspect ratio for images with modified width or height */
+img {
+  width: auto;
+  height: auto;
 }
