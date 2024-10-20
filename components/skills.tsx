@@ -24,8 +24,8 @@ const fadeInAnimationVariants = {
     },
   }),
   whileHover: {
-    scale: 2,
-    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+    scale: 1.05,
+    boxShadow: "0px 6px 15px rgba(0, 0, 0, 0.15)",
     transition: {
       duration: 0.2,
       ease: "easeInOut",
@@ -47,35 +47,43 @@ export default function Skills() {
       className="mb-20 max-w-[53rem] scroll-mt-20 text-center sm:mb-8"
     >
       <SectionHeading>Skills</SectionHeading>
-      <motion.ul 
-        className="flex flex-wrap justify-center gap-4 text-sm text-gray-800"
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true }}
-      >
-        {skillsData.map((skill, index) => (
-          <motion.li
-            className="bg-white borderBlack rounded-lg px-4 py-2 dark:bg-white/10 dark:text-white/80 cursor-pointer shadow-md"
-            key={index}
-            variants={fadeInAnimationVariants}
-            custom={index}
-            whileHover="whileHover"
-            whileTap="whileTap"
-            transition={{
-              type: "spring",
-              stiffness: 400,
-              damping: 20,
-            }}
+      {Object.entries(skillsData).map(([category, skills], index) => (
+        <div key={index} className="mb-10">
+          {/* Skill Category Header */}
+          <h3 className="text-lg font-semibold text-gray-600 mb-4">
+            {category}
+          </h3>
+          <motion.ul 
+            className="flex flex-wrap justify-center gap-4 text-sm text-gray-800"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
           >
-            <motion.span
-              className="inline-block"
-              whileHover={{ scale: 1.1 }}
-            >
-              {skill}
-            </motion.span>
-          </motion.li>
-        ))}
-      </motion.ul>
+            {skills.map((skill, skillIndex) => (
+              <motion.li
+                className="bg-white borderBlack rounded-lg px-4 py-2 dark:bg-white/10 dark:text-white/80 cursor-pointer shadow-md"
+                key={skillIndex}
+                variants={fadeInAnimationVariants}
+                custom={skillIndex}
+                whileHover="whileHover"
+                whileTap="whileTap"
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 20,
+                }}
+              >
+                <motion.span
+                  className="inline-block"
+                  whileHover={{ scale: 1 }}
+                >
+                  {skill}
+                </motion.span>
+              </motion.li>
+            ))}
+          </motion.ul>
+        </div>
+      ))}
     </section>
   );
 }
