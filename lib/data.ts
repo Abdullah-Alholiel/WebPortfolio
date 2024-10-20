@@ -37,7 +37,7 @@ export const links = [
 
 export const experiencesData = [
   {
-    title: "AI Tutor",
+    title: "AI Feedback Evalutator",
     location: "Remote, Freelance, UK",
     description:
       "Reviewed AI-generated responses for Outlier AI and DataAnnotation to enhance LLM performance. Delivered feedback on accuracy, relevance, and verbosity, helping refine chatbot models and improve user interactions.",
@@ -125,19 +125,32 @@ tags: ["HTML", "CSS", "Digital Marketing", "Shopify", "E-commerce", "SEO", "Soci
   },
 ] as const;
 
-export const skillsData = [
-  "C#", ".NET", "Java", "JavaScript", "Python", "TypeScript",
-  "MongoDB", "MySQL", "SQL", "Node.js", "Express", "React",
-  "Vue", "Redux", "jQuery", "NoSQL", "Git", "OOP", "Django",
-  "Flask", "PHP", "HTML/CSS", "RESTful API", "Azure",
-  "Cloud Computing", "AWS", "GCP", "Microservices",
-  "CI/CD Pipelines", "DevOps", "Edge Computing", "GitHub Actions",
-  "Serverless Functions", "Unit Testing", "Hybrid Solutions",
-  "NumPy", "Pandas", "Scikit-learn", "MATLAB", "R",
-  "Power BI", "Tableau", "Google Big Query", "Agile", "Six Sigma",
-  "Jira", "Trello", "Microsoft 365", "Notion", "CFD", "Creo CAD",
-  "Matplotlib"
-] as const;
+  export const skillsData = {
+    "Programming Languages & Frameworks": [
+      "C#", ".NET (Core, MVC, Entity Framework)", "Java", "JavaScript", "Python", "TypeScript",
+      "MongoDB", "MySQL (SQL)", "Node.js", "Express", "React", "Vue", "Redux", "jQuery", 
+      "NoSQL", "GraphQL", "Graph Databases", "Git", "OOP", "Design Patterns", "Django", 
+      "Flask", "PHP", "HTML5/CSS3", "RESTful API", "tRPC", "SOAP"
+    ],
+    "Cloud Computing & Services": [
+      "Azure (Functions, Cosmos DB, Logic Apps)", "AWS (S3, EC2, Lambda)", 
+      "GCP (Cloud Functions, Firestore)", "Microservices", 
+      "CI/CD Pipelines (GitHub Actions, Jenkins, Docker)", "DevOps", "Kubernetes", 
+      "Terraform", "Edge Computing", "Serverless Functions", 
+      "Unit Testing", "Integration Testing", "Hybrid Solutions", 
+      "Monitoring & Logging"
+    ],
+    "Machine Learning, Project Management, Data Analysis & Visualization": [
+      "NumPy", "Pandas", "Scikit-learn", "MATLAB", "R", "Power BI", 
+      "Tableau", "Google Big Query", "Agile", "Scrum", "Kanban", 
+      "Six Sigma", "Lean", "Jira", "Trello", "Asana", 
+      "Microsoft 365 (Excel, PowerPoint, Word)", "Data Analysis", 
+      "Data Modeling", "Data Visualization", "Dashboard Design", 
+      "Machine Learning Algorithms (Regression, Classification, Clustering)", 
+      "Deep Learning (TensorFlow, Keras, PyTorch)", 
+      "Natural Language Processing (NLP)", "Retrieval Augmented Generation (RAG)"
+    ]
+  } as const;
 
 export const achievementsData = [
   {
