@@ -90,11 +90,11 @@ export default function Intro() {
         </Link>
 
         <a
-          href="/Abdullah_Alholaiel_CV_Saudi.pdf"
-          download
+          href="https://drive.google.com/file/d/1eD9Z4_MewaOIhF9E1CceTKgTWHmKKe9x/view?usp=sharing" // Replace with your actual hosted CV URL
+          target="_blank"  // Opens in new tab instead of downloading
           className="group bg-white-900 px-8 py-4 flex items-center gap-3 rounded-full outline-none focus:scale-110 hover:scale-110 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10"
         >
-          Download CV
+          View CV
           <HiDownload className="opacity-60 group-hover:translate-y-1 transition" />
         </a>
 
