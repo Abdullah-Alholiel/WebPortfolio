@@ -1,12 +1,14 @@
 import React from "react";
 import { CgWorkAlt } from "react-icons/cg";
-import { FaReact, FaCloud, FaDatabase, FaCode, FaBrain, FaLightbulb, FaBalanceScale, FaPaperPlane, FaSitemap, FaTruck, FaChalkboardTeacher } from "react-icons/fa";
+import { FaReact, FaCloud, FaDatabase, FaCode, FaBrain, FaLightbulb, FaBalanceScale, FaPaperPlane, FaSitemap, FaTruck, FaChalkboardTeacher, FaGamepad, FaRobot, FaMapMarkedAlt } from "react-icons/fa";
 import cloudOfThingsImg from "@/public/cloud-of-things.png";
 import digitalMigrationImg from "@/public/digital-migration.png";
 import azureHybridImg from "@/public/azure-hybrid.jpeg";
-import ecommerceImg from "@/public/ecommerce.png"; // Ensure correct path
+import ecommerceImg from "@/public/ecommerce.png";
 import electricaircraftImg from "@/public/electric-aircraft-img.png";
-
+import aiTriviaGameImg from "@/public/ai-trivia-game.png";
+import aiAgencyImg from "@/public/ai-agency.png";
+import rideHailingImg from "@/public/ride-hailing-app.png";
 
 export const links = [
   {
@@ -37,10 +39,10 @@ export const links = [
 
 export const experiencesData = [
   {
-    title: "AI Feedback Evalutator",
+    title: "AI Feedback Evaluator",
     location: "Remote, Freelance, UK",
     description:
-      "Reviewed AI-generated responses for Outlier AI and DataAnnotation to enhance LLM performance. Delivered feedback on accuracy, relevance, and verbosity, helping refine chatbot models and improve user interactions.",
+      "Reviewing AI-generated responses for Outlier AI and DataAnnotation to enhance LLM performance. Delivering feedback on accuracy, relevance, and coherence, contributing to the refinement of conversational AI models and improved user experience.",
     icon: React.createElement(FaBrain),
     date: "01/2024 - Present",
   },
@@ -48,15 +50,15 @@ export const experiencesData = [
     title: "Digital Strategist",
     location: "EndUp, Manchester, UK",
     description:
-      "Developed digital strategies that enhanced customer engagement by 25%, drove revenue growth by 30% through e-commerce, partnerships, and subscriptions. Led migration to a hybrid operational model, reducing infrastructure costs by 40%.",
-    icon: React.createElement(CgWorkAlt ),
+      "Developed comprehensive digital strategies that enhanced customer engagement by 25%, drove revenue growth by 30% through optimized e-commerce operations, strategic partnerships, and subscription models. Led migration to a hybrid operational model, reducing infrastructure costs by 40%.",
+    icon: React.createElement(CgWorkAlt),
     date: "01/2023 - 01/2024",
   },
   {
     title: "Digital Consultant",
     location: "CLO, Riyadh, Saudi Arabia",
     description:
-      "Executed digital strategies that increased business outcomes for tourism and F&B sectors. Provided data-driven recommendations and conducted comprehensive market research.",
+      "Executed data-driven digital strategies that increased business outcomes for tourism and F&B sectors. Conducted comprehensive market research and provided actionable recommendations based on analytical insights.",
     icon: React.createElement(CgWorkAlt),
     date: "08/2022 - 01/2023",
   },
@@ -64,7 +66,7 @@ export const experiencesData = [
     title: "Junior System Engineer",
     location: "Novintiq, Cairo, Egypt",
     description:
-      "Enhanced IT infrastructure, led a developer training program improving team productivity by 30%. Designed and implemented cloud solutions that reduced costs by 20% and improved system uptime by 15%.",
+      "Enhanced IT infrastructure reliability, led developer training programs that improved team productivity by 30%. Designed and implemented cloud solutions reducing operational costs by 20% while improving system uptime by 15%.",
     icon: React.createElement(FaCloud),
     date: "06/2021 - 06/2022",
   },
@@ -72,21 +74,42 @@ export const experiencesData = [
     title: "Freelance E-commerce Specialist",
     location: "Self-employed, Liverpool, UK",
     description:
-      "Operated an online store, leveraging digital marketing skills to drive sales, leading to a successful qualification for an E-commerce internship at Gao Tek.",
+      "Operated an online store with comprehensive digital marketing strategy, analytics-driven decision making, and conversion optimization, leading to a successful qualification for an E-commerce internship at Gao Tek.",
     icon: React.createElement(FaTruck),
-      date: "01/2019 - 03/2019",
+    date: "01/2019 - 03/2019",
   },
-  // Additional experience based on earlier roles
   {
     title: "Event Organizer",
     location: "City International Schools, Cairo",
     description:
-      "Spearheaded school events, generating significant profits and enhancing collaboration across schools.",
+      "Spearheaded school events, generating significant profits and enhancing collaboration across school departments through effective project management and stakeholder coordination.",
     icon: React.createElement(FaSitemap),
     date: "05/2016 - 05/2018",
   },
 ] as const;
+
 export const projectsData = [
+  {
+    title: "AI-Powered Trivia Web Game",
+    description:
+      "Developing an engaging trivia game with AI-generated questions, dynamic difficulty adjustment, for a personalized learning paths. Implementing real-time multiplayer features and adaptive content generation.",
+    tags: ["React - Next.js", "Node.js", "LangChain", "OpenAI API", "TypeScript", "CrewAI", "Pydantic", "WebSockets", "Vector DB" ,"Relational DB", "FastAPI", "Cross Data Modelling"],
+    imageUrl: aiTriviaGameImg,
+  },
+  {
+    title: "Multi-Agent AI Agency Platform",
+    description:
+      "Building a platform that orchestrates specialized AI agents for business applications. Creating a system that enables autonomous task execution with human oversight and interagent communication protocols.",
+    tags: ["Python", "CrewAI", "Pydantic", "Vector Databases", "LangChain", "React - Next.js", "TypeScript", "FastAPI", "Docker", "RAG", "LLM", "Embeddings"],
+    imageUrl: aiAgencyImg,
+  },
+  {
+    title: "Ride Hailing Application",
+    description:
+      "Leading the development of mapping and routing algorithms for a ride-hailing service, optimizing driver-passenger matching and implementing efficient path-finding solutions for urban environments.",
+    tags: ["Geospatial Algorithms", "Python", "GraphQL", "Nest.js", "MongoDB", "Docker", "React Native", "AWS", "MapBox API", "Redis", "Microservices"],
+    imageUrl: rideHailingImg,
+  },
   {
     title: "Cloud of Things Solution for Smart Parking Management",
     description:
@@ -97,60 +120,64 @@ export const projectsData = [
   {
     title: "Database and Big Data Modelling for Digital Migration Company",
     description:
-      "Created an optimized ERD schema for digital transformation, enhancing data storage, retrieval, and analysis capabilities.",
-    tags: [ "SQL", "Data Modelling", "ERD", "Big Data", "ETL", "Database Design", "Scalability", "Business Intelligence"],
+      "Created an optimized ERD schema for digital transformation, enhancing data storage, retrieval, and analysis capabilities for enterprise-scale operations.",
+    tags: ["SQL", "Data Modelling", "ERD", "Big Data", "ETL", "Database Design", "Scalability", "Business Intelligence"],
     imageUrl: digitalMigrationImg,
   },
   {
     title: "Cloud-Based Hybrid Migration Software Development using Azure",
     description:
-      "Developed a Django-based web app integrated with Azure services, achieving efficient deployment and governance compliance.",
+      "Developed a Django-based web application integrated with Azure services, achieving efficient deployment and compliance with governance requirements for enterprise clients.",
     tags: ["Python", "Django", "Azure", "Microservices", "DevOps", "Cloud", "Hybrid Migration", "Software Development", "Cloud Security", "Cloud Computing"],
     imageUrl: azureHybridImg,
   },
   {
     title: "E-commerce Store Development",
     description:
-      "Built and managed an online store, applying web development and digital marketing techniques to effectively sell health products.",
-tags: ["HTML", "CSS", "Digital Marketing", "Shopify", "E-commerce", "SEO", "Social Media", "Google Analytics"],
+      "Built and managed an online store, applying web development and digital marketing techniques to effectively market health products with data-driven optimization strategies.",
+    tags: ["HTML", "CSS", "Digital Marketing", "Shopify", "E-commerce", "SEO", "Social Media", "Google Analytics"],
     imageUrl: ecommerceImg,
   },
-  // Bachelor degree projects
   {
     title: "Design and Simulation of a Fully Electric Aircraft",
     description:
-      "Designed and simulated a sustainable, electric aircraft adhering to industry standards, focusing on zero carbon emissions.",
-    tags: ["MATLAB", "Aerospace Engineering", "Hybrid Solutions", "Simulation", "Zero Carbon", "Electric Aircraft", ],
-    imageUrl: electricaircraftImg, // Placeholder path
+      "Designed and simulated a sustainable, electric aircraft adhering to industry standards, focusing on zero carbon emissions and innovative propulsion systems.",
+    tags: ["MATLAB", "Aerospace Engineering", "Hybrid Solutions", "Simulation", "Zero Carbon", "Electric Aircraft"],
+    imageUrl: electricaircraftImg,
   },
 ] as const;
 
-  export const skillsData = {
-    "Programming Languages & Frameworks": [
-      "C#", ".NET (Core, MVC, Entity Framework)", "Java", "JavaScript", "Python", "TypeScript",
-      "MongoDB", "MySQL (SQL)", "Node.js", "Express", "React", "Vue", "Redux", "jQuery", 
-      "NoSQL", "GraphQL", "Graph Databases", "Git", "OOP", "Design Patterns", "Django", 
-      "Flask", "PHP", "HTML5/CSS3", "RESTful API", "tRPC", "SOAP"
-    ],
-    "Cloud Computing & Services": [
-      "Azure (Functions, Cosmos DB, Logic Apps)", "AWS (S3, EC2, Lambda)", 
-      "GCP (Cloud Functions, Firestore)", "Microservices", 
-      "CI/CD Pipelines (GitHub Actions, Jenkins, Docker)", "DevOps", "Kubernetes", 
-      "Terraform", "Edge Computing", "Serverless Functions", 
-      "Unit Testing", "Integration Testing", "Hybrid Solutions", 
-      "Monitoring & Logging"
-    ],
-    "Machine Learning, Project Management, Data Analysis & Visualization": [
-      "NumPy", "Pandas", "Scikit-learn", "MATLAB", "R", "Power BI", 
-      "Tableau", "Google Big Query", "Agile", "Scrum", "Kanban", 
-      "Six Sigma", "Lean", "Jira", "Trello", "Asana", 
-      "Microsoft 365 (Excel, PowerPoint, Word)", "Data Analysis", 
-      "Data Modeling", "Data Visualization", "Dashboard Design", 
-      "Machine Learning Algorithms (Regression, Classification, Clustering)", 
-      "Deep Learning (TensorFlow, Keras, PyTorch)", 
-      "Natural Language Processing (NLP)", "Retrieval Augmented Generation (RAG)"
-    ]
-  } as const;
+export const skillsData = {
+  "Programming Languages & Frameworks": [
+    "C#", ".NET (Core, MVC, Entity Framework)", "Java", "JavaScript", "Python", "TypeScript",
+    "MongoDB", "MySQL (SQL)", "Node.js", "Express", "React", "Vue", "Redux", "jQuery", 
+    "NoSQL", "GraphQL", "Graph Databases", "Git", "OOP", "Design Patterns", "FatsAPI", "Nest.js" ,  "Uvicorn" , "Django", 
+    "Flask", "PHP", "HTML5/CSS3", "RESTful API", "GRPC", "SOAP", "ERD - Cross Data Modelling", "Chakra UI", "Material UI", "Tailwind CSS", "Bootstrap", "SASS", "PASS"
+  ],
+  "AI & Advanced Technologies": [
+    "LangChain","CrewAI", "PhiData", "OpenRouter API", "Langserve", "Pydantic", "OpenAI API", "Vector Databases", "RAG (Retrieval Augmented Generation)",
+    "Embeddings", "Prompt Engineering", "AI Voice Assitants and Chatbots" ,"LLM Fine-tuning", "Multi-agent Systems", "AI Orchestration",
+    , "System Mapping", "Algorithm Optimization", "WebSockets", "Real-time Systems"
+  ],
+  "Cloud Computing & Services": [
+    "Azure (Functions, Cosmos DB, Logic Apps)", "AWS (S3, EC2, Lambda)", 
+    "GCP (Cloud Functions, Firestore)", "Microservices", 
+    "CI/CD Pipelines (GitHub Actions, Jenkins, Docker)", "DevOps", "Kubernetes", 
+    "Terraform", "Edge Computing", "Serverless Functions", 
+    "Unit Testing", "Integration Testing", "Hybrid Solutions", 
+    "Monitoring & Logging"
+  ],
+  "Machine Learning, Project Management, Data Analysis & Visualization": [
+    "NumPy", "Pandas", "Scikit-learn", "MATLAB", "R", "Power BI", 
+    "Tableau", "Google Big Query", "Agile", "Scrum", "Kanban", 
+    "Six Sigma", "Lean", "Jira", "Trello", "Asana", 
+    "Microsoft 365 (Excel, PowerPoint, Word)", "Data Analysis", 
+    "Data Modeling", "Data Visualization", "Dashboard Design", 
+    "Machine Learning Algorithms (Regression, Classification, Clustering)", 
+    "Deep Learning (TensorFlow, Keras, PyTorch)", 
+    "Natural Language Processing (NLP)", "Retrieval Augmented Generation (RAG)"
+  ]
+} as const;
 
 export const achievementsData = [
   {
@@ -171,7 +198,6 @@ export const achievementsData = [
     Icon: FaDatabase,
     certificateUrl: "/ey-technology-consulting-project.png",
   },
-  // Additional achievements and certifications
   {
     title: "Ethics and Law in Data Analytics Certificate",
     description: "Completed course focusing on the ethical and legal aspects of data analytics.",
