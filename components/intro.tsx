@@ -90,7 +90,7 @@ export default function Intro() {
         </Link>
 
         <a
-          href="/Abdullah_Alholaiel_CV.pdf"
+          href="/Abdullah_Alholaiel_CV_Saudi.pdf"
           download
           className="group bg-white-900 px-8 py-4 flex items-center gap-3 rounded-full outline-none focus:scale-110 hover:scale-110 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10"
         >
