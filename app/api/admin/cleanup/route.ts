@@ -16,9 +16,6 @@ function checkAuth(request: NextRequest): boolean {
 
 export async function GET(request: NextRequest) {
   try {
-    // Bypass SSL for corporate networks
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    
     // Only allow cleanup from server-side or admin
     if (!checkAuth(request)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -65,9 +62,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Bypass SSL for corporate networks
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    
     // Only allow cleanup from server-side or admin
     if (!checkAuth(request)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

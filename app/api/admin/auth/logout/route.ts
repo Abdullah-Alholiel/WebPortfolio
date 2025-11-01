@@ -8,9 +8,6 @@ const redis = new Redis({
 
 export async function POST(request: NextRequest) {
   try {
-    // Bypass SSL for corporate networks
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    
     const sessionId = request.cookies.get('admin_session')?.value;
 
     if (sessionId) {
@@ -36,9 +33,6 @@ export async function POST(request: NextRequest) {
 // Helper to check if user is authenticated
 export async function checkAuth(request: NextRequest): Promise<{ authenticated: boolean; email?: string }> {
   try {
-    // Bypass SSL for corporate networks
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    
     const sessionId = request.cookies.get('admin_session')?.value;
 
     if (!sessionId) {

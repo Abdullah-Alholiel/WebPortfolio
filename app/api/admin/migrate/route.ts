@@ -15,9 +15,6 @@ const redis = new Redis({
 
 export async function GET() {
   try {
-    // Temporarily bypass SSL for corporate networks
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    
     console.log('Starting migration...');
     
     const personalInfo = {
