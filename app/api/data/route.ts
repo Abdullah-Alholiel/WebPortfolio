@@ -47,8 +47,8 @@ function sanitizeIcon(icon: any): string {
 /**
  * Sanitizes experiences array to ensure all icons are strings
  */
-function sanitizeExperiences(experiences: any[]): any[] {
-  if (!Array.isArray(experiences)) return [];
+function sanitizeExperiences(experiences: any): any[] {
+  if (!experiences || !Array.isArray(experiences)) return [];
   
   return experiences.map(exp => ({
     ...exp,
@@ -59,8 +59,8 @@ function sanitizeExperiences(experiences: any[]): any[] {
 /**
  * Sanitizes achievements array to ensure all Icons are strings
  */
-function sanitizeAchievements(achievements: any[]): any[] {
-  if (!Array.isArray(achievements)) return [];
+function sanitizeAchievements(achievements: any): any[] {
+  if (!achievements || !Array.isArray(achievements)) return [];
   
   return achievements.map(ach => ({
     ...ach,
@@ -102,8 +102,8 @@ export async function GET() {
 
     // Sanitize data to ensure icons are strings (not React components/objects)
     // This prevents React error #130 when rendering
-    const sanitizedExperiences = sanitizeExperiences(experiences || []);
-    const sanitizedAchievements = sanitizeAchievements(achievements || []);
+    const sanitizedExperiences = sanitizeExperiences(experiences);
+    const sanitizedAchievements = sanitizeAchievements(achievements);
 
     // Return Upstash data with cache headers
     const response = NextResponse.json({
