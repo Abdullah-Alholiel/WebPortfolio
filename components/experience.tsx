@@ -9,18 +9,8 @@ import "react-vertical-timeline-component/style.min.css";
 import { useSectionInView } from "@/lib/hooks";
 import { useTheme } from "@/context/theme-context";
 import { usePortfolioData } from "@/context/portfolio-data-context";
-import { FaAward, FaBrain, FaCloud, FaTruck, FaSitemap } from "react-icons/fa";
-import { CgWorkAlt } from "react-icons/cg";
-
-// Icon mapping - maps icon name strings to React icon components
-const iconMap: Record<string, React.ComponentType> = {
-  FaBrain,
-  FaCloud,
-  FaTruck,
-  FaSitemap,
-  CgWorkAlt,
-  FaAward, // default fallback
-};
+import { getExperienceIcon } from "@/lib/icon-utils";
+import StandardIcon from "./standard-icon";
 
 interface ExperienceItem {
   title: string;
@@ -36,20 +26,15 @@ export default function Experience() {
   const { data, loading: isLoading } = usePortfolioData();
   const experiences: ExperienceItem[] = data.experiences || [];
 
-  // Function to get icon component from item
+  // Function to get icon component from item (for VerticalTimeline which needs the component)
   const getIcon = (item: ExperienceItem) => {
-    // If icon is already a function/component, return it
+    // If icon is already a function/component, return it (for backward compatibility)
     if (typeof item.icon === 'function') {
       return item.icon;
     }
     
-    // If icon is a string, look it up in iconMap
-    if (typeof item.icon === 'string' && iconMap[item.icon]) {
-      return iconMap[item.icon];
-    }
-    
-    // Default to FaAward if no valid icon found
-    return FaAward;
+    // Use the centralized icon utility to get icon from string name
+    return getExperienceIcon(item.icon);
   };
 
   if (isLoading) {
@@ -102,14 +87,26 @@ export default function Experience() {
                     : "0.4rem solid rgba(255, 255, 255, 0.5)",
               }}
               date={item.date || ''}
-              icon={React.createElement(IconComponent)}
+              icon={
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  height: '100%',
+                }}>
+                  <StandardIcon 
+                    icon={item.icon} 
+                    variant="timeline"
+                    className="!text-2xl"
+                  />
+                </div>
+              }
               iconStyle={{
                 background:
                   theme === "light" 
                     ? "#fff" 
                     : "rgba(255, 255, 255, 0.15)",
-                color: theme === "light" ? "#6366f1" : "#a78bfa",
-                fontSize: "1.5rem",
                 width: "60px",
                 height: "60px",
                 display: "flex",

@@ -32,19 +32,50 @@ export async function POST(request: NextRequest) {
     console.log('Email verified. Generating token...');
     // Generate secure token
     const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = Date.now() + 3600000; // 1 hour
+    const expiresAt = Date.now() + 86400000; // 1 day (24 hours)
 
     console.log('Storing token in Redis...');
-    // Store token in Redis with TTL (1 hour = 3600 seconds)
-    await redis.setex(`admin:token:${token}`, 3600, {
+    // Store token in Redis with TTL (1 day = 86400 seconds)
+    await redis.setex(`admin:token:${token}`, 86400, {
       email,
       expiresAt,
     });
-    console.log('Token stored successfully with 1 hour TTL');
+    console.log('Token stored successfully with 1 day TTL');
 
+    // Determine base URL - prefer environment variable, then detect from request, fallback to localhost
+    let baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    
+    // If not set, try to detect from request headers (works automatically in production)
+    if (!baseUrl) {
+      const host = request.headers.get('host') || request.headers.get('x-forwarded-host');
+      
+      if (host) {
+        // Determine protocol based on host and environment
+        let protocol = request.headers.get('x-forwarded-proto');
+        
+        // If no protocol header, determine based on host and environment
+        if (!protocol) {
+          // Check if host is localhost or 127.0.0.1 (development)
+          const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1') || host.startsWith('localhost:');
+          
+          // Use http for localhost, https for production
+          protocol = isLocalhost ? 'http' : 'https';
+        }
+        
+        baseUrl = `${protocol}://${host}`;
+      } else {
+        // Fallback to localhost for development
+        baseUrl = 'http://localhost:3000';
+      }
+    }
+    
+    // Ensure baseUrl doesn't end with a slash
+    baseUrl = baseUrl.replace(/\/$/, '');
+    
     // Send magic link email
-    const magicLink = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/verify?token=${token}`;
+    const magicLink = `${baseUrl}/admin/verify?token=${token}`;
     console.log('Magic link:', magicLink);
+    console.log('Base URL:', baseUrl);
     console.log('Sending email to:', email);
     
     try {
@@ -60,7 +91,7 @@ export async function POST(request: NextRequest) {
               Login to Admin
             </a>
             <p style="color: #666; font-size: 12px; margin-top: 30px;">
-              This link will expire in 1 hour.
+              This link will expire in 24 hours.
             </p>
           </div>
         `,

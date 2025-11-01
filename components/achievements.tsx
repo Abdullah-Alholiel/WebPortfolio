@@ -4,11 +4,12 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '@/context/theme-context';
 import { usePortfolioData } from '@/context/portfolio-data-context';
+import StandardIcon from './standard-icon';
 
 interface Achievement {
   title: string;
   description: string;
-  Icon?: any;
+  Icon?: string | any; // Can be string (icon name) or React component (for backward compatibility)
   certificateUrl: string;
 }
 
@@ -50,7 +51,13 @@ const AchievementCard = ({ title, description, Icon, certificateUrl }: Achieveme
         animate={{ scale: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {Icon && <Icon className="text-5xl text-blue-500 transition-transform duration-500 group-hover:rotate-12" />}
+        {Icon && (
+          <StandardIcon 
+            icon={Icon} 
+            variant="card"
+            className="group-hover:rotate-12"
+          />
+        )}
         <div className="text-center">
           <h3 className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'} mb-2`}>{title}</h3>
           <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{description}</p>

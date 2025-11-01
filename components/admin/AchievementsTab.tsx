@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
+import { getIconOptionsForSelect } from '@/lib/icon-utils';
+import StandardIcon from '@/components/standard-icon';
 
 interface Achievement {
   title: string;
   description: string;
+  Icon?: string;
   certificateUrl: string;
 }
 
@@ -13,11 +16,25 @@ export default function AchievementsTab() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | string | null>(null);
+  const [iconSearch, setIconSearch] = useState('');
   const [formData, setFormData] = useState<Achievement>({
     title: '',
     description: '',
+    Icon: 'FaAward',
     certificateUrl: '',
   });
+
+  // Get all icon options and filter by search
+  const iconOptions = useMemo(() => {
+    const allOptions = getIconOptionsForSelect();
+    if (!iconSearch) return allOptions.slice(0, 100); // Show first 100 by default
+    
+    const searchLower = iconSearch.toLowerCase();
+    return allOptions.filter(opt => 
+      opt.value.toLowerCase().includes(searchLower) || 
+      opt.label.toLowerCase().includes(searchLower)
+    ).slice(0, 100);
+  }, [iconSearch]);
 
   useEffect(() => {
     loadAchievements();
@@ -114,7 +131,8 @@ export default function AchievementsTab() {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', certificateUrl: '' });
+    setFormData({ title: '', description: '', Icon: 'FaAward', certificateUrl: '' });
+    setIconSearch('');
     setEditing(null);
   };
 
@@ -154,6 +172,34 @@ export default function AchievementsTab() {
               rows={3}
               required
             />
+            <div>
+              <label className="block text-sm font-medium mb-2">Icon</label>
+              <input
+                type="text"
+                placeholder="Search icons..."
+                value={iconSearch}
+                onChange={(e) => setIconSearch(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 mb-2"
+              />
+              <select
+                value={formData.Icon || 'FaAward'}
+                onChange={(e) => setFormData({ ...formData, Icon: e.target.value })}
+                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+                size={Math.min(iconOptions.length, 10)}
+              >
+                {iconOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {formData.Icon && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Preview:</span>
+                  <StandardIcon icon={formData.Icon} variant="card" />
+                </div>
+              )}
+            </div>
             <input
               type="text"
               value={formData.certificateUrl}

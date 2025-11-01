@@ -23,16 +23,59 @@ const defaultPersonalInfo = {
  */
 export function getFallbackData() {
   // Convert icon components to string format for experiences
-  const formattedExperiences = experiencesData.map(exp => ({
-    ...exp,
-    icon: typeof exp.icon === 'function' ? exp.icon.toString() : exp.icon,
-  }));
+  // exp.icon is a React element (object) from React.createElement, not a function
+  // We need to extract the component name or convert to a serializable format
+  const formattedExperiences = experiencesData.map(exp => {
+    let iconValue: string = 'FaAward'; // default fallback
+    
+    if (typeof exp.icon === 'string') {
+      // Already a string, use it
+      iconValue = exp.icon;
+    } else if (exp.icon && typeof exp.icon === 'object' && 'type' in exp.icon) {
+      // React element - extract component name from type
+      const elementType = (exp.icon as any).type;
+      if (typeof elementType === 'function') {
+        // Component function - get its name
+        iconValue = elementType.name || 'FaAward';
+      } else if (elementType && typeof elementType === 'object' && elementType.displayName) {
+        // Component with displayName
+        iconValue = elementType.displayName;
+      } else {
+        // Fallback to string conversion
+        iconValue = String(elementType || 'FaAward');
+      }
+    } else if (exp.icon) {
+      // Some other type, try to convert
+      iconValue = String(exp.icon);
+    }
+    
+    return {
+      ...exp,
+      icon: iconValue,
+    };
+  });
 
   // Format achievements to match API structure
-  const formattedAchievements = achievementsData.map(ach => ({
-    ...ach,
-    Icon: typeof ach.Icon === 'function' ? ach.Icon.toString() : ach.Icon,
-  }));
+  // ach.Icon is a React component (function), convert to component name string
+  const formattedAchievements = achievementsData.map(ach => {
+    let iconValue: string = 'FaAward'; // default fallback
+    
+    if (typeof ach.Icon === 'function') {
+      // React component function - get its name
+      iconValue = ach.Icon.name || 'FaAward';
+    } else if (typeof ach.Icon === 'string') {
+      // Already a string, use it
+      iconValue = ach.Icon;
+    } else if (ach.Icon) {
+      // Some other type, try to convert
+      iconValue = String(ach.Icon);
+    }
+    
+    return {
+      ...ach,
+      Icon: iconValue,
+    };
+  });
 
   return {
     personal: defaultPersonalInfo,
