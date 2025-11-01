@@ -9,9 +9,6 @@ const redis = new Redis({
 
 export async function POST(request: NextRequest) {
   try {
-    // Bypass SSL for corporate networks
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    
     console.log('Verify token called');
     const { token } = await request.json();
     console.log('Token received:', token);

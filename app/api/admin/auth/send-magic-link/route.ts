@@ -13,9 +13,6 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
 
 export async function POST(request: NextRequest) {
   try {
-    // Bypass SSL for corporate networks
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    
     const { email } = await request.json();
     console.log('Received email:', email);
     console.log('ADMIN_EMAIL env:', ADMIN_EMAIL);

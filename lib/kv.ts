@@ -1,7 +1,9 @@
 import { Redis } from '@upstash/redis';
 
-// Bypass SSL for corporate networks
-if (typeof process !== 'undefined') {
+// Only bypass SSL in development if explicitly needed (e.g., corporate proxy)
+// Set ALLOW_INSECURE_TLS=true in .env.local if you encounter SSL certificate errors
+// NEVER set this in production - it's a security risk!
+if (process.env.NODE_ENV === 'development' && process.env.ALLOW_INSECURE_TLS === 'true') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
