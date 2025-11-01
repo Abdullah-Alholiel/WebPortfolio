@@ -1,11 +1,18 @@
 // Achievements.jsx
 import React, { useState, useEffect } from 'react';
-import { achievementsData } from '@/lib/data';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useTheme } from '@/context/theme-context'; // Import useTheme to access the current theme
+import { useTheme } from '@/context/theme-context';
+import { usePortfolioData } from '@/context/portfolio-data-context';
 
-const AchievementCard = ({ title, description, Icon, certificateUrl }: typeof achievementsData[number]) => {
+interface Achievement {
+  title: string;
+  description: string;
+  Icon?: any;
+  certificateUrl: string;
+}
+
+const AchievementCard = ({ title, description, Icon, certificateUrl }: Achievement) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const { theme } = useTheme(); // Use the theme context
@@ -43,7 +50,7 @@ const AchievementCard = ({ title, description, Icon, certificateUrl }: typeof ac
         animate={{ scale: 1 }}
         transition={{ duration: 0.3 }}
       >
-        <Icon className="text-5xl text-blue-500 transition-transform duration-500 group-hover:rotate-12" />
+        {Icon && <Icon className="text-5xl text-blue-500 transition-transform duration-500 group-hover:rotate-12" />}
         <div className="text-center">
           <h3 className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'} mb-2`}>{title}</h3>
           <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{description}</p>
@@ -69,14 +76,16 @@ const AchievementCard = ({ title, description, Icon, certificateUrl }: typeof ac
 };
 
 export default function Achievements() {
+  const { data, loading: isLoading } = usePortfolioData();
+  const achievements = data.achievements || [];
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? achievementsData.length - 2 : prevIndex - 2));
+    setCurrentIndex((prevIndex) => (prevIndex === 0 ? achievements.length - 2 : prevIndex - 2));
   };
 
   const goToNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex >= achievementsData.length - 2 ? 0 : prevIndex + 2));
+    setCurrentIndex((prevIndex) => (prevIndex >= achievements.length - 2 ? 0 : prevIndex + 2));
   };
 
   const cardVariants = {
@@ -92,16 +101,20 @@ export default function Achievements() {
         <div className="relative">
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 gap-8"
-            key={`${achievementsData[currentIndex]?.title}-${achievementsData[currentIndex + 1]?.title}`}
+            key={`${achievements[currentIndex]?.title}-${achievements[currentIndex + 1]?.title}`}
             variants={cardVariants}
             initial="initial"
             animate="animate"
             exit="exit"
             transition={{ duration: 0.5 }}
           >
-            <AchievementCard {...achievementsData[currentIndex]} />
-            {achievementsData[currentIndex + 1] && (
-              <AchievementCard {...achievementsData[currentIndex + 1]} />
+            {!isLoading && achievements[currentIndex] && (
+              <>
+                <AchievementCard {...achievements[currentIndex]} />
+                {achievements[currentIndex + 1] && (
+                  <AchievementCard {...achievements[currentIndex + 1]} />
+                )}
+              </>
             )}
           </motion.div>
           <button

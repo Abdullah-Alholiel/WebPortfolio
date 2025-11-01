@@ -7,6 +7,7 @@ import ActiveSectionContextProvider from "@/context/active-section-context";
 import Footer from "@/components/footer";
 import ThemeSwitch from "@/components/theme-switch";
 import ThemeContextProvider from "@/context/theme-context";
+import { PortfolioDataProvider } from "@/context/portfolio-data-context";
 import { Toaster } from "react-hot-toast";
 import ScrollProgressBar from "@/components/scroll-progress-bar";
 
@@ -31,14 +32,16 @@ export default function RootLayout({
         <ScrollProgressBar />
         
         <ThemeContextProvider>
-          <ActiveSectionContextProvider>
-            <Header />
-            {children}
-            <Footer />
+          <PortfolioDataProvider>
+            <ActiveSectionContextProvider>
+              <Header />
+              {children}
+              <Footer />
 
-            <Toaster position="top-right" />
-            <ThemeSwitch />
-          </ActiveSectionContextProvider>
+              <Toaster position="top-right" />
+              <ThemeSwitch />
+            </ActiveSectionContextProvider>
+          </PortfolioDataProvider>
         </ThemeContextProvider>
       </body>
     </html>

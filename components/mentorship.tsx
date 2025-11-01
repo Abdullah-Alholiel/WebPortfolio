@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import { mentorshipData } from '@/lib/data';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useTheme } from '@/context/theme-context'; // Import useTheme to access the current theme
+import { useTheme } from '@/context/theme-context';
+import { usePortfolioData } from '@/context/portfolio-data-context';
 
-const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl }: typeof mentorshipData[number]) => {
+interface MentorshipItem {
+  title: string;
+  description: string;
+  icon: string;
+  imageUrl: string;
+  certificateUrl: string;
+}
+
+const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl }: MentorshipItem) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const { theme } = useTheme(); // Use the theme context
@@ -82,13 +90,27 @@ const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl }: 
 };
 
 export default function Mentorship() {
+  const { data, loading: isLoading } = usePortfolioData();
+  const mentorship = data.mentorship || [];
+
+  if (isLoading) {
+    return (
+      <section className="py-20">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-10">Mentorship Experiences</h2>
+          <div className="text-center">Loading...</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-20">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-10">Mentorship Experiences</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mentorshipData.map((mentorship) => (
-            <MentorshipCard key={mentorship.title} {...mentorship} />
+          {mentorship.map((item) => (
+            <MentorshipCard key={item.title} {...item} />
           ))}
         </div>
       </div>
