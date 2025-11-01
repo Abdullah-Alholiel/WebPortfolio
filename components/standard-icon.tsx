@@ -71,8 +71,28 @@ export default function StandardIcon({
   if (typeof icon === 'string') {
     // Get icon by name from the icon utility
     IconComponent = getIcon(icon);
-  } else {
+  } else if (typeof icon === 'function') {
+    // Direct React component function
     IconComponent = icon;
+  } else if (typeof icon === 'object' && icon !== null) {
+    // If it's an object (React element or serialized component), try to extract string name
+    // This prevents React error #130 (Objects are not valid as a React child)
+    let iconName = 'FaAward'; // default fallback
+    
+    if ('type' in icon && icon.type) {
+      const elementType = icon.type;
+      if (typeof elementType === 'function') {
+        iconName = elementType.name || 'FaAward';
+      } else if (typeof elementType === 'string') {
+        iconName = elementType;
+      }
+    }
+    
+    // Use the extracted name to get the icon component
+    IconComponent = getIcon(iconName);
+  } else {
+    // Fallback: try to convert to string and get icon
+    IconComponent = getIcon(String(icon));
   }
 
   // Determine size based on variant or explicit size prop

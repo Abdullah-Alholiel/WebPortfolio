@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Redis } from '@upstash/redis';
+import { getRedis } from '@/lib/kv';
 import {
   projectsData,
   experiencesData,
@@ -8,10 +8,7 @@ import {
   mentorshipData,
 } from '@/lib/data';
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || '',
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-});
+const redis = getRedis();
 
 export async function GET() {
   try {
