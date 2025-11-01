@@ -13,6 +13,14 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
 });
 
+/**
+ * Get the Redis client instance
+ * Use this instead of creating new Redis instances to ensure SSL bypass is configured
+ */
+export function getRedis() {
+  return redis;
+}
+
 // Data structure keys
 export const KV_KEYS = {
   PROJECTS: 'portfolio:projects',

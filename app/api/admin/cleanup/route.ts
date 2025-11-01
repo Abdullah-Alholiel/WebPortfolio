@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Redis } from '@upstash/redis';
-import { listKeys, deleteKVData } from '@/lib/kv';
+import { getRedis, listKeys, deleteKVData } from '@/lib/kv';
 import { cleanupOldTokens } from '@/lib/admin-utils';
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || '',
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-});
+const redis = getRedis();
 
 // Helper function to check authorization
 function checkAuth(request: NextRequest): boolean {
