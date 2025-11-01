@@ -2,19 +2,31 @@
 
 import React from "react";
 import SectionHeading from "./section-heading";
-import { projectsData } from "@/lib/data";
 import Project from "./project";
 import { useSectionInView } from "@/lib/hooks";
+import { usePortfolioData } from "@/context/portfolio-data-context";
 
 export default function Projects() {
   const { ref } = useSectionInView("Projects", 0.5);
+  const { data, loading: isLoading } = usePortfolioData();
+  const projects = data.projects || [];
+  // Projects are already in newest-first order from API (prepended)
+
+  if (isLoading) {
+    return (
+      <section ref={ref} id="projects" className="scroll-mt-28 mb-28">
+        <SectionHeading>My projects</SectionHeading>
+        <div className="text-center">Loading...</div>
+      </section>
+    );
+  }
 
   return (
     <section ref={ref} id="projects" className="scroll-mt-28 mb-28">
       <SectionHeading>My projects</SectionHeading>
       <div>
-        {projectsData.map((project, index) => (
-          <React.Fragment key={index}>
+        {projects.map((project, index) => (
+          <React.Fragment key={project.title || index}>
             <Project {...project} />
           </React.Fragment>
         ))}

@@ -30,3 +30,83 @@ img {
   width: auto;
   height: auto;
 }
+
+/* Vertical Timeline Customizations */
+.vertical-timeline-element-content {
+  box-shadow: 0 3px 0 #e5e7eb;
+}
+
+.vertical-timeline::before {
+  background: var(--line-color);
+}
+
+.vertical-timeline-element-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.vertical-timeline-element-icon-centered {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.vertical-timeline-element-icon-centered > * {
+  margin: auto;
+}
+
+/* Blob Animation for Background Elements */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Subtle typing animation for greeting */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: rgb(79, 70, 229); /* indigo-600 */
+  }
+}
+
+.typing-animation {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 0.15em solid rgb(79, 70, 229);
+  animation: typing 2s steps(30, end), blink-caret 0.75s step-end infinite;
+}
