@@ -79,8 +79,9 @@ export default function StandardIcon({
     // This prevents React error #130 (Objects are not valid as a React child)
     let iconName = 'FaAward'; // default fallback
     
-    if ('type' in icon && icon.type) {
-      const elementType = icon.type;
+    const iconObj = icon as Record<string, any>;
+    if ('type' in iconObj && iconObj.type) {
+      const elementType = iconObj.type;
       if (typeof elementType === 'function') {
         iconName = elementType.name || 'FaAward';
       } else if (typeof elementType === 'string') {
