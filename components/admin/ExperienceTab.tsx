@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
+import { getIconOptionsForSelect } from '@/lib/icon-utils';
+import StandardIcon from '@/components/standard-icon';
 
 interface Experience {
   title: string;
@@ -15,6 +17,7 @@ export default function ExperienceTab() {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | string | null>(null);
+  const [iconSearch, setIconSearch] = useState('');
   const [formData, setFormData] = useState<Experience>({
     title: '',
     location: '',
@@ -23,14 +26,17 @@ export default function ExperienceTab() {
     icon: 'FaAward',
   });
 
-  const iconOptions = [
-    { value: 'FaAward', label: 'Award (Default)' },
-    { value: 'FaBrain', label: 'Brain' },
-    { value: 'CgWorkAlt', label: 'Work' },
-    { value: 'FaCloud', label: 'Cloud' },
-    { value: 'FaTruck', label: 'Truck' },
-    { value: 'FaSitemap', label: 'Sitemap' },
-  ];
+  // Get all icon options and filter by search
+  const iconOptions = useMemo(() => {
+    const allOptions = getIconOptionsForSelect();
+    if (!iconSearch) return allOptions.slice(0, 100); // Show first 100 by default
+    
+    const searchLower = iconSearch.toLowerCase();
+    return allOptions.filter(opt => 
+      opt.value.toLowerCase().includes(searchLower) || 
+      opt.label.toLowerCase().includes(searchLower)
+    ).slice(0, 100);
+  }, [iconSearch]);
 
   useEffect(() => {
     loadExperiences();
@@ -137,6 +143,7 @@ export default function ExperienceTab() {
       date: '',
       icon: 'FaAward',
     });
+    setIconSearch('');
     setEditing(null);
   };
 
@@ -194,10 +201,18 @@ export default function ExperienceTab() {
             />
             <div>
               <label className="block text-sm font-medium mb-2">Icon</label>
+              <input
+                type="text"
+                placeholder="Search icons..."
+                value={iconSearch}
+                onChange={(e) => setIconSearch(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 mb-2"
+              />
               <select
                 value={formData.icon || 'FaAward'}
                 onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
                 className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+                size={Math.min(iconOptions.length, 10)}
               >
                 {iconOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -205,6 +220,12 @@ export default function ExperienceTab() {
                   </option>
                 ))}
               </select>
+              {formData.icon && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Preview:</span>
+                  <StandardIcon icon={formData.icon} size="2xl" />
+                </div>
+              )}
             </div>
             <div className="flex gap-4">
               <button

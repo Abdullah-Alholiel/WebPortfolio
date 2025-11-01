@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 export default function AdminVerify() {
-  const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
+  const [status, setStatus] = useState<'waiting' | 'verifying' | 'success' | 'error'>('waiting');
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -13,10 +13,9 @@ export default function AdminVerify() {
   const email = searchParams.get('email');
 
   useEffect(() => {
-    // If there's an email but no token, show "check your email" message
+    // If there's an email but no token, show "check your email" success message
     if (email && !token) {
-      setStatus('error');
-      setErrorMessage('Please check your email for the magic link.');
+      setStatus('waiting');
       return;
     }
 
@@ -26,6 +25,9 @@ export default function AdminVerify() {
       setErrorMessage('No token provided');
       return;
     }
+
+    // Set status to verifying when token is present
+    setStatus('verifying');
 
     // Verify token
     const verifyToken = async () => {
@@ -79,6 +81,27 @@ export default function AdminVerify() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
       <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full text-center">
+        {status === 'waiting' && (
+          <>
+            <div className="text-6xl mb-4">📧</div>
+            <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">
+              Check Your Email
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              We've sent a magic link to <strong>{email}</strong>
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+              Click the link in your email to access the admin dashboard.
+            </p>
+            <button
+              onClick={() => router.push('/admin/login')}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg transition"
+            >
+              Back to Login
+            </button>
+          </>
+        )}
+
         {status === 'verifying' && (
           <>
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto mb-4"></div>
@@ -119,17 +142,6 @@ export default function AdminVerify() {
               Try Again
             </button>
           </>
-        )}
-
-        {email && status === 'verifying' && (
-          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Checking your email... ({email})
-            </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-              If you have the token, it will be processed automatically
-            </p>
-          </div>
         )}
       </div>
     </div>
