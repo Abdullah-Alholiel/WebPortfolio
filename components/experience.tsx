@@ -21,7 +21,7 @@ interface ExperienceItem {
 }
 
 export default function Experience() {
-  const { ref } = useSectionInView("Experience");
+  const { ref } = useSectionInView("Experience", 0.3);
   const { theme } = useTheme();
   const { data, loading: isLoading } = usePortfolioData();
   const experiences: ExperienceItem[] = data.experiences || [];

@@ -110,3 +110,47 @@ img {
   border-right: 0.15em solid rgb(79, 70, 229);
   animation: typing 2s steps(30, end), blink-caret 0.75s step-end infinite;
 }
+
+/* Ensure inputs have white background in light mode - only when NOT dark */
+html:not(.dark) input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="file"]),
+html:not(.dark) textarea,
+html:not(.dark) select {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #111827 !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="file"]),
+html.dark textarea,
+html.dark select {
+  background-color: #374151 !important;
+  background: #374151 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Admin pages - hide portfolio header completely */
+/* Only hide the portfolio navigation header (z-[999]), not admin header */
+html.admin-page header[class*="z-\[999\]"],
+body.admin-page header[class*="z-\[999\]"],
+body.admin-page header.z-\[999\],
+html.admin-page body header.z-\[999\] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+}

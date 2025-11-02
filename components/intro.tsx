@@ -74,7 +74,7 @@ function parseIntroText(text: string): string[] {
 }
 
 export default function Intro() {
-  const { ref } = useSectionInView("Home", 0.5);
+  const { ref } = useSectionInView("Home", 0.3);
   const { setActiveSection, setTimeOfLastClick } = useActiveSectionContext();
   const { data } = usePortfolioData();
   const personalInfo = data.personal as PersonalInfo | null;

@@ -22,6 +22,17 @@ const tabs = [
 export default function AdminLayout() {
   const [activeTab, setActiveTab] = useState('projects');
   const router = useRouter();
+  
+  // Get portfolio URL - use current window location (same server) or production URL
+  const getPortfolioUrl = () => {
+    if (typeof window !== 'undefined') {
+      // Client-side: use current window location (same server, any port)
+      // This works for both localhost with any port and production
+      return window.location.origin + '/';
+    }
+    // Server-side: use NEXT_PUBLIC_BASE_URL or fallback to root
+    return process.env.NEXT_PUBLIC_BASE_URL || '/';
+  };
 
   const handleLogout = async () => {
     try {
@@ -54,7 +65,7 @@ export default function AdminLayout() {
             </div>
             <div className="flex items-center gap-4">
               <a
-                href="/"
+                href={getPortfolioUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"

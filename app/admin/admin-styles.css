@@ -1,0 +1,79 @@
+/* Force white background on all inputs in admin pages - ONLY when NOT in dark mode */
+/* Only apply white background when html does NOT have 'dark' class */
+/* Use multiple selectors to override Tailwind's dark:bg-gray-700 */
+html:not(.dark) body.admin-page input,
+html:not(.dark) html.admin-page input,
+html:not(.dark) body.admin-page textarea,
+html:not(.dark) html.admin-page textarea,
+html:not(.dark) body.admin-page select,
+html:not(.dark) html.admin-page select,
+html:not(.dark) .admin-page input,
+html:not(.dark) .admin-page textarea,
+html:not(.dark) .admin-page select,
+html:not(.dark) div.admin-page input,
+html:not(.dark) div.admin-page textarea,
+html:not(.dark) div.admin-page select,
+html:not(.dark) form input,
+html:not(.dark) form textarea,
+html:not(.dark) form select,
+html:not(.dark) .admin-page input[type="text"],
+html:not(.dark) .admin-page input[type="email"],
+html:not(.dark) .admin-page input[type="url"],
+html:not(.dark) .admin-page textarea,
+html:not(.dark) input.bg-white,
+html:not(.dark) textarea.bg-white,
+html:not(.dark) select.bg-white {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #111827 !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Dark mode styles - apply gray background when html HAS 'dark' class */
+html.dark body.admin-page input,
+html.dark html.admin-page input,
+html.dark body.admin-page textarea,
+html.dark html.admin-page textarea,
+html.dark body.admin-page select,
+html.dark html.admin-page select,
+html.dark .admin-page input,
+html.dark .admin-page textarea,
+html.dark .admin-page select,
+html.dark form input,
+html.dark form textarea,
+html.dark form select,
+html.dark .admin-page input[type="text"],
+html.dark .admin-page input[type="email"],
+html.dark .admin-page input[type="url"],
+html.dark .admin-page textarea {
+  background-color: #374151 !important;
+  background: #374151 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Hide portfolio header completely on admin pages */
+/* Only hide the portfolio navigation header (z-[999]), not admin header (z-50) */
+.admin-page header[class*="z-\[999\]"],
+body.admin-page header[class*="z-\[999\]"],
+html.admin-page header[class*="z-\[999\]"],
+html.admin-page header.z-\[999\] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+}
+

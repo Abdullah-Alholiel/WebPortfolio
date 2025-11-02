@@ -152,14 +152,14 @@ export default function MentorshipTab() {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="Title"
               required
             />
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="Description"
               rows={3}
               required
@@ -168,21 +168,21 @@ export default function MentorshipTab() {
               type="text"
               value={formData.icon}
               onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="Icon emoji (e.g., 🧠)"
             />
             <input
               type="text"
               value={formData.imageUrl}
               onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="Image URL"
             />
             <input
               type="text"
               value={formData.certificateUrl}
               onChange={(e) => setFormData({ ...formData, certificateUrl: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="Certificate URL"
             />
             <div className="flex gap-4">

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '@/context/theme-context';
 import { usePortfolioData } from '@/context/portfolio-data-context';
+import { useSectionInView } from '@/lib/hooks';
 
 interface MentorshipItem {
   title: string;
@@ -90,12 +91,13 @@ const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl }: 
 };
 
 export default function Mentorship() {
+  const { ref } = useSectionInView("Mentorship", 0.3);
   const { data, loading: isLoading } = usePortfolioData();
   const mentorship = data.mentorship || [];
 
   if (isLoading) {
     return (
-      <section className="py-20">
+      <section id="mentorship" ref={ref} className="scroll-mt-28 mb-28 py-20">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-10">Mentorship Experiences</h2>
           <div className="text-center">Loading...</div>
@@ -105,7 +107,7 @@ export default function Mentorship() {
   }
 
   return (
-    <section className="py-20">
+    <section id="mentorship" ref={ref} className="scroll-mt-28 mb-28 py-20">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-10">Mentorship Experiences</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

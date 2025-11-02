@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AdminLayout from '@/components/admin/AdminLayout';
+import './admin-styles.css';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -45,6 +46,25 @@ export default function AdminDashboard() {
       </div>
     );
   }
+
+  useEffect(() => {
+    // Force apply styles as fallback if CSS hasn't loaded yet
+    if (typeof window !== 'undefined') {
+      // Force input styles for admin pages
+      const fixInputs = () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        document.querySelectorAll('input, textarea, select').forEach((el: any) => {
+          if (el.type !== 'checkbox' && el.type !== 'radio' && el.type !== 'button' && el.type !== 'submit') {
+            el.style.backgroundColor = isDark ? '#374151' : '#ffffff';
+            el.style.color = isDark ? '#ffffff' : '#111827';
+          }
+        });
+      };
+      
+      fixInputs();
+      setTimeout(() => { fixInputs(); }, 100);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

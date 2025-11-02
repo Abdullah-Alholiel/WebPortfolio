@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getKVData, KV_KEYS } from '@/lib/kv';
 import { getFallbackData, isUpstashUnavailable } from '@/lib/data-fallback';
+import { syncCache } from '@/lib/data-sync';
 
 // Revalidate every 60 seconds for ISR (Incremental Static Regeneration)
 export const revalidate = 60;
@@ -89,8 +90,8 @@ export async function GET() {
 
     // Check if Upstash is completely unavailable
     if (isUpstashUnavailable(projects, experiences, skills, achievements, mentorship, personalInfo)) {
-      console.warn('Upstash appears unavailable, falling back to static data.ts');
-      const fallbackData = getFallbackData();
+      console.warn('Upstash appears unavailable, falling back to cached or static data');
+      const fallbackData = await getFallbackData();
       
       // Return fallback data with appropriate cache headers
       return NextResponse.json(fallbackData, {
@@ -105,15 +106,27 @@ export async function GET() {
     const sanitizedExperiences = sanitizeExperiences(experiences);
     const sanitizedAchievements = sanitizeAchievements(achievements);
 
-    // Return Upstash data with cache headers
-    const response = NextResponse.json({
+    // Prepare the Upstash data for response
+    const upstashData = {
       personal: personalInfo,
-      projects: projects || [],
+      projects: Array.isArray(projects) ? projects : [],
       experiences: sanitizedExperiences,
       skills: skills || {},
       achievements: sanitizedAchievements,
-      mentorship: mentorship || [],
-    }, {
+      mentorship: Array.isArray(mentorship) ? mentorship : [],
+    };
+
+    // Sync cache in the background (don't await - non-blocking)
+    // This ensures fallback data is always up-to-date with remote database
+    syncCache(upstashData).catch((error) => {
+      // Silently handle sync errors - caching is optional
+      if (process.env.DEBUG_UPSTASH === 'true') {
+        console.warn('Cache sync failed (non-critical):', error);
+      }
+    });
+
+    // Return Upstash data with cache headers
+    const response = NextResponse.json(upstashData, {
       headers: {
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
       },
@@ -123,9 +136,9 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching data from Upstash:', error);
     
-    // Fallback to static data on error
-    console.warn('Falling back to static data.ts due to error');
-    const fallbackData = getFallbackData();
+    // Fallback to cached or static data on error
+    console.warn('Falling back to cached or static data due to error');
+    const fallbackData = await getFallbackData();
     
     return NextResponse.json(fallbackData, {
       headers: {

@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import { useTheme } from '@/context/theme-context'; // Import useTheme to access the current theme
 
 export default function Contact() {
-  const { ref } = useSectionInView("Contact");
+  const { ref } = useSectionInView("Contact", 0.3);
   const { theme } = useTheme(); // Use the theme context
 
   return (
