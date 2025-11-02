@@ -7,14 +7,14 @@ import { useSectionInView } from "@/lib/hooks";
 import { usePortfolioData } from "@/context/portfolio-data-context";
 
 export default function Projects() {
-  const { ref } = useSectionInView("Projects", 0.5);
+  const { ref } = useSectionInView("Projects", 0.1);
   const { data, loading: isLoading } = usePortfolioData();
   const projects = data.projects || [];
   // Projects are already in newest-first order from API (prepended)
 
   if (isLoading) {
     return (
-      <section ref={ref} id="projects" className="scroll-mt-28 mb-28">
+      <section id="projects" ref={ref} className="scroll-mt-28 mb-28">
         <SectionHeading>My projects</SectionHeading>
         <div className="text-center">Loading...</div>
       </section>
@@ -22,7 +22,7 @@ export default function Projects() {
   }
 
   return (
-    <section ref={ref} id="projects" className="scroll-mt-28 mb-28">
+    <section id="projects" ref={ref} className="scroll-mt-28 mb-28">
       <SectionHeading>My projects</SectionHeading>
       <div>
         {projects.map((project, index) => (

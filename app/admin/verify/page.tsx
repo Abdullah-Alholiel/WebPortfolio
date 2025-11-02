@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
+import '../admin-styles.css';
 
 export default function AdminVerify() {
   const [status, setStatus] = useState<'waiting' | 'verifying' | 'success' | 'error'>('waiting');

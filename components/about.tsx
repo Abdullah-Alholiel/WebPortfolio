@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useSectionInView } from "@/lib/hooks";
 
 const AboutMe = () => {
-  const { ref } = useSectionInView("About", 0.75);
+  const { ref } = useSectionInView("About", 0.3);
   const { theme } = useTheme();
   const { data } = usePortfolioData();
   const personalInfo = data.personal;

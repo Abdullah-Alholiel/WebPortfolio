@@ -5,9 +5,10 @@ import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import type { SectionName } from "./types";
 
-export function useSectionInView(sectionName: SectionName, threshold = 0.75) {
+export function useSectionInView(sectionName: SectionName, threshold = 0.4) {
   const { ref, inView } = useInView({
-    threshold,
+    threshold: threshold || 0.4,
+    triggerOnce: false, // Allow re-triggering when scrolling
   });
   const { setActiveSection, timeOfLastClick } = useActiveSectionContext();
 

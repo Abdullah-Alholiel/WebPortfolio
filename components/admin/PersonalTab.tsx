@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { useTheme } from '@/context/theme-context';
 
 interface PersonalInfo {
   cvLink: string;
@@ -13,6 +14,7 @@ interface PersonalInfo {
 }
 
 export default function PersonalTab() {
+  const { theme } = useTheme();
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     cvLink: '',
     introText: '',
@@ -22,6 +24,11 @@ export default function PersonalTab() {
     githubUrl: '',
   });
   const [loading, setLoading] = useState(true);
+  
+  // Theme-aware input styles - force white in light mode
+  const inputStyle = theme === 'dark' 
+    ? { backgroundColor: '#374151', color: '#ffffff' }
+    : { backgroundColor: '#ffffff', color: '#111827', backgroundImage: 'none' };
 
   useEffect(() => {
     loadPersonalInfo();
@@ -73,7 +80,8 @@ export default function PersonalTab() {
             type="url"
             value={personalInfo.cvLink}
             onChange={(e) => setPersonalInfo({ ...personalInfo, cvLink: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            style={inputStyle}
             required
           />
         </div>
@@ -83,7 +91,8 @@ export default function PersonalTab() {
           <textarea
             value={personalInfo.introText}
             onChange={(e) => setPersonalInfo({ ...personalInfo, introText: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            style={inputStyle}
             rows={4}
             required
           />
@@ -94,7 +103,8 @@ export default function PersonalTab() {
           <textarea
             value={personalInfo.aboutText}
             onChange={(e) => setPersonalInfo({ ...personalInfo, aboutText: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            style={inputStyle}
             rows={6}
             required
           />
@@ -106,7 +116,8 @@ export default function PersonalTab() {
             type="email"
             value={personalInfo.contactEmail}
             onChange={(e) => setPersonalInfo({ ...personalInfo, contactEmail: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            style={inputStyle}
             required
           />
         </div>
@@ -117,7 +128,8 @@ export default function PersonalTab() {
             type="url"
             value={personalInfo.linkedInUrl}
             onChange={(e) => setPersonalInfo({ ...personalInfo, linkedInUrl: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            style={inputStyle}
             required
           />
         </div>
@@ -128,7 +140,8 @@ export default function PersonalTab() {
             type="url"
             value={personalInfo.githubUrl}
             onChange={(e) => setPersonalInfo({ ...personalInfo, githubUrl: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700"
+            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            style={inputStyle}
             required
           />
         </div>

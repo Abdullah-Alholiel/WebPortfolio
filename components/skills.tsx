@@ -38,7 +38,7 @@ const fadeInAnimationVariants = {
 };
 
 export default function Skills() {
-  const { ref } = useSectionInView("Skills");
+  const { ref } = useSectionInView("Skills", 0.3);
   const { data, loading: isLoading } = usePortfolioData();
   const skills = data.skills || {};
 
@@ -47,7 +47,7 @@ export default function Skills() {
       <section
         id="skills"
         ref={ref}
-        className="mb-20 max-w-[53rem] scroll-mt-20 text-center sm:mb-8"
+        className="mb-20 max-w-[53rem] scroll-mt-28 text-center sm:mb-8"
       >
         <SectionHeading>Skills</SectionHeading>
         <div className="text-center">Loading...</div>
@@ -56,11 +56,11 @@ export default function Skills() {
   }
 
   return (
-    <section
-      id="skills"
-      ref={ref}
-      className="mb-20 max-w-[53rem] scroll-mt-20 text-center sm:mb-8"
-    >
+      <section
+        id="skills"
+        ref={ref}
+        className="mb-20 max-w-[53rem] scroll-mt-28 text-center sm:mb-8"
+      >
       <SectionHeading>Skills</SectionHeading>
       {Object.entries(skills).map(([category, categorySkills], index) => {
         // Ensure categorySkills is always an array of strings

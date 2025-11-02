@@ -5,6 +5,7 @@ import {
   achievementsData,
   mentorshipData,
 } from './data';
+import { getCachedData } from './data-sync';
 
 /**
  * Personal info fallback (default values)
@@ -19,9 +20,39 @@ const defaultPersonalInfo = {
 };
 
 /**
- * Formats static data from data.ts to match API response structure
+ * Get fallback data with priority:
+ * 1. Cached data from last successful Upstash sync (if available)
+ * 2. Hardcoded data from data.ts (if cache unavailable)
  */
-export function getFallbackData() {
+export async function getFallbackData(): Promise<{
+  personal: any;
+  projects: any[];
+  experiences: any[];
+  skills: any;
+  achievements: any[];
+  mentorship: any[];
+}> {
+  // Try to get cached data first (synced from Upstash)
+  const cachedData = await getCachedData();
+  if (cachedData) {
+    // Return cached data without syncedAt timestamp
+    const { syncedAt, ...data } = cachedData;
+    if (process.env.NODE_ENV === 'development') {
+      const syncDate = new Date(syncedAt).toLocaleString();
+      console.log(`📦 Using cached fallback data (synced at: ${syncDate})`);
+    }
+    return data;
+  }
+
+  // Fall back to hardcoded data if cache is unavailable
+  return getHardcodedFallbackData();
+}
+
+/**
+ * Formats static data from data.ts to match API response structure
+ * This is the ultimate fallback when cache is not available
+ */
+function getHardcodedFallbackData() {
   // Convert icon components to string format for experiences
   // exp.icon is a React element (object) from React.createElement, not a function
   // We need to extract the component name or convert to a serializable format

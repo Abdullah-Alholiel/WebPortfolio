@@ -1,10 +1,7 @@
-import { Redis } from '@upstash/redis';
-import { listKeys, deleteKVData } from './kv';
+import { getRedis, listKeys, deleteKVData } from './kv';
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || '',
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-});
+// Use centralized Redis instance to ensure SSL configuration is consistent
+const redis = getRedis();
 
 /**
  * Check if user is authenticated

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '@/context/theme-context';
 import { usePortfolioData } from '@/context/portfolio-data-context';
+import { useSectionInView } from '@/lib/hooks';
 import StandardIcon from './standard-icon';
 
 interface Achievement {
@@ -83,6 +84,7 @@ const AchievementCard = ({ title, description, Icon, certificateUrl }: Achieveme
 };
 
 export default function Achievements() {
+  const { ref } = useSectionInView("Achievements", 0.3);
   const { data, loading: isLoading } = usePortfolioData();
   const achievements = data.achievements || [];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -102,7 +104,7 @@ export default function Achievements() {
   };
 
   return (
-    <section className="py-12 px-5">
+    <section id="achievements" ref={ref} className="scroll-mt-28 mb-28 py-12 px-5">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-8">Achievements</h2>
         <div className="relative">

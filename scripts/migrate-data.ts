@@ -7,6 +7,16 @@
 
 import { Redis } from '@upstash/redis';
 
+// Handle SSL certificate issues in development mode (same as lib/kv.ts)
+if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
+  if (process.env.ALLOW_INSECURE_TLS === 'true' || process.env.SKIP_SSL_VERIFY === 'true') {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  } else if (process.env.ALLOW_INSECURE_TLS !== 'false') {
+    // Auto-disable SSL verification for local development
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  }
+}
+
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL || '',
   token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
