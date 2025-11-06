@@ -237,7 +237,7 @@ export const mentorshipData = [
   {
     title: "PepsiCo Advanced Software Engineering Job Simulation",
     description: "Developed engineering solutions using CI/CD and Azure, improving system visualization and development skills.",
-    icon: "🔧",
+    icon: "💻",
     imageUrl: "/pepsico.png",
     certificateUrl: "/pepsicocert1.png",
   },
