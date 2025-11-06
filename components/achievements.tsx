@@ -1,6 +1,5 @@
-// Achievements.jsx
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '@/context/theme-context';
 import { usePortfolioData } from '@/context/portfolio-data-context';
@@ -10,75 +9,116 @@ import StandardIcon from './standard-icon';
 interface Achievement {
   title: string;
   description: string;
-  Icon?: string | any; // Can be string (icon name) or React component (for backward compatibility)
+  Icon?: string | any;
   certificateUrl: string;
 }
 
-const AchievementCard = ({ title, description, Icon, certificateUrl }: Achievement) => {
+const AchievementCard = ({ title, description, Icon, certificateUrl, index }: Achievement & { index: number }) => {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const { theme } = useTheme(); // Use the theme context
+  const { theme } = useTheme();
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (isFlipped) {
       timeout = setTimeout(() => {
         setIsFlipped(false);
-      }, 4000);
+      }, 5000);
     }
     return () => clearTimeout(timeout);
   }, [isFlipped]);
 
-  const handleCardClick = () => {
-    setIsFlipped(!isFlipped);
-  };
-
   return (
     <motion.div
-      className={`rounded-lg p-8 ${theme === 'dark' ? 'bg-gray-800' : 'bg-transparent'} shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105 cursor-pointer`}
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-      whileHover={{ scale: 1.05 }}
-      onClick={handleCardClick}
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
+      className="group relative h-full"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ delay: index * 0.1, duration: 0.4 }}
     >
-      {/* Front Side */}
-      <motion.div
-        className={`flex flex-col items-center space-y-6 ${isFlipped ? 'hidden' : ''}`}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.3 }}
+      <div
+        className={`relative h-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300 ${
+          theme === 'dark'
+            ? 'bg-gray-800/50 border border-gray-700/50 hover:border-gray-600 hover:bg-gray-800'
+            : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg'
+        }`}
+        onClick={() => setIsFlipped(!isFlipped)}
       >
-        {Icon && (
-          <StandardIcon 
-            icon={Icon} 
-            variant="card"
-            className="group-hover:rotate-12"
-          />
-        )}
-        <div className="text-center">
-          <h3 className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'} mb-2`}>{title}</h3>
-          <p className={`text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{description}</p>
-        </div>
-        {showTooltip && (
-          <div className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-800'} text-white text-sm px-2 py-1 rounded-md`}>
-            Click to show Certificate
-          </div>
-        )}
-      </motion.div>
+        <AnimatePresence mode="wait">
+          {!isFlipped ? (
+            <motion.div
+              key="front"
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="p-6 md:p-8 h-full flex flex-col"
+            >
+              {/* Icon */}
+              {Icon && (
+                <div className="mb-6">
+                  <div className={`inline-flex p-3 rounded-lg ${
+                    theme === 'dark' 
+                      ? 'bg-blue-500/10 text-blue-400' 
+                      : 'bg-blue-100 text-blue-600'
+                  }`}>
+                    <StandardIcon 
+                      icon={Icon} 
+                      variant="card"
+                      className="text-2xl"
+                    />
+                  </div>
+                </div>
+              )}
 
-      {/* Back Side */}
-      <motion.div
-        className={`${isFlipped ? '' : 'hidden'}`}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Image src={certificateUrl} alt={`${title} certificate`} width={600} height={400} className="object-contain" />
-      </motion.div>
+              {/* Content */}
+              <div className="flex-1">
+                <h3 className={`text-xl font-semibold mb-3 leading-tight ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>
+                  {title}
+                </h3>
+                <p className={`text-sm leading-relaxed ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  {description}
+                </p>
+              </div>
+
+              {/* Footer */}
+              <div className={`mt-6 pt-4 border-t ${
+                theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+              }`}>
+                <div className={`flex items-center gap-2 text-xs font-medium ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`}>
+                  <span>View Certificate</span>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="back"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className={`h-full p-4 flex items-center justify-center ${
+                theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+              }`}
+            >
+              <Image 
+                src={certificateUrl} 
+                alt={`${title} certificate`} 
+                width={600} 
+                height={400} 
+                className="object-contain max-h-full max-w-full rounded-lg" 
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 };
@@ -88,61 +128,146 @@ export default function Achievements() {
   const { data, loading: isLoading } = usePortfolioData();
   const achievements = data.achievements || [];
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { theme } = useTheme();
+
+  const itemsPerView = 3;
+  const totalPages = Math.ceil(achievements.length / itemsPerView);
+  const currentPage = Math.floor(currentIndex / itemsPerView);
 
   const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? achievements.length - 2 : prevIndex - 2));
+    setCurrentIndex((prev) => {
+      const newIndex = prev - itemsPerView;
+      return newIndex < 0 ? Math.max(0, (totalPages - 1) * itemsPerView) : newIndex;
+    });
   };
 
   const goToNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex >= achievements.length - 2 ? 0 : prevIndex + 2));
+    setCurrentIndex((prev) => {
+      const newIndex = prev + itemsPerView;
+      return newIndex >= achievements.length ? 0 : newIndex;
+    });
   };
 
-  const cardVariants = {
-    initial: { opacity: 0, x: '-100%' },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: '100%' },
+  const goToPage = (pageIndex: number) => {
+    setCurrentIndex(pageIndex * itemsPerView);
   };
+
+  const visibleAchievements = achievements.slice(currentIndex, currentIndex + itemsPerView);
+
+  if (isLoading) {
+    return (
+      <section id="achievements" ref={ref} className="scroll-mt-28 mb-28 py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-8">Achievements</h2>
+          <div className="text-center text-gray-500">Loading...</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section id="achievements" ref={ref} className="scroll-mt-28 mb-28 py-12 px-5">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-8">Achievements</h2>
-        <div className="relative">
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
-            key={`${achievements[currentIndex]?.title}-${achievements[currentIndex + 1]?.title}`}
-            variants={cardVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.5 }}
-          >
-            {!isLoading && achievements[currentIndex] && (
+    <section id="achievements" ref={ref} className="scroll-mt-28 mb-28 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="text-center mb-12"
+        >
+          <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
+            Achievements
+          </h2>
+          <p className={`text-base md:text-lg ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            Professional certifications and accomplishments
+          </p>
+        </motion.div>
+
+        {/* Carousel */}
+        {achievements.length > 0 && (
+          <div className="relative">
+            {/* Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <AnimatePresence mode="wait">
+                {visibleAchievements.map((achievement, idx) => (
+                  <AchievementCard
+                    key={`${achievement.title}-${currentIndex + idx}`}
+                    {...achievement}
+                    index={idx}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Navigation */}
+            {achievements.length > itemsPerView && (
               <>
-                <AchievementCard {...achievements[currentIndex]} />
-                {achievements[currentIndex + 1] && (
-                  <AchievementCard {...achievements[currentIndex + 1]} />
-                )}
+                {/* Arrows */}
+                <button
+                  onClick={goToPrevious}
+                  className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 hidden lg:flex items-center justify-center w-10 h-10 rounded-full transition-all ${
+                    theme === 'dark'
+                      ? 'bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-300'
+                      : 'bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 shadow-sm'
+                  }`}
+                  aria-label="Previous achievements"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={goToNext}
+                  className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 hidden lg:flex items-center justify-center w-10 h-10 rounded-full transition-all ${
+                    theme === 'dark'
+                      ? 'bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-300'
+                      : 'bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 shadow-sm'
+                  }`}
+                  aria-label="Next achievements"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+
+                {/* Pagination Dots */}
+                <div className="flex justify-center items-center gap-2">
+                  {Array.from({ length: totalPages }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToPage(index)}
+                      className="focus:outline-none"
+                      aria-label={`Go to page ${index + 1}`}
+                    >
+                      <motion.div
+                        className={`rounded-full transition-all ${
+                          currentPage === index
+                            ? theme === 'dark'
+                              ? 'bg-blue-500'
+                              : 'bg-blue-600'
+                            : theme === 'dark'
+                            ? 'bg-gray-700 hover:bg-gray-600'
+                            : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        initial={false}
+                        animate={{
+                          width: currentPage === index ? 24 : 8,
+                          height: 8,
+                        }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </button>
+                  ))}
+                </div>
               </>
             )}
-          </motion.div>
-          <button
-            className="absolute top-1/2 -left-12 transform -translate-y-1/2 px-4 py-2 rounded-full focus:outline-none text-2xl transition-colors duration-300"
-            onClick={goToPrevious}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 hover:text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <button
-            className="absolute top-1/2 -right-12 transform -translate-y-1/2 px-4 py-2 rounded-full focus:outline-none text-2xl transition-colors duration-300"
-            onClick={goToNext}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 hover:text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );
