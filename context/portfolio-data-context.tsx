@@ -44,11 +44,13 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
   const [isFetching, setIsFetching] = useState(false);
 
   // Environment-based polling interval
-  // Production: 5 minutes (300000ms), Development: 30 seconds (30000ms)
-  const POLLING_INTERVAL = process.env.NODE_ENV === 'production' ? 300000 : 30000;
+  // Production: 30 seconds (30000ms) - faster updates for admin changes
+  // Development: 10 seconds (10000ms) - very fast for testing
+  const POLLING_INTERVAL = process.env.NODE_ENV === 'production' ? 30000 : 10000;
   
-  // Stale-while-revalidate: Consider data stale after 4 minutes in prod, 20s in dev
-  const STALE_THRESHOLD = process.env.NODE_ENV === 'production' ? 240000 : 20000;
+  // Stale-while-revalidate: Consider data stale after 20 seconds in prod, 5s in dev
+  // Reduced thresholds to ensure fresh data appears quickly
+  const STALE_THRESHOLD = process.env.NODE_ENV === 'production' ? 20000 : 5000;
 
   const fetchData = async (force = false) => {
     // Request deduplication: prevent concurrent fetches
@@ -66,8 +68,12 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
     try {
       setError(null);
       const response = await fetch('/api/data', {
-        // Add cache control to leverage browser/CDN caching
-        cache: 'no-cache', // Always check with server, but leverage HTTP cache headers
+        // Force fresh data fetch - bypass all caches
+        cache: 'no-store', // No caching - always fetch fresh data from Upstash
+        headers: {
+          // Add timestamp to prevent any caching
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
       });
       if (!response.ok) {
         throw new Error('Failed to fetch portfolio data');
