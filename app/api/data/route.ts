@@ -3,8 +3,10 @@ import { getKVData, KV_KEYS } from '@/lib/kv';
 import { getFallbackData, isUpstashUnavailable } from '@/lib/data-fallback';
 import { syncCache } from '@/lib/data-sync';
 
-// Revalidate every 60 seconds for ISR (Incremental Static Regeneration)
-export const revalidate = 60;
+// CRITICAL: Force dynamic rendering - always fetch fresh data from Upstash
+// This ensures admin changes appear immediately in production
+export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable ISR caching - always fetch fresh data
 
 /**
  * Sanitizes icon data to ensure it's always a string
@@ -93,10 +95,11 @@ export async function GET() {
       console.warn('Upstash appears unavailable, falling back to cached or static data');
       const fallbackData = await getFallbackData();
       
-      // Return fallback data with appropriate cache headers
+      // Return fallback data with minimal caching
       return NextResponse.json(fallbackData, {
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=0',
+          'X-Data-Timestamp': Date.now().toString(),
         },
       });
     }
@@ -125,10 +128,14 @@ export async function GET() {
       }
     });
 
-    // Return Upstash data with cache headers
+    // Return Upstash data with minimal caching to ensure fresh data
+    // Reduced cache time so admin changes appear quickly
     const response = NextResponse.json(upstashData, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        // Short cache: 10 seconds max, no stale-while-revalidate to ensure freshness
+        'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=0',
+        // Add timestamp to help with cache busting
+        'X-Data-Timestamp': Date.now().toString(),
       },
     });
 
@@ -142,7 +149,8 @@ export async function GET() {
     
     return NextResponse.json(fallbackData, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=0',
+        'X-Data-Timestamp': Date.now().toString(),
       },
     });
   }
