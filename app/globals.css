@@ -40,20 +40,97 @@ img {
   background: var(--line-color);
 }
 
+/* Ensure timeline line is properly positioned */
+.vertical-timeline {
+  position: relative;
+}
+
+/* Desktop: line is centered, icons should be centered on it */
+@media (min-width: 1170px) {
+  .vertical-timeline::before {
+    left: 50% !important;
+    margin-left: -2px !important; /* Half of line width (4px) */
+  }
+}
+
+/* Mobile/tablet: line is left-aligned, but icons should still be centered on it */
+@media (max-width: 1169px) {
+  .vertical-timeline::before {
+    left: 30px !important; /* Library default for mobile */
+  }
+}
+
+/* Ensure icon container (circle) is perfectly centered on the grey line and aligned with arrow */
+/* Note: Arrow (.vertical-timeline-element-content-arrow) is positioned by library at vertical center of card */
+/* We align the icon to match that vertical position without moving the arrow */
 .vertical-timeline-element-icon {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  margin-left: 0 !important;
+  margin-top: 0 !important;
+  /* Position icon at same vertical center as the card arrow (arrow is at 50% of element height) */
+  top: 2% !important;
+  /* Center the icon vertically by offsetting half its height */
+  margin-top: -21px !important; /* Half of icon height (42px / 2 = 21px) */
 }
 
+/* Desktop: line is centered at 50%, so center icons horizontally at 50% */
+@media (min-width: 1170px) {
+  .vertical-timeline-element-icon {
+    left: 50% !important;
+    /* Only translate X to center horizontally, Y positioning is handled by top + margin-top */
+    transform: translateX(-50%) !important;
+  }
+}
+
+/* Mobile/tablet: line is at 30px, so center icons horizontally at 30px */
+@media (max-width: 1169px) {
+  .vertical-timeline-element-icon {
+    left: 30px !important;
+    /* Only translate X to center horizontally, Y positioning is handled by top + margin-top */
+    transform: translateX(-45%) !important;
+  }
+}
+
+/* Icon content wrapper - ensures SVG is centered inside circle */
 .vertical-timeline-element-icon-centered {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
 }
 
-.vertical-timeline-element-icon-centered > * {
-  margin: auto;
+/* Ensure SVG elements are perfectly centered and properly sized */
+.vertical-timeline-element-icon-centered svg {
+  display: block !important;
+  margin: 0 !important;
+  width: 1.5rem !important; /* 24px - fits nicely in 42px circle with 9px padding */
+  height: 1.5rem !important;
+  max-width: 1.5rem !important;
+  max-height: 1.5rem !important;
+  flex-shrink: 0 !important;
+  /* Remove any default positioning */
+  position: static !important;
+  left: auto !important;
+  transform: none !important;
+}
+
+/* Force icon container to respect size constraints */
+.vertical-timeline-element-icon {
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  /* Prevent library from overriding our size */
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  max-width: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
 }
 
 /* Blob Animation for Background Elements */

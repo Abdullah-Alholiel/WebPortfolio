@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
+import crypto from 'crypto';
 
 // Determine cache file path
 // In production (Vercel), filesystem is read-only except /tmp
@@ -18,6 +19,10 @@ function getCacheFilePath(): string {
 
 const CACHE_FILE_PATH = getCacheFilePath();
 
+// Track last sync time to prevent excessive logging
+let lastSyncTime = 0;
+const SYNC_INTERVAL_MS = 60000; // Only sync once per minute maximum
+
 /**
  * Portfolio data structure for cache
  */
@@ -29,11 +34,13 @@ interface CachedPortfolioData {
   achievements: any[];
   mentorship: any[];
   syncedAt: number; // timestamp of last sync
+  dataHash?: string; // hash of the data to detect changes
 }
 
 /**
  * Save Upstash data to local cache file
  * This keeps the fallback data in sync with remote database
+ * Only syncs if data has changed or enough time has passed
  */
 export async function syncCache(data: {
   personal: any;
@@ -44,9 +51,28 @@ export async function syncCache(data: {
   mentorship: any[];
 }): Promise<boolean> {
   try {
+    const now = Date.now();
+    
+    // Rate limiting: don't sync more than once per interval
+    if (now - lastSyncTime < SYNC_INTERVAL_MS) {
+      return true; // Silently skip - data is likely the same
+    }
+
+    // Generate hash of current data to detect changes
+    const dataString = JSON.stringify(data);
+    const dataHash = crypto.createHash('sha256').update(dataString).digest('hex');
+
+    // Check if data has changed since last sync
+    const existingCache = await getCachedData();
+    if (existingCache?.dataHash === dataHash) {
+      lastSyncTime = now;
+      return true; // Data unchanged, skip write
+    }
+
     const cacheData: CachedPortfolioData = {
       ...data,
-      syncedAt: Date.now(),
+      syncedAt: now,
+      dataHash,
     };
 
     // Write to cache file (creates or overwrites)
@@ -56,7 +82,10 @@ export async function syncCache(data: {
       'utf-8'
     );
 
-    if (process.env.NODE_ENV === 'development') {
+    lastSyncTime = now;
+
+    // Only log when data actually changes or in debug mode
+    if (process.env.NODE_ENV === 'development' && process.env.DEBUG_CACHE === 'true') {
       console.log('✅ Fallback cache synced with Upstash data');
     }
 

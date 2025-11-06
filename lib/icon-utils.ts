@@ -232,10 +232,141 @@ export function getPopularIcons(): string[] {
 }
 
 /**
+ * Get professional/work-related icons for experiences
+ * Returns a curated list of icons relevant to jobs, careers, and professional work
+ */
+export function getProfessionalIcons(): string[] {
+  // Curated list of professional/work-related icon names
+  const professionalKeywords = [
+    // Work & Career
+    'Work', 'Briefcase', 'Suitcase', 'Office', 'Business', 'Career', 'Job',
+    // Technology & Development
+    'Code', 'Computer', 'Laptop', 'Server', 'Cloud', 'Database', 'Network', 'Terminal',
+    'CodeSlash', 'CodeBranch', 'CodeCommit', 'CodeMerge', 'CodePullRequest',
+    'Devices', 'Desktop', 'Mobile', 'Tablet', 'Hardware',
+    // AI & Data
+    'Brain', 'Robot', 'Chip', 'Microchip', 'Data', 'Analytics', 'Chart', 'Graph',
+    'BarChart', 'LineChart', 'PieChart', 'Trending', 'Insights',
+    // Engineering & Systems
+    'Cog', 'Gear', 'Settings', 'Tools', 'Wrench', 'Screwdriver', 'Hammer',
+    'Blueprint', 'Architecture', 'Infrastructure', 'System', 'Server',
+    // Strategy & Consulting
+    'Lightbulb', 'Bulb', 'Idea', 'Strategy', 'Target', 'Goal', 'Flag', 'Trophy',
+    'Award', 'Medal', 'Star', 'Rocket', 'Launch', 'Growth', 'Trending',
+    // Management & Organization
+    'Sitemap', 'Diagram', 'Project', 'Task', 'Checklist', 'List', 'Board',
+    'Kanban', 'Timeline', 'Calendar', 'Schedule', 'Clock', 'Time',
+    // Communication & Collaboration
+    'Users', 'Team', 'Group', 'Meeting', 'Presentation', 'Screen', 'Share',
+    'Message', 'Chat', 'Mail', 'Email', 'Phone', 'Video',
+    // E-commerce & Business
+    'Shopping', 'Cart', 'Store', 'Shop', 'Truck', 'Delivery', 'Package',
+    'Box', 'Bag', 'CreditCard', 'Money', 'Dollar', 'Euro', 'Pound',
+    // Design & Creative
+    'Palette', 'Brush', 'Paint', 'Design', 'Image', 'Photo', 'Camera',
+    'Video', 'Film', 'Edit', 'Pen', 'Pencil',
+    // Security & Quality
+    'Shield', 'Lock', 'Key', 'Security', 'Check', 'Verified', 'Badge',
+    'Certificate', 'Diploma', 'Graduation', 'School', 'University',
+    // Cloud & DevOps
+    'Cloud', 'CloudUpload', 'CloudDownload', 'CloudSync', 'Deploy',
+    'Container', 'Docker', 'Kubernetes', 'Git', 'GitBranch', 'GitCommit',
+    // Consulting & Strategy
+    'Consulting', 'Advice', 'Support', 'Help', 'Question', 'Solution',
+    'Puzzle', 'Pieces', 'Connect', 'Link', 'Chain',
+  ];
+
+  const professionalIcons: string[] = [];
+  const iconNameLowerMap = new Map<string, string>(); // Map lowercase to original
+
+  // Build a map of all icon names (lowercase -> original)
+  Object.keys(iconMap).forEach(iconName => {
+    const nameWithoutPrefix = iconName.replace(/^(Fa|Cg|Bs|Hi|Ai|Md|Fi|Io|Io5|Ri|Si|Tb|Bi|Gr|Im|Vsc|Wi)/, '');
+    iconNameLowerMap.set(nameWithoutPrefix.toLowerCase(), iconName);
+  });
+
+  // Match professional keywords to icon names
+  professionalKeywords.forEach(keyword => {
+    const keywordLower = keyword.toLowerCase();
+    
+    // Direct match
+    if (iconNameLowerMap.has(keywordLower)) {
+      const iconName = iconNameLowerMap.get(keywordLower)!;
+      if (!professionalIcons.includes(iconName)) {
+        professionalIcons.push(iconName);
+      }
+    }
+
+    // Partial match (icon name contains keyword)
+    iconNameLowerMap.forEach((iconName, nameLower) => {
+      if (nameLower.includes(keywordLower) && !professionalIcons.includes(iconName)) {
+        professionalIcons.push(iconName);
+      }
+    });
+  });
+
+  // Add some specific popular professional icons that might not match keywords
+  const additionalProfessionalIcons = [
+    'FaBriefcase', 'FaSuitcase', 'FaLaptop', 'FaDesktop', 'FaServer',
+    'FaDatabase', 'FaCloud', 'FaCode', 'FaBrain', 'FaRocket',
+    'FaAward', 'FaTrophy', 'FaStar', 'FaChartLine', 'FaChartBar',
+    'FaProjectDiagram', 'FaSitemap', 'FaUsers', 'FaUserTie',
+    'FaHandshake', 'FaBullseye', 'FaTarget', 'FaFlag', 'FaGavel',
+    'FaBalanceScale', 'FaGraduationCap', 'FaCertificate', 'FaShield',
+    'FaLock', 'FaKey', 'FaCog', 'FaTools', 'FaWrench',
+    'FaShoppingCart', 'FaStore', 'FaTruck', 'FaBox', 'FaCreditCard',
+    'FaPalette', 'FaPaintBrush', 'FaImage', 'FaCamera', 'FaVideo',
+    'FaEnvelope', 'FaPhone', 'FaComments', 'FaShare', 'FaHandshake',
+    'CgWorkAlt', 'CgBriefcase', 'CgLaptop', 'CgServer', 'CgCode',
+    'CgCodeSlash', 'CgDatabase', 'CgCloud', 'CgChart', 'CgUser',
+    'CgUsers', 'CgScreen', 'CgEdit', 'CgDesign', 'CgToolbox',
+    'MdWork', 'MdBusiness', 'MdComputer', 'MdLaptop', 'MdPhone',
+    'MdEmail', 'MdSettings', 'MdBuild', 'MdCode', 'MdCloud',
+    'MdTrendingUp', 'MdBarChart', 'MdPieChart', 'MdAssessment',
+    'MdGroup', 'MdPeople', 'MdPerson', 'MdSchool', 'MdBusinessCenter',
+    'HiOfficeBuilding', 'HiBriefcase', 'HiCode', 'HiChip', 'HiCloud',
+    'HiChart', 'HiTrendingUp', 'HiUsers', 'HiUserGroup', 'HiLightBulb',
+    'RiBriefcaseLine', 'RiBriefcaseFill', 'RiComputerLine', 'RiCodeSSlashLine',
+    'RiCloudLine', 'RiDatabaseLine', 'RiBarChartLine', 'RiLineChartLine',
+    'RiTeamLine', 'RiUserLine', 'RiSettingsLine', 'RiToolsLine',
+    'RiShoppingCartLine', 'RiStoreLine', 'RiMailLine', 'RiPhoneLine',
+    'BsBriefcase', 'BsLaptop', 'BsPhone', 'BsEnvelope', 'BsPeople',
+    'BsGraphUp', 'BsBarChart', 'BsPieChart', 'BsGear', 'BsTools',
+    'FiBriefcase', 'FiLaptop', 'FiCode', 'FiDatabase', 'FiCloud',
+    'FiTrendingUp', 'FiUsers', 'FiUser', 'FiSettings', 'FiTool',
+    'TbBriefcase', 'TbLaptop', 'TbCode', 'TbDatabase', 'TbCloud',
+    'TbChart', 'TbUsers', 'TbUser', 'TbSettings', 'TbTools',
+    'BiBriefcase', 'BiLaptop', 'BiCode', 'BiData', 'BiCloud',
+    'BiBarChart', 'BiLineChart', 'BiPieChart', 'BiTrendingUp',
+    'BiUser', 'BiGroup', 'BiCog', 'BiTool',
+  ];
+
+  additionalProfessionalIcons.forEach(iconName => {
+    if (iconMap[iconName] && !professionalIcons.includes(iconName)) {
+      professionalIcons.push(iconName);
+    }
+  });
+
+  // Sort and return
+  return professionalIcons.sort();
+}
+
+/**
  * Get a simplified list of icons for admin dropdowns
  * Returns icons grouped by category with search functionality
+ * @param context - Optional context to filter icons (e.g., 'experience' for professional icons only)
  */
-export function getIconOptionsForSelect(): Array<{ value: string; label: string; category: string }> {
+export function getIconOptionsForSelect(context?: 'experience' | 'achievement' | 'general'): Array<{ value: string; label: string; category: string }> {
+  // For experience context, only return professional icons
+  if (context === 'experience') {
+    const professionalIcons = getProfessionalIcons();
+    return professionalIcons.map(iconName => ({
+      value: iconName,
+      label: iconName,
+      category: 'Professional',
+    }));
+  }
+
   const popular = getPopularIcons();
   const options: Array<{ value: string; label: string; category: string }> = [];
 

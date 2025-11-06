@@ -30,36 +30,59 @@ export async function POST(request: NextRequest) {
 
     console.log('Storing token in Redis...');
     // Store token in Redis with TTL (1 day = 86400 seconds)
-    await redis.setex(`admin:token:${token}`, 86400, {
+    const redisKey = `admin:token:${token}`;
+    await redis.setex(redisKey, 86400, {
       email,
       expiresAt,
     });
     console.log('Token stored successfully with 1 day TTL');
-
-    // Determine base URL - prefer environment variable, then detect from request, fallback to localhost
-    let baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     
-    // If not set, try to detect from request headers (works automatically in production)
-    if (!baseUrl) {
+    // Verify token was stored correctly
+    try {
+      const storedToken = await redis.get<{ email: string; expiresAt: number }>(redisKey);
+      if (storedToken) {
+        console.log('Token verification: Successfully stored and retrievable');
+      } else {
+        console.warn('Token verification: Token not immediately retrievable - may be a timing issue');
+      }
+    } catch (verifyError) {
+      console.warn('Token verification check failed:', verifyError);
+    }
+
+    // Determine base URL based on environment
+    // In development: always detect from request headers (ignore NEXT_PUBLIC_BASE_URL)
+    // In production: use NEXT_PUBLIC_BASE_URL if set, otherwise detect from headers
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    let baseUrl: string | undefined;
+    
+    if (isDevelopment) {
+      // In development, always detect from request headers
       const host = request.headers.get('host') || request.headers.get('x-forwarded-host');
       
       if (host) {
-        // Determine protocol based on host and environment
-        let protocol = request.headers.get('x-forwarded-proto');
-        
-        // If no protocol header, determine based on host and environment
-        if (!protocol) {
-          // Check if host is localhost or 127.0.0.1 (development)
-          const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1') || host.startsWith('localhost:');
-          
-          // Use http for localhost, https for production
-          protocol = isLocalhost ? 'http' : 'https';
-        }
-        
+        // Check if host is localhost or 127.0.0.1 (development)
+        const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
+        const protocol = isLocalhost ? 'http' : 'https';
         baseUrl = `${protocol}://${host}`;
       } else {
         // Fallback to localhost for development
         baseUrl = 'http://localhost:3000';
+      }
+    } else {
+      // In production, prefer environment variable, then detect from request headers
+      baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+      
+      if (!baseUrl) {
+        const host = request.headers.get('host') || request.headers.get('x-forwarded-host');
+        
+        if (host) {
+          // Determine protocol from headers or default to https in production
+          const protocol = request.headers.get('x-forwarded-proto') || 'https';
+          baseUrl = `${protocol}://${host}`;
+        } else {
+          // Fallback (shouldn't happen in production)
+          baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://aalholiel-web-portfolio.vercel.app';
+        }
       }
     }
     

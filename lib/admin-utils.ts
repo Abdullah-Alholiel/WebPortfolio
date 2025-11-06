@@ -4,18 +4,35 @@ import { getRedis, listKeys, deleteKVData } from './kv';
 const redis = getRedis();
 
 /**
- * Check if user is authenticated
+ * Check if user is authenticated and refresh session if valid
+ * Sessions are refreshed on each access to extend expiration (sliding expiration)
  */
-export async function verifyAdminSession(sessionId: string): Promise<{ authenticated: boolean; email?: string }> {
+export async function verifyAdminSession(
+  sessionId: string,
+  refreshSession: boolean = true
+): Promise<{ authenticated: boolean; email?: string }> {
   try {
     if (!sessionId) {
       return { authenticated: false };
     }
 
-    const session = await redis.get<{ email: string; createdAt: number }>(`admin:session:${sessionId}`);
+    const sessionKey = `admin:session:${sessionId}`;
+    const session = await redis.get<{ email: string; createdAt: number }>(sessionKey);
 
     if (!session) {
       return { authenticated: false };
+    }
+
+    // Refresh session expiration if requested (sliding expiration)
+    // This extends the session by 24 hours from now on each access
+    if (refreshSession) {
+      try {
+        // Extend session TTL to 24 hours (86400 seconds) from now
+        await redis.expire(sessionKey, 86400);
+      } catch (refreshError) {
+        // If refresh fails, log but don't fail authentication
+        console.warn('Failed to refresh session TTL:', refreshError);
+      }
     }
 
     return { authenticated: true, email: session.email };

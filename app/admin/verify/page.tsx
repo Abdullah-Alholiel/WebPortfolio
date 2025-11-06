@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import '../admin-styles.css';
@@ -12,8 +12,14 @@ export default function AdminVerify() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const email = searchParams.get('email');
+  const verificationAttempted = useRef(false);
 
   useEffect(() => {
+    // Prevent multiple verification attempts (React Strict Mode in dev causes double renders)
+    if (verificationAttempted.current) {
+      return;
+    }
+
     // If there's an email but no token, show "check your email" success message
     if (email && !token) {
       setStatus('waiting');
@@ -26,6 +32,9 @@ export default function AdminVerify() {
       setErrorMessage('No token provided');
       return;
     }
+
+    // Mark verification as attempted
+    verificationAttempted.current = true;
 
     // Set status to verifying when token is present
     setStatus('verifying');

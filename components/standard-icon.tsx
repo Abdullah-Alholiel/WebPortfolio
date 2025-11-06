@@ -136,7 +136,16 @@ export default function StandardIcon({
   // Wrapper classes (for positioning/display)
   const wrapperClassName = variantClassName;
 
-  // Create wrapper span for consistent styling
+  // For timeline variant, render icon directly without wrapper for perfect centering
+  if (variant === 'timeline') {
+    return (
+      <IconComponent 
+        className={iconClassName}
+      />
+    );
+  }
+  
+  // For other variants, use wrapper
   return (
     <span 
       className={wrapperClassName}
