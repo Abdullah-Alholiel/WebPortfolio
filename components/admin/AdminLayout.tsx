@@ -36,19 +36,31 @@ export default function AdminLayout() {
 
   const handleLogout = async () => {
     try {
+      console.log('[Admin] Logging out...');
       const response = await fetch('/api/admin/auth/logout', {
         method: 'POST',
+        credentials: 'include',
       });
 
+      console.log('[Admin] Logout response status:', response.status);
+
       if (response.ok) {
+        const data = await response.json().catch(() => ({}));
+        console.log('[Admin] Logout successful:', data);
         toast.success('Logged out successfully');
         router.push('/admin/login');
       } else {
-        toast.error('Failed to logout');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('[Admin] Logout failed:', errorData);
+        toast.error(errorData.error || 'Failed to logout');
       }
     } catch (error) {
+      console.error('[Admin] Logout error:', error);
+      console.error('[Admin] Error details:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       toast.error('Failed to logout');
-      console.error('Error:', error);
     }
   };
 

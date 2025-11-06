@@ -23,19 +23,19 @@ export default function ExperienceTab() {
     location: '',
     description: '',
     date: '',
-    icon: 'FaAward',
+    icon: 'FaBriefcase',
   });
 
-  // Get all icon options and filter by search
+  // Get professional/work-related icon options and filter by search
   const iconOptions = useMemo(() => {
-    const allOptions = getIconOptionsForSelect();
-    if (!iconSearch) return allOptions.slice(0, 100); // Show first 100 by default
+    const allOptions = getIconOptionsForSelect('experience'); // Only show professional icons
+    if (!iconSearch) return allOptions; // Show all professional icons by default
     
     const searchLower = iconSearch.toLowerCase();
     return allOptions.filter(opt => 
       opt.value.toLowerCase().includes(searchLower) || 
       opt.label.toLowerCase().includes(searchLower)
-    ).slice(0, 100);
+    );
   }, [iconSearch]);
 
   useEffect(() => {
@@ -102,7 +102,7 @@ export default function ExperienceTab() {
   const handleEdit = (exp: Experience, index: number) => {
     setFormData({
       ...exp,
-      icon: exp.icon || 'FaAward',
+      icon: exp.icon || 'FaBriefcase',
     });
     setEditing(index);
   };
@@ -141,7 +141,7 @@ export default function ExperienceTab() {
       location: '',
       description: '',
       date: '',
-      icon: 'FaAward',
+      icon: 'FaBriefcase',
     });
     setIconSearch('');
     setEditing(null);
@@ -209,10 +209,10 @@ export default function ExperienceTab() {
                 className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white mb-2"
               />
               <select
-                value={formData.icon || 'FaAward'}
+                value={formData.icon || 'FaBriefcase'}
                 onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
                 className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white"
-                size={Math.min(iconOptions.length, 10)}
+                size={Math.min(iconOptions.length, 15)}
               >
                 {iconOptions.map((option) => (
                   <option key={option.value} value={option.value}>

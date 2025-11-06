@@ -88,33 +88,32 @@ export default function Experience() {
               }}
               date={item.date || ''}
               icon={
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '100%',
-                  height: '100%',
-                }}>
-                  <StandardIcon 
-                    icon={item.icon} 
-                    variant="timeline"
-                    className="!text-2xl"
-                  />
-                </div>
+                <StandardIcon 
+                  icon={item.icon} 
+                  variant="timeline"
+                  size="lg"
+                />
               }
               iconStyle={{
                 background:
                   theme === "light" 
                     ? "#fff" 
                     : "rgba(255, 255, 255, 0.15)",
-                width: "60px",
-                height: "60px",
+                width: "42px",
+                height: "42px",
+                minWidth: "42px",
+                maxWidth: "42px",
+                minHeight: "42px",
+                maxHeight: "42px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                margin: 0,
+                padding: "8px",
                 boxShadow: theme === "light" 
-                  ? "0 0 0 4px #f3f4f6, inset 0 2px 0 rgba(0,0,0,.08), 0 3px 0 4px rgba(0,0,0,.05)" 
-                  : "0 0 0 4px rgba(255, 255, 255, 0.05), inset 0 2px 0 rgba(255,255,255,.08), 0 3px 0 4px rgba(0,0,0,.05)",
+                  ? "0 0 0 3px #f3f4f6, inset 0 2px 0 rgba(0,0,0,.08), 0 3px 0 3px rgba(0,0,0,.05)" 
+                  : "0 0 0 3px rgba(255, 255, 255, 0.05), inset 0 2px 0 rgba(255,255,255,.08), 0 3px 0 3px rgba(0,0,0,.05)",
+                boxSizing: "border-box",
               }}
               iconClassName="vertical-timeline-element-icon-centered"
               visible={true}
