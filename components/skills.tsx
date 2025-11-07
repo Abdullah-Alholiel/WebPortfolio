@@ -4,6 +4,7 @@ import SectionHeading from "./section-heading";
 import { useSectionInView } from "@/lib/hooks";
 import { usePortfolioData } from "@/context/portfolio-data-context";
 import { motion } from "framer-motion";
+import Loader from "@/components/ui/loader";
 
 const fadeInAnimationVariants = {
   initial: {
@@ -50,7 +51,9 @@ export default function Skills() {
         className="mb-20 max-w-[53rem] scroll-mt-28 text-center sm:mb-8"
       >
         <SectionHeading>Skills</SectionHeading>
-        <div className="text-center">Loading...</div>
+        <div className="mt-8 flex justify-center">
+          <Loader label="Loading skills" />
+        </div>
       </section>
     );
   }

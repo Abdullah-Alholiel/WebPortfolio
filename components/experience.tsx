@@ -11,6 +11,7 @@ import { useTheme } from "@/context/theme-context";
 import { usePortfolioData } from "@/context/portfolio-data-context";
 import { getExperienceIcon } from "@/lib/icon-utils";
 import StandardIcon from "./standard-icon";
+import Loader from "@/components/ui/loader";
 
 interface ExperienceItem {
   title: string;
@@ -41,9 +42,9 @@ export default function Experience() {
     return (
       <section id="experience" ref={ref} className="scroll-mt-28 mb-28 sm:mb-40">
         <SectionHeading>Professional Journey</SectionHeading>
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading experiences...</p>
+        <div className="flex flex-col items-center py-12 gap-4">
+          <Loader className="justify-center" label="Loading experiences" />
+          <p className="text-gray-600 dark:text-gray-400">Loading experiences...</p>
         </div>
       </section>
     );

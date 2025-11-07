@@ -98,7 +98,7 @@ export default function AdminVerify() {
               Check Your Email
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              We've sent a magic link to <strong>{email}</strong>
+              We&apos;ve sent a magic link to <strong>{email}</strong>
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
               Click the link in your email to access the admin dashboard.

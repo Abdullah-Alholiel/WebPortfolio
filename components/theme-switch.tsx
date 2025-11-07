@@ -2,17 +2,53 @@
 
 import { useTheme } from "@/context/theme-context";
 import React from "react";
-import { BsMoon, BsSun } from "react-icons/bs";
+import { FaPlane } from "react-icons/fa";
+import styles from "./theme-switch.module.css";
 
 export default function ThemeSwitch() {
   const { theme, toggleTheme } = useTheme();
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
-    <button
-      className="fixed bottom-5 right-5 bg-white w-[3rem] h-[3rem] bg-opacity-80 backdrop-blur-[0.5rem] border border-white border-opacity-40 shadow-2xl rounded-full flex items-center justify-center hover:scale-[1.15] active:scale-105 transition-all dark:bg-gray-950"
-      onClick={toggleTheme}
+    <label
+      className={`${styles.switch} fixed bottom-5 right-5 z-50 drop-shadow-lg`}
+      aria-label="Toggle color theme"
+      role="switch"
+      aria-checked={theme === "light"}
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (
+          event.key === "Enter" ||
+          event.key === " " ||
+          event.key === "Space" ||
+          event.key === "Spacebar"
+        ) {
+          event.preventDefault();
+          toggleTheme();
+        }
+      }}
     >
-      {theme === "light" ? <BsSun /> : <BsMoon />}
-    </button>
+      <input
+        type="checkbox"
+        checked={theme === "light"}
+        onChange={toggleTheme}
+      />
+      <div>
+        <span className={styles["street-middle"]} />
+        <span className={styles.cloud} />
+        <span className={`${styles.cloud} ${styles.two}`} />
+        <div>
+          <FaPlane aria-hidden="true" focusable="false" />
+        </div>
+      </div>
+    </label>
   );
 }

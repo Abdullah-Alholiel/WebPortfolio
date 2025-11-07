@@ -5,6 +5,7 @@ import SectionHeading from "./section-heading";
 import Project from "./project";
 import { useSectionInView } from "@/lib/hooks";
 import { usePortfolioData } from "@/context/portfolio-data-context";
+import Loader from "@/components/ui/loader";
 
 export default function Projects() {
   const { ref } = useSectionInView("Projects", 0.1);
@@ -16,7 +17,7 @@ export default function Projects() {
     return (
       <section id="projects" ref={ref} className="scroll-mt-28 mb-28">
         <SectionHeading>My projects</SectionHeading>
-        <div className="text-center">Loading...</div>
+        <Loader className="w-full justify-center" label="Loading projects" />
       </section>
     );
   }

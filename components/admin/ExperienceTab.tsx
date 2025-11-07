@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { getIconOptionsForSelect } from '@/lib/icon-utils';
 import StandardIcon from '@/components/standard-icon';
+import Loader from '@/components/ui/loader';
 
 interface Experience {
   title: string;
@@ -147,7 +148,7 @@ export default function ExperienceTab() {
     setEditing(null);
   };
 
-  if (loading) return <div className="text-center py-12">Loading...</div>;
+  if (loading) return <Loader className="w-full py-12" />;
 
   return (
     <div>

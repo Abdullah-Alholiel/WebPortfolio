@@ -1,17 +1,25 @@
 "use client";
 
-import { useRef } from "react";
-import { projectsData } from "@/lib/data";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { resolveImageUrl } from "@/lib/image-utils";
+import { getProjectFallbackImage } from "@/lib/project-fallbacks";
 
-type ProjectProps = (typeof projectsData)[number];
+type ProjectProps = {
+  title: string;
+  description: string;
+  tags: string[];
+  imageUrl?: string;
+  fallbackImageUrl?: string;
+};
 
 export default function Project({
   title,
   description,
   tags,
   imageUrl,
+  fallbackImageUrl,
 }: ProjectProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -20,6 +28,86 @@ export default function Project({
   });
   const scaleProgess = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
   const opacityProgess = useTransform(scrollYProgress, [0, 1], [0.6, 1]);
+  const titleFallback = useMemo(
+    () => getProjectFallbackImage({ title, remoteUrl: imageUrl, fallbackCandidate: fallbackImageUrl }),
+    [title, imageUrl, fallbackImageUrl]
+  );
+  const resolvedPrimary = useMemo(() => resolveImageUrl({ url: imageUrl }), [imageUrl]);
+  const resolvedFallback = useMemo(() => {
+    if (titleFallback) {
+      const mappedFallback = resolveImageUrl({ url: titleFallback });
+      if (mappedFallback) {
+        return mappedFallback;
+      }
+    }
+    return null;
+  }, [titleFallback]);
+  const [imageFallbackUsed, setImageFallbackUsed] = useState(false);
+  const [currentImageSrc, setCurrentImageSrc] = useState<string>(() => {
+    if (resolvedPrimary) {
+      return resolvedPrimary;
+    }
+    if (resolvedFallback) {
+      return resolvedFallback;
+    }
+    return "/favicon.ico";
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const applyFallback = () => {
+      if (cancelled) return;
+      if (resolvedFallback) {
+        setCurrentImageSrc(resolvedFallback);
+        setImageFallbackUsed(true);
+      } else {
+        setCurrentImageSrc("/favicon.ico");
+        setImageFallbackUsed(true);
+      }
+    };
+
+    if (!resolvedPrimary) {
+      applyFallback();
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    if (typeof window === "undefined") {
+      // During SSR fall back immediately to avoid hydration mismatch
+      applyFallback();
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const img = new window.Image();
+    img.onload = () => {
+      if (cancelled) return;
+      setCurrentImageSrc(resolvedPrimary);
+      setImageFallbackUsed(false);
+    };
+    img.onerror = () => {
+      applyFallback();
+    };
+    img.src = resolvedPrimary;
+
+    return () => {
+      cancelled = true;
+    };
+  }, [resolvedPrimary, resolvedFallback]);
+
+  const fallbackSrc = resolvedFallback ?? "/favicon.ico";
+
+  const handleImageError = () => {
+    if (!imageFallbackUsed) {
+      setImageFallbackUsed(true);
+      setCurrentImageSrc(fallbackSrc);
+    } else if (currentImageSrc !== "/favicon.ico") {
+      setCurrentImageSrc("/favicon.ico");
+    }
+  };
 
   return (
     <motion.div
@@ -49,9 +137,12 @@ export default function Project({
         </div>
 
         <Image
-          src={imageUrl}
+          key={currentImageSrc}
+          src={currentImageSrc}
           alt="Project I worked on"
           quality={95}
+          width={904}
+          height={600}
           className="absolute hidden sm:block top-8 -right-40 w-[28.25rem] rounded-t-lg shadow-2xl
         transition 
         group-hover:scale-[1.04]
@@ -64,6 +155,7 @@ export default function Project({
         group-even:group-hover:rotate-2
 
         group-even:right-[initial] group-even:-left-40"
+          onError={handleImageError}
         />
       </section>
     </motion.div>

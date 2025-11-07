@@ -1,6 +1,17 @@
 import "./globals.css";
 import ClientLayout from "@/components/client-layout";
 
+const themeInitializer = `(() => {
+  try {
+    const storedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldUseDark = storedTheme ? storedTheme === 'dark' : prefersDark;
+    document.documentElement.classList.toggle('dark', shouldUseDark);
+  } catch (error) {
+    console.warn('Theme initialization failed', error);
+  }
+})();`;
+
 export default function RootLayout({
   children,
 }: {
@@ -18,6 +29,9 @@ export default function RootLayout({
         className="bg-gray-50 text-gray-950 relative dark:bg-gray-900 dark:text-gray-50 dark:text-opacity-90"
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
+        <script
+          dangerouslySetInnerHTML={{ __html: themeInitializer }}
+        />
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

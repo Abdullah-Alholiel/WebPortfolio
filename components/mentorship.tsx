@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { useTheme } from '@/context/theme-context';
 import { usePortfolioData } from '@/context/portfolio-data-context';
 import { useSectionInView } from '@/lib/hooks';
+import { resolveImageUrl } from '@/lib/image-utils';
+import Loader from '@/components/ui/loader';
 
 interface MentorshipItem {
   title: string;
@@ -11,6 +13,8 @@ interface MentorshipItem {
   icon: string;
   imageUrl: string;
   certificateUrl: string;
+  fallbackImageUrl?: string;
+  fallbackCertificateUrl?: string;
 }
 
 interface MentorshipCardProps extends MentorshipItem {
@@ -18,9 +22,19 @@ interface MentorshipCardProps extends MentorshipItem {
   index: number;
 }
 
-const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl, size, index }: MentorshipCardProps) => {
+const MentorshipCard = ({ title, description, icon, imageUrl, fallbackImageUrl, certificateUrl, fallbackCertificateUrl, size, index }: MentorshipCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [imageFallbackUsed, setImageFallbackUsed] = useState(false);
+  const [certificateFallbackUsed, setCertificateFallbackUsed] = useState(false);
+  const [currentImageSrc, setCurrentImageSrc] = useState<string>(() => {
+    const resolved = resolveImageUrl({ url: imageUrl, fallback: fallbackImageUrl });
+    return resolved ?? '/favicon.ico';
+  });
+  const [currentCertificateSrc, setCurrentCertificateSrc] = useState<string>(() => {
+    const resolved = resolveImageUrl({ url: certificateUrl, fallback: fallbackCertificateUrl });
+    return resolved ?? '/favicon.ico';
+  });
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -35,6 +49,33 @@ const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl, si
 
   const handleCardClick = () => {
     setIsFlipped(!isFlipped);
+  };
+
+  useEffect(() => {
+    const resolvedImage = resolveImageUrl({ url: imageUrl, fallback: fallbackImageUrl });
+    setCurrentImageSrc(resolvedImage ?? '/favicon.ico');
+    setImageFallbackUsed(false);
+
+    const resolvedCertificate = resolveImageUrl({ url: certificateUrl, fallback: fallbackCertificateUrl });
+    setCurrentCertificateSrc(resolvedCertificate ?? '/favicon.ico');
+    setCertificateFallbackUsed(false);
+  }, [imageUrl, certificateUrl, fallbackImageUrl, fallbackCertificateUrl]);
+
+  const fallbackImageSrc = resolveImageUrl({ url: fallbackImageUrl }) ?? '/favicon.ico';
+  const fallbackCertificateSrc = resolveImageUrl({ url: fallbackCertificateUrl }) ?? '/favicon.ico';
+
+  const handleImageError = () => {
+    if (!imageFallbackUsed && fallbackImageSrc !== currentImageSrc) {
+      setImageFallbackUsed(true);
+      setCurrentImageSrc(fallbackImageSrc);
+    }
+  };
+
+  const handleCertificateError = () => {
+    if (!certificateFallbackUsed && fallbackCertificateSrc !== currentCertificateSrc) {
+      setCertificateFallbackUsed(true);
+      setCurrentCertificateSrc(fallbackCertificateSrc);
+    }
   };
 
   const sizeClasses = {
@@ -117,11 +158,12 @@ const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl, si
                   transition={{ duration: 0.3 }}
                 >
                   <Image 
-                    src={imageUrl} 
+                    src={currentImageSrc}
                     alt={`${title} logo`} 
                     width={200} 
                     height={200} 
                     className="rounded-full shadow-xl border-4 border-white/20" 
+                    onError={handleImageError}
                   />
                 </motion.div>
                 <h3 className={`text-2xl md:text-3xl font-bold mb-3 text-center ${
@@ -163,11 +205,12 @@ const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl, si
                   transition={{ duration: 0.3 }}
                 >
                   <Image 
-                    src={imageUrl} 
+                    src={currentImageSrc}
                     alt={`${title} logo`} 
                     width={150} 
                     height={150} 
                     className="rounded-full shadow-lg border-4 border-white/20" 
+                    onError={handleImageError}
                   />
                 </motion.div>
                 <h3 className={`text-xl md:text-2xl font-bold mb-2 text-center ${
@@ -209,11 +252,12 @@ const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl, si
                   transition={{ duration: 0.3 }}
                 >
                   <Image 
-                    src={imageUrl} 
+                    src={currentImageSrc}
                     alt={`${title} logo`} 
                     width={100} 
                     height={100} 
                     className="rounded-full shadow-md border-2 border-white/20" 
+                    onError={handleImageError}
                   />
                 </motion.div>
                 <h3 className={`text-lg font-bold mb-2 text-center ${
@@ -259,11 +303,12 @@ const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl, si
           transition={{ duration: 0.5 }}
         >
           <Image 
-            src={certificateUrl} 
+            src={currentCertificateSrc}
             alt={`${title} certificate`} 
             width={600} 
             height={400} 
             className="object-contain rounded-lg shadow-2xl max-h-full" 
+            onError={handleCertificateError}
           />
         </motion.div>
       </motion.div>
@@ -274,7 +319,7 @@ const MentorshipCard = ({ title, description, icon, imageUrl, certificateUrl, si
 export default function Mentorship() {
   const { ref } = useSectionInView("Mentorship", 0.3);
   const { data, loading: isLoading } = usePortfolioData();
-  const mentorship = data.mentorship || [];
+  const mentorship = data?.mentorship || [];
   const { theme } = useTheme();
 
   // Determine card sizes for bento grid layout - optimized for better visual balance
@@ -307,7 +352,7 @@ export default function Mentorship() {
       <section id="mentorship" ref={ref} className="scroll-mt-28 mb-28 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-center mb-12">Mentorship Experiences</h2>
-          <div className="text-center">Loading...</div>
+          <Loader className="w-full justify-center" label="Loading mentorship experiences" />
         </div>
       </section>
     );

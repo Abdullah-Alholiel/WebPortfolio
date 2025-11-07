@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkAuth } from '../auth/logout/route';
 import { getKVData, setKVData, KV_KEYS } from '@/lib/kv';
 import { syncCacheFromUpstash } from '@/lib/data-sync';
+import { normalizeProjectMedia } from '@/lib/media-normalizer';
 
 export async function GET(request: NextRequest) {
   // Verify auth
@@ -12,7 +13,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const data = await getKVData<any[]>(KV_KEYS.PROJECTS);
-    return NextResponse.json({ data: data || [] });
+    const normalized = Array.isArray(data) ? data.map(normalizeProjectMedia) : [];
+    return NextResponse.json({ data: normalized });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
   }
@@ -25,11 +27,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const project = await request.json();
+    const project = normalizeProjectMedia(await request.json());
     console.log('Saving project to Upstash:', project);
     const existing = await getKVData<any[]>(KV_KEYS.PROJECTS) || [];
+    const existingNormalized = Array.isArray(existing)
+      ? existing.map(normalizeProjectMedia)
+      : [];
     // Prepend new project to the beginning (newest first)
-    const updated = [project, ...existing];
+    const updated = [project, ...existingNormalized];
     const success = await setKVData(KV_KEYS.PROJECTS, updated);
     console.log('Save result:', success);
     
@@ -54,8 +59,11 @@ export async function PUT(request: NextRequest) {
   try {
     const { index, project } = await request.json();
     const existing = await getKVData<any[]>(KV_KEYS.PROJECTS) || [];
-    existing[index] = project;
-    await setKVData(KV_KEYS.PROJECTS, existing);
+    const normalizedExisting = Array.isArray(existing)
+      ? existing.map(normalizeProjectMedia)
+      : [];
+    normalizedExisting[index] = normalizeProjectMedia(project);
+    await setKVData(KV_KEYS.PROJECTS, normalizedExisting);
     
     // Sync cache in background (non-blocking)
     syncCacheFromUpstash().catch(() => {

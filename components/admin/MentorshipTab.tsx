@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import Loader from '@/components/ui/loader';
+import MediaPicker from './MediaPicker';
+
+const MEDIA_PREFIX = process.env.NEXT_PUBLIC_BLOB_MEDIA_PREFIX ?? 'web-pics';
 
 interface Mentorship {
   title: string;
@@ -9,6 +13,8 @@ interface Mentorship {
   icon: string;
   imageUrl: string;
   certificateUrl: string;
+  fallbackImageUrl?: string;
+  fallbackCertificateUrl?: string;
 }
 
 export default function MentorshipTab() {
@@ -21,6 +27,8 @@ export default function MentorshipTab() {
     icon: '',
     imageUrl: '',
     certificateUrl: '',
+    fallbackImageUrl: '',
+    fallbackCertificateUrl: '',
   });
 
   useEffect(() => {
@@ -113,7 +121,13 @@ export default function MentorshipTab() {
   };
 
   const handleEdit = (m: Mentorship, index: number) => {
-    setFormData(m);
+    setFormData({
+      ...m,
+      fallbackImageUrl:
+        m.fallbackImageUrl || (m.imageUrl?.startsWith('/') ? m.imageUrl : m.fallbackImageUrl) || '',
+      fallbackCertificateUrl:
+        m.fallbackCertificateUrl || (m.certificateUrl?.startsWith('/') ? m.certificateUrl : m.fallbackCertificateUrl) || '',
+    });
     setEditing(index);
   };
 
@@ -124,11 +138,13 @@ export default function MentorshipTab() {
       icon: '',
       imageUrl: '',
       certificateUrl: '',
+      fallbackImageUrl: '',
+      fallbackCertificateUrl: '',
     });
     setEditing(null);
   };
 
-  if (loading) return <div className="text-center py-12">Loading...</div>;
+  if (loading) return <Loader className="w-full py-12" />;
 
   return (
     <div>
@@ -171,19 +187,27 @@ export default function MentorshipTab() {
               className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="Icon emoji (e.g., 🧠)"
             />
-            <input
-              type="text"
+            <MediaPicker
+              label="Mentorship Image"
               value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="Image URL"
+              fallbackValue={formData.fallbackImageUrl}
+              onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
+              onFallbackChange={(fallback) =>
+                setFormData((prev) => ({ ...prev, fallbackImageUrl: fallback }))
+              }
+              helperText="Prefer blob URLs but keep a /public fallback for reliability."
+              prefix={MEDIA_PREFIX}
             />
-            <input
-              type="text"
+            <MediaPicker
+              label="Certificate Image"
               value={formData.certificateUrl}
-              onChange={(e) => setFormData({ ...formData, certificateUrl: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="Certificate URL"
+              fallbackValue={formData.fallbackCertificateUrl}
+              onChange={(url) => setFormData((prev) => ({ ...prev, certificateUrl: url }))}
+              onFallbackChange={(fallback) =>
+                setFormData((prev) => ({ ...prev, fallbackCertificateUrl: fallback }))
+              }
+              helperText="Displayed when card flips."
+              prefix={MEDIA_PREFIX}
             />
             <div className="flex gap-4">
               <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg">

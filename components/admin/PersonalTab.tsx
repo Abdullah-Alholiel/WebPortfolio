@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import Loader from '@/components/ui/loader';
 import { useTheme } from '@/context/theme-context';
+import MediaPicker from './MediaPicker';
+
+const MEDIA_PREFIX = process.env.NEXT_PUBLIC_BLOB_MEDIA_PREFIX ?? 'web-pics';
 
 interface PersonalInfo {
   cvLink: string;
@@ -11,6 +15,7 @@ interface PersonalInfo {
   contactEmail: string;
   linkedInUrl: string;
   githubUrl: string;
+  profileImageUrl?: string;
 }
 
 export default function PersonalTab() {
@@ -22,6 +27,7 @@ export default function PersonalTab() {
     contactEmail: '',
     linkedInUrl: '',
     githubUrl: '',
+    profileImageUrl: '',
   });
   const [loading, setLoading] = useState(true);
   
@@ -68,12 +74,22 @@ export default function PersonalTab() {
     }
   };
 
-  if (loading) return <div className="text-center py-12">Loading...</div>;
+  if (loading) return <Loader className="w-full py-12" />;
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">Personal Information</h2>
       <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-6">
+        <div>
+          <MediaPicker
+            label="Profile Image"
+            value={personalInfo.profileImageUrl}
+            onChange={(url) => setPersonalInfo({ ...personalInfo, profileImageUrl: url })}
+            helperText="This image appears on the home section."
+            prefix={MEDIA_PREFIX}
+          />
+        </div>
+
         <div>
           <label className="block text-sm font-medium mb-2">CV Link</label>
           <input

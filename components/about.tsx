@@ -121,7 +121,7 @@ const AboutMe = () => {
                   </Link>
                   {" "}and a{" "}
                   <Link href="#experience" className={highlightStyle}>
-                    Master's in Applied Computing
+                    Master&apos;s in Applied Computing
                   </Link>
                   , providing me with a unique blend of{" "}
                   <span className="font-semibold text-gray-800 dark:text-gray-200">
