@@ -5,15 +5,18 @@ import { useTheme } from '@/context/theme-context';
 import { usePortfolioData } from '@/context/portfolio-data-context';
 import { useSectionInView } from '@/lib/hooks';
 import StandardIcon from './standard-icon';
+import Loader from '@/components/ui/loader';
+import { resolveImageUrl } from '@/lib/image-utils';
 
 interface Achievement {
   title: string;
   description: string;
   Icon?: string | any;
-  certificateUrl: string;
+  certificateUrl?: string;
+  fallbackCertificateUrl?: string;
 }
 
-const AchievementCard = ({ title, description, Icon, certificateUrl, index }: Achievement & { index: number }) => {
+const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCertificateUrl, index }: Achievement & { index: number }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const { theme } = useTheme();
 
@@ -109,7 +112,12 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, index }: Ac
               }`}
             >
               <Image 
-                src={certificateUrl} 
+                src={
+                  resolveImageUrl({
+                    url: certificateUrl,
+                    fallback: fallbackCertificateUrl ?? certificateUrl ?? undefined,
+                  }) || '/favicon.ico'
+                }
                 alt={`${title} certificate`} 
                 width={600} 
                 height={400} 
@@ -159,7 +167,7 @@ export default function Achievements() {
       <section id="achievements" ref={ref} className="scroll-mt-28 mb-28 py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-8">Achievements</h2>
-          <div className="text-center text-gray-500">Loading...</div>
+          <Loader className="w-full justify-center" label="Loading achievements" />
         </div>
       </section>
     );

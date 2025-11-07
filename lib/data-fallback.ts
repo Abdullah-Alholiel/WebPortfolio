@@ -4,6 +4,7 @@ import {
   skillsData,
   achievementsData,
   mentorshipData,
+  blob,
 } from './data';
 import { getCachedData } from './data-sync';
 
@@ -18,6 +19,7 @@ const defaultPersonalInfo = {
   contactEmail: 'a.alholaiel@gmail.com',
   linkedInUrl: 'https://www.linkedin.com/in/abdullah-alholaiel-74208a210/',
   githubUrl: 'https://www.github.com/Abdullah-Alholiel',
+  profileImageUrl: blob("web-pics/abdullah.jpg"),
 };
 
 /**

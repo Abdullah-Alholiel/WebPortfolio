@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkAuth } from '../auth/logout/route';
 import { getKVData, setKVData, KV_KEYS } from '@/lib/kv';
 import { syncCacheFromUpstash } from '@/lib/data-sync';
+import { normalizePersonalMedia } from '@/lib/media-normalizer';
 
 export async function GET(request: NextRequest) {
   const auth = await checkAuth(request);
@@ -10,7 +11,8 @@ export async function GET(request: NextRequest) {
   }
   try {
     const data = await getKVData<any>(KV_KEYS.PERSONAL_INFO);
-    return NextResponse.json({ data: data || {} });
+    const normalized = data ? normalizePersonalMedia(data) : {};
+    return NextResponse.json({ data: normalized });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
   }
@@ -22,7 +24,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {
-    const personalInfo = await request.json();
+    const personalInfo = normalizePersonalMedia(await request.json());
     console.log('Saving personal info to Upstash:', personalInfo);
     const success = await setKVData(KV_KEYS.PERSONAL_INFO, personalInfo);
     console.log('Save result:', success);

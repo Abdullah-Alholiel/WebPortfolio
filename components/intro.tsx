@@ -1,7 +1,7 @@
 'use client';
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { BsArrowRight, BsLinkedin } from "react-icons/bs";
@@ -10,6 +10,7 @@ import { FaGithubSquare } from "react-icons/fa";
 import { useSectionInView } from "@/lib/hooks";
 import { useActiveSectionContext } from "@/context/active-section-context";
 import { usePortfolioData } from "@/context/portfolio-data-context";
+import { resolveImageUrl } from "@/lib/image-utils";
 
 interface PersonalInfo {
   cvLink: string;
@@ -18,6 +19,7 @@ interface PersonalInfo {
   contactEmail: string;
   linkedInUrl: string;
   githubUrl: string;
+  profileImageUrl?: string;
 }
 
 // Helper function to parse intro text into structured parts
@@ -78,7 +80,43 @@ export default function Intro() {
   const { setActiveSection, setTimeOfLastClick } = useActiveSectionContext();
   const { data } = usePortfolioData();
   const personalInfo = data.personal as PersonalInfo | null;
+  const [profileFallbackUsed, setProfileFallbackUsed] = useState(false);
+  const [profileImageSrc, setProfileImageSrc] = useState<string>(() => {
+    const resolvedPrimary = resolveImageUrl({
+      url: personalInfo?.profileImageUrl || 'web-pics/abdullah-ofsfQSEwijx6Eofa11RdeYEw8Rqpnz.jpg',
+    });
+    if (resolvedPrimary) {
+      return resolvedPrimary;
+    }
+    const resolvedFallback = resolveImageUrl({ url: '/abdullah.jpg' });
+    return resolvedFallback ?? '/abdullah.jpg';
+  });
   const [isProfileHovered, setIsProfileHovered] = useState(false);
+
+  useEffect(() => {
+    const resolvedPrimary = resolveImageUrl({
+      url: personalInfo?.profileImageUrl || 'web-pics/abdullah-ofsfQSEwijx6Eofa11RdeYEw8Rqpnz.jpg',
+    });
+    if (resolvedPrimary) {
+      setProfileImageSrc(resolvedPrimary);
+      setProfileFallbackUsed(false);
+      return;
+    }
+    const resolvedFallback = resolveImageUrl({ url: '/abdullah.jpg' });
+    setProfileImageSrc(resolvedFallback ?? '/abdullah.jpg');
+    setProfileFallbackUsed(true);
+  }, [personalInfo?.profileImageUrl]);
+
+  const fallbackProfileSrc = resolveImageUrl({ url: '/abdullah.jpg' }) ?? '/abdullah.jpg';
+
+  const handleProfileImageError = () => {
+    if (!profileFallbackUsed) {
+      setProfileFallbackUsed(true);
+      setProfileImageSrc(fallbackProfileSrc);
+    } else if (profileImageSrc !== '/abdullah.jpg') {
+      setProfileImageSrc('/abdullah.jpg');
+    }
+  };
 
   return (
     <section
@@ -110,7 +148,7 @@ export default function Intro() {
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-50 blur-lg animate-pulse"></div>
               
               <Image
-                src="/abdullah.jpg"
+                src={profileImageSrc}
                 alt="Abdullah Alholaiel"
                 width="384"
                 height="384"
@@ -120,6 +158,7 @@ export default function Intro() {
                 style={{
                   transform: isProfileHovered ? 'scale(1.02)' : 'scale(1)',
                 }}
+                onError={handleProfileImageError}
               />
             </motion.div>
 

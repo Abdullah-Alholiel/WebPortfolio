@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import Loader from '@/components/ui/loader';
 
 interface SkillsData {
   [category: string]: string[];
@@ -75,7 +76,7 @@ export default function SkillsTab() {
     setEditingSkills(editingSkills.filter((_, i) => i !== index));
   };
 
-  if (loading) return <div className="text-center py-12">Loading...</div>;
+  if (loading) return <Loader className="w-full py-12" />;
 
   return (
     <div>

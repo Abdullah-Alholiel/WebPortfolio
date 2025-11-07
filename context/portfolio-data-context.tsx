@@ -9,6 +9,7 @@ interface PersonalInfo {
   contactEmail?: string;
   linkedInUrl?: string;
   githubUrl?: string;
+  profileImageUrl?: string;
 }
 
 interface PortfolioData {

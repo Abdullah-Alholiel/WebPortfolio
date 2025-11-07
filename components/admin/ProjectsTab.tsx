@@ -2,12 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import Loader from '@/components/ui/loader';
+import MediaPicker from './MediaPicker';
+
+const MEDIA_PREFIX = process.env.NEXT_PUBLIC_BLOB_MEDIA_PREFIX ?? 'web-pics';
 
 interface Project {
   title: string;
   description: string;
   tags: string[];
   imageUrl: string;
+  fallbackImageUrl?: string;
 }
 
 export default function ProjectsTab() {
@@ -19,6 +24,7 @@ export default function ProjectsTab() {
     description: '',
     tags: [],
     imageUrl: '',
+    fallbackImageUrl: '',
   });
   const [tagInput, setTagInput] = useState('');
 
@@ -99,7 +105,11 @@ export default function ProjectsTab() {
   };
 
   const handleEdit = (project: Project, index: number) => {
-    setFormData(project);
+    setFormData({
+      ...project,
+      fallbackImageUrl:
+        project.fallbackImageUrl || (project.imageUrl?.startsWith('/') ? project.imageUrl : project.fallbackImageUrl) || '',
+    });
     setEditing(index); // Store the index for PUT request
   };
 
@@ -109,6 +119,7 @@ export default function ProjectsTab() {
       description: '',
       tags: [],
       imageUrl: '',
+      fallbackImageUrl: '',
     });
     setTagInput('');
     setEditing(null);
@@ -132,7 +143,7 @@ export default function ProjectsTab() {
   };
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>;
+    return <Loader className="w-full py-12" />;
   }
 
   return (
@@ -182,20 +193,17 @@ export default function ProjectsTab() {
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Image URL
-              </label>
-              <input
-                type="text"
-                value={formData.imageUrl}
-                onChange={(e) =>
-                  setFormData({ ...formData, imageUrl: e.target.value })
-                }
-                className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white"
-                required
-              />
-            </div>
+            <MediaPicker
+              label="Project Image"
+              value={formData.imageUrl}
+              fallbackValue={formData.fallbackImageUrl}
+              onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
+              onFallbackChange={(fallback) =>
+                setFormData((prev) => ({ ...prev, fallbackImageUrl: fallback }))
+              }
+              helperText="Use the media library to upload images. Provide a /public fallback for reliability."
+              prefix={MEDIA_PREFIX}
+            />
             <div>
               <label className="block text-sm font-medium mb-2">Tags</label>
               <div className="flex gap-2">

@@ -4,12 +4,17 @@ import React, { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { getIconOptionsForSelect } from '@/lib/icon-utils';
 import StandardIcon from '@/components/standard-icon';
+import Loader from '@/components/ui/loader';
+import MediaPicker from './MediaPicker';
+
+const MEDIA_PREFIX = process.env.NEXT_PUBLIC_BLOB_MEDIA_PREFIX ?? 'web-pics';
 
 interface Achievement {
   title: string;
   description: string;
   Icon?: string;
   certificateUrl: string;
+  fallbackCertificateUrl?: string;
 }
 
 export default function AchievementsTab() {
@@ -22,6 +27,7 @@ export default function AchievementsTab() {
     description: '',
     Icon: 'FaAward',
     certificateUrl: '',
+    fallbackCertificateUrl: '',
   });
 
   // Get all icon options and filter by search
@@ -126,17 +132,21 @@ export default function AchievementsTab() {
   };
 
   const handleEdit = (ach: Achievement, index: number) => {
-    setFormData(ach);
+    setFormData({
+      ...ach,
+      fallbackCertificateUrl:
+        ach.fallbackCertificateUrl || (ach.certificateUrl?.startsWith('/') ? ach.certificateUrl : ach.fallbackCertificateUrl) || '',
+    });
     setEditing(index);
   };
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', Icon: 'FaAward', certificateUrl: '' });
+    setFormData({ title: '', description: '', Icon: 'FaAward', certificateUrl: '', fallbackCertificateUrl: '' });
     setIconSearch('');
     setEditing(null);
   };
 
-  if (loading) return <div className="text-center py-12">Loading...</div>;
+  if (loading) return <Loader className="w-full py-12" />;
 
   return (
     <div>
@@ -200,13 +210,16 @@ export default function AchievementsTab() {
                 </div>
               )}
             </div>
-            <input
-              type="text"
+            <MediaPicker
+              label="Certificate Image"
               value={formData.certificateUrl}
-              onChange={(e) => setFormData({ ...formData, certificateUrl: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white"
-              placeholder="Certificate URL"
-              required
+              fallbackValue={formData.fallbackCertificateUrl}
+              onChange={(url) => setFormData((prev) => ({ ...prev, certificateUrl: url }))}
+              onFallbackChange={(fallback) =>
+                setFormData((prev) => ({ ...prev, fallbackCertificateUrl: fallback }))
+              }
+              helperText="Upload a certificate or choose an existing blob. Provide a /public fallback path."
+              prefix={MEDIA_PREFIX}
             />
             <div className="flex gap-4">
               <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg">

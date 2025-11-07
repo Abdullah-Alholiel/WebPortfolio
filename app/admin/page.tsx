@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AdminLayout from '@/components/admin/AdminLayout';
+import Loader from '@/components/ui/loader';
 import './admin-styles.css';
 
 export default function AdminDashboard() {
@@ -80,7 +81,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600"></div>
+        <Loader className="w-auto" label="Verifying admin access" />
       </div>
     );
   }
