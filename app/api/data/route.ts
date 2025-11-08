@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getKVData, setKVData, KV_KEYS } from '@/lib/kv';
 import { getFallbackData, isUpstashUnavailable } from '@/lib/data-fallback';
 import { syncCache } from '@/lib/data-sync';
-import { repairPortfolioMedia } from '@/lib/media-repair';
+import { repairPortfolioMedia, type PortfolioDataPayload } from '@/lib/media-repair';
 
 // CRITICAL: Force dynamic rendering - always fetch fresh data from Upstash
 // This ensures admin changes appear immediately in production
@@ -111,8 +111,15 @@ export async function GET() {
     const sanitizedAchievements = sanitizeAchievements(achievements);
 
     // Prepare the Upstash data for response
-    const upstashData = {
-      personal: personalInfo,
+    const normalizePersonal = (): PortfolioDataPayload['personal'] => {
+      if (!personalInfo || typeof personalInfo !== 'object') {
+        return null;
+      }
+      return personalInfo as Record<string, any>;
+    };
+
+    const upstashData: PortfolioDataPayload = {
+      personal: normalizePersonal(),
       projects: Array.isArray(projects) ? projects : [],
       experiences: sanitizedExperiences,
       skills: skills || {},
