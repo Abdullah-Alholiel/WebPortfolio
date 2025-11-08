@@ -19,6 +19,7 @@ export default function ProjectsTab() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<string | number | null>(null); // Changed to number | null to track index
+  const [reordering, setReordering] = useState(false);
   const [formData, setFormData] = useState<Project>({
     title: '',
     description: '',
@@ -33,8 +34,15 @@ export default function ProjectsTab() {
   }, []);
 
   const loadProjects = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('/api/admin/projects');
+      const response = await fetch('/api/admin/projects', {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      });
       const data = await response.json();
 
       if (response.ok) {
@@ -56,13 +64,18 @@ export default function ProjectsTab() {
     try {
       // If editing is a number (index), use PUT to update; otherwise use POST to create
       const isEditing = typeof editing === 'number';
+      const sanitizedPayload = {
+        ...formData,
+        imageUrl: (formData.imageUrl || '').trim(),
+        fallbackImageUrl: (formData.fallbackImageUrl || '').trim(),
+      };
       const response = await fetch('/api/admin/projects', {
         method: isEditing ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(
           isEditing 
-            ? { index: editing, project: formData }
-            : formData
+            ? { index: editing, project: sanitizedPayload }
+            : sanitizedPayload
         ),
       });
 
@@ -72,7 +85,7 @@ export default function ProjectsTab() {
         toast.success(isEditing ? 'Project updated successfully!' : 'Project saved successfully!');
         setEditing(null);
         resetForm();
-        loadProjects();
+        await loadProjects();
       } else {
         toast.error(data.error || `Failed to ${isEditing ? 'update' : 'save'} project`);
       }
@@ -111,6 +124,73 @@ export default function ProjectsTab() {
         project.fallbackImageUrl || (project.imageUrl?.startsWith('/') ? project.imageUrl : project.fallbackImageUrl) || '',
     });
     setEditing(index); // Store the index for PUT request
+  };
+
+  const persistOrder = async (updatedProjects: Project[]) => {
+    try {
+      setReordering(true);
+      const response = await fetch('/api/admin/projects', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projects: updatedProjects }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to reorder projects');
+      }
+
+      toast.success('Project order updated!');
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to reorder projects';
+      toast.error(message);
+      throw error instanceof Error ? error : new Error(message);
+    } finally {
+      setReordering(false);
+    }
+  };
+
+  const handleMove = (index: number, direction: 'up' | 'down') => {
+    if (reordering) {
+      return;
+    }
+
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= projects.length) {
+      return;
+    }
+
+    const previousProjects = [...projects];
+    const updatedProjects = [...projects];
+    const [movedProject] = updatedProjects.splice(index, 1);
+    updatedProjects.splice(newIndex, 0, movedProject);
+    setProjects(updatedProjects);
+
+    let editingChanged = false;
+    let nextEditing = editing;
+
+    if (typeof editing === 'number') {
+      if (editing === index) {
+        nextEditing = newIndex;
+      } else if (newIndex < index && editing >= newIndex && editing < index) {
+        nextEditing = editing + 1;
+      } else if (newIndex > index && editing > index && editing <= newIndex) {
+        nextEditing = editing - 1;
+      }
+
+      if (nextEditing !== editing) {
+        editingChanged = true;
+        setEditing(nextEditing);
+      }
+    }
+
+    persistOrder(updatedProjects).catch(() => {
+      setProjects(previousProjects);
+      if (editingChanged) {
+        setEditing(editing);
+      }
+    });
   };
 
   const resetForm = () => {
@@ -153,7 +233,17 @@ export default function ProjectsTab() {
           Projects
         </h2>
         <button
-          onClick={() => setEditing('new')}
+          onClick={() => {
+            setFormData({
+              title: '',
+              description: '',
+              tags: [],
+              imageUrl: '',
+              fallbackImageUrl: '',
+            });
+            setTagInput('');
+            setEditing('new');
+          }}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition"
         >
           + Add Project
@@ -267,8 +357,11 @@ export default function ProjectsTab() {
             key={index}
             className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div>
+            <div className="flex justify-between items-start mb-4 gap-4">
+              <div className="flex-1">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 font-semibold mb-2">
+                  {index + 1}
+                </span>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                   {project.title}
                 </h3>
@@ -286,19 +379,37 @@ export default function ProjectsTab() {
                   ))}
                 </div>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleEdit(project, index)}
-                  className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 px-4 py-2 rounded-lg"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(index)}
-                  className="text-red-600 hover:text-red-700 px-4 py-2 rounded-lg"
-                >
-                  Delete
-                </button>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleMove(index, 'up')}
+                    disabled={index === 0 || reordering}
+                    className="text-indigo-600 hover:text-indigo-700 disabled:text-gray-400 disabled:cursor-not-allowed dark:text-indigo-400 px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-900"
+                  >
+                    Move Up
+                  </button>
+                  <button
+                    onClick={() => handleMove(index, 'down')}
+                    disabled={index === projects.length - 1 || reordering}
+                    className="text-indigo-600 hover:text-indigo-700 disabled:text-gray-400 disabled:cursor-not-allowed dark:text-indigo-400 px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-900"
+                  >
+                    Move Down
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(project, index)}
+                    className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 px-4 py-2 rounded-lg"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(index)}
+                    className="text-red-600 hover:text-red-700 px-4 py-2 rounded-lg"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           </div>

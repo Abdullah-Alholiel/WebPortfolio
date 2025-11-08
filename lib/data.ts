@@ -97,7 +97,7 @@ export const projectsData = [
     description:
       "Developing an engaging trivia game with AI-generated questions, dynamic difficulty adjustment, for a personalized learning paths. Implementing real-time multiplayer features and adaptive content generation.",
     tags: ["React - Next.js", "Node.js", "LangChain", "OpenAI API", "TypeScript", "CrewAI", "Pydantic", "WebSockets", "Vector DB" ,"Relational DB", "FastAPI", "Cross Data Modelling"],
-    imageUrl: blob("web-pics/ai-trivia-game.png"),
+    imageUrl: blob("web-pics/ai-trivia-game-gGrkBP9NkxAuGGzXcoBNrqSymgBYxG.png"),
     fallbackImageUrl: "/ai-trivia-game.png",
   },
   {
@@ -105,7 +105,7 @@ export const projectsData = [
     description:
       "Building a platform that orchestrates specialized AI agents for business applications. Creating a system that enables autonomous task execution with human oversight and interagent communication protocols.",
     tags: ["Python", "CrewAI", "Pydantic", "Vector Databases", "LangChain", "React - Next.js", "TypeScript", "FastAPI", "Docker", "RAG", "LLM", "Embeddings"],
-    imageUrl: blob("web-pics/ai-agency.png"),
+    imageUrl: blob("web-pics/ai-agency-sHdG237MuUWiVsWeQuYVajrEfjvQEB.png"),
     fallbackImageUrl: "/ai-agency.png",
   },
   {
@@ -113,7 +113,7 @@ export const projectsData = [
     description:
       "Leading the development of mapping and routing algorithms for a ride-hailing service, optimizing driver-passenger matching and implementing efficient path-finding solutions for urban environments.",
     tags: ["Geospatial Algorithms", "Python", "GraphQL", "Nest.js", "MongoDB", "Docker", "React Native", "AWS", "MapBox API", "Redis", "Microservices"],
-    imageUrl: blob("web-pics/ride-hailing-app.png"),
+    imageUrl: blob("web-pics/ride-hailing-app-KHBS00D4dniQttGGVEDqAoDyuvR0Bn.png"),
     fallbackImageUrl: "/ride-hailing-app.png",
   },
   {
@@ -121,7 +121,7 @@ export const projectsData = [
     description:
       "Developed a scalable CoT solution using the MERN stack, enhancing smart parking operations with real-time data processing and serverless architecture on Azure.",
     tags: ["React", "Node.js", "Express", "MongoDB", "Mongoose", "Chakra UI", "Azure", "IoT", "Serverless", "Full Stack", "RESTful API", "Real-time Data", "Cloud Computing"],
-    imageUrl: blob("web-pics/cloud-of-things.png"),
+    imageUrl: blob("web-pics/cloud-of-things-8iCx5Oh4iNgPm0Th1ceP0vPw8vOfQJ.png"),
     fallbackImageUrl: "/cloud-of-things.png",
   },
   {
@@ -129,7 +129,7 @@ export const projectsData = [
     description:
       "Created an optimized ERD schema for digital transformation, enhancing data storage, retrieval, and analysis capabilities for enterprise-scale operations.",
     tags: ["SQL", "Data Modelling", "ERD", "Big Data", "ETL", "Database Design", "Scalability", "Business Intelligence"],
-    imageUrl: blob("web-pics/digital-migration.png"),
+    imageUrl: blob("web-pics/digital-migration-0QfhilMRNOGvwoQSLL5cUPdzdpGOIa.png"),
     fallbackImageUrl: "/digital-migration.png",
   },
   {
@@ -137,7 +137,7 @@ export const projectsData = [
     description:
       "Developed a Django-based web application integrated with Azure services, achieving efficient deployment and compliance with governance requirements for enterprise clients.",
     tags: ["Python", "Django", "Azure", "Microservices", "DevOps", "Cloud", "Hybrid Migration", "Software Development", "Cloud Security", "Cloud Computing"],
-    imageUrl: blob("web-pics/azure-hybrid.jpeg"),
+    imageUrl: blob("web-pics/azure-hybrid-bQzHwaOpNd2s2YGExvcSJ3b0rGpNKZ.jpeg"),
     fallbackImageUrl: "/azure-hybrid.jpeg",
   },
   {
@@ -145,7 +145,7 @@ export const projectsData = [
     description:
       "Built and managed an online store, applying web development and digital marketing techniques to effectively market health products with data-driven optimization strategies.",
     tags: ["HTML", "CSS", "Digital Marketing", "Shopify", "E-commerce", "SEO", "Social Media", "Google Analytics"],
-    imageUrl: blob("web-pics/Ecommercestore.png"),
+    imageUrl: blob("web-pics/Ecommercestore-jqWfH1FmYdGoXjTNsrFKTTpPbIeCJN.png"),
     fallbackImageUrl: "/ecommerce.png",
   },
   {
@@ -153,7 +153,7 @@ export const projectsData = [
     description:
       "Designed and simulated a sustainable, electric aircraft adhering to industry standards, focusing on zero carbon emissions and innovative propulsion systems.",
     tags: ["MATLAB", "Aerospace Engineering", "Hybrid Solutions", "Simulation", "Zero Carbon", "Electric Aircraft"],
-    imageUrl: blob("web-pics/electric-aircraft-img.png"),
+    imageUrl: blob("web-pics/electric-aircraft-img-qp9YQh7k8hErqmwPk3uzMrNGFH1CCr.png"),
     fallbackImageUrl: "/electric-aircraft-img.png",
   },
 ] as const;
@@ -195,42 +195,42 @@ export const achievementsData = [
     title: "Microsoft Azure Certifications – AZ-900/104/204",
     description: "Mastered Azure cloud services, enhancing cloud solution design and implementation capabilities.",
     Icon: FaCloud,
-    certificateUrl: blob("web-pics/azure-certifications.png"),
+    certificateUrl: blob("web-pics/azure-certifications-bjUeUf1jjjyc34MskHBqfmQOR4E376.png"),
     fallbackCertificateUrl: "/azure-certifications.png",
   },
   {
     title: "Google Data Analytics Professional Certificate",
     description: "Developed expertise in data collection, analysis, and visualization to inform strategic decision-making.",
     Icon: FaCode,
-    certificateUrl: blob("web-pics/google-data-analytics-certificate2.png"),
+    certificateUrl: blob("web-pics/google-data-analytics-certificate2-LcsffaD9YGr0ttd6b39XTLIn1qyxcJ.png"),
     fallbackCertificateUrl: "/google-data-analytics-certificate2.png",
   },
   {
     title: "EY Technology Consulting Project",
     description: "Delivered a technology consulting project for EY, focusing on data-driven strategies and solutions.",
     Icon: FaDatabase,
-    certificateUrl: blob("web-pics/ey-technology-consulting-project.png"),
+    certificateUrl: blob("web-pics/ey-technology-consulting-project-kZTaBvO9le2REIczW3p1v7mDZ97gXV.png"),
     fallbackCertificateUrl: "/ey-technology-consulting-project.png",
   },
   {
     title: "Ethics and Law in Data Analytics Certificate",
     description: "Completed course focusing on the ethical and legal aspects of data analytics.",
     Icon: FaBalanceScale,
-    certificateUrl: blob("web-pics/ethics-law-data-analytics-certificate1.png"),
+    certificateUrl: blob("web-pics/ethics-law-data-analytics-certificate1-UMGBNoraVwF5pHlIVoy7LvB4k09aTB.png"),
     fallbackCertificateUrl: "/ethics-law-data-analytics-certificate1.png",
   },
   {
     title: "AI Foundations: Machine Learning Certificate",
     description: "Gained foundational knowledge in AI and machine learning techniques.",
     Icon: FaBrain,
-    certificateUrl: blob("web-pics/ai-foundations-machine-learning-certificate.png"),
+    certificateUrl: blob("web-pics/ai-foundations-machine-learning-certificate-k0HW9LkzxmCmMmwYab5SiKJKddNcE1.png"),
     fallbackCertificateUrl: "/ai-foundations-machine-learning-certificate.png",
   },
   {
     title: "Google Digital Marketing Garage Certificate",
     description: "Acquired skills in digital marketing strategies and applications.",
     Icon: FaLightbulb,
-    certificateUrl: blob("web-pics/google-digital-marketing-garage-certificate1.png"),
+    certificateUrl: blob("web-pics/google-digital-marketing-garage-certificate1-krYLqdR5BK0zPABZfBM6BPLQsfa9lD.png"),
     fallbackCertificateUrl: "/google-digital-marketing-garage-certificate1.png",
   },
 ] as const;
@@ -240,8 +240,8 @@ export const mentorshipData = [
     title: "Accenture Job Simulation Experience",
     description: "Participated in data analytics and developer technology simulations, enhancing decision-making and problem-solving skills.",
     icon: "🧠",
-    imageUrl: blob("web-pics/accenture.png"),
-    certificateUrl: blob("web-pics/accenturecert1 copy.png"),
+    imageUrl: blob("web-pics/accenture-d9jUEwZwap5dV866wp8oUp2At6lV4f.png"),
+    certificateUrl: blob("web-pics/accenturecert1 copy-do6VK4tcH7xrf7UuZkzyq7WAMb0UBo.png"),
     fallbackImageUrl: "/accenture.png",
     fallbackCertificateUrl: "/accenturecert1 copy.png",
   },
@@ -249,8 +249,8 @@ export const mentorshipData = [
     title: "PepsiCo Advanced Software Engineering Job Simulation",
     description: "Developed engineering solutions using CI/CD and Azure, improving system visualization and development skills.",
     icon: "💻",
-    imageUrl: blob("web-pics/pepsico.png"),
-    certificateUrl: blob("web-pics/pepsicocert1.png"),
+    imageUrl: blob("web-pics/pepsico-FwAHoH0vHhOAcfjp7DLybvNJuWLJwE.png"),
+    certificateUrl: blob("web-pics/pepsicocert1-eu8Ouw0MdHmLX0QI7u3XMpzgApJGnr.png"),
     fallbackImageUrl: "/pepsico.png",
     fallbackCertificateUrl: "/pepsicocert1.png",
   },
@@ -258,8 +258,8 @@ export const mentorshipData = [
     title: "British Airways Data Science Job Simulation",
     description: "Conducted data-driven simulation and machine learning projects to optimize operational strategies.",
     icon: "✈️",
-    imageUrl: blob("web-pics/britishairways.png"),
-    certificateUrl: blob("web-pics/britishairways-certificate1.png"),
+    imageUrl: blob("web-pics/britishairways-6lwrNtCQex79nfue0rLDSuN840oWZP.png"),
+    certificateUrl: blob("web-pics/britishairways-certificate1-Xqxp28z2CU44DxuZ3wNjNT7mHtAlhX.png"),
     fallbackImageUrl: "/britishairways.png",
     fallbackCertificateUrl: "/britishairways-certificate1.png",
   },
@@ -267,8 +267,8 @@ export const mentorshipData = [
     title: "GE Aerospace Digital Technology Exploration",
     description: "Implemented Vue.js UI features, enhancing user experience and system efficiency.",
     icon: "💻",
-    imageUrl: blob("web-pics/geaerospace.png"),
-    certificateUrl: blob("web-pics/ge2.png"),
+    imageUrl: blob("web-pics/geaerospace-P9IeAGOgUPdjisoX0xl7rvO0bgZUzL.png"),
+    certificateUrl: blob("web-pics/ge2-G1Yflg2ewOJgX6b76aVCIGwiofV4Aa.png"),
     fallbackImageUrl: "/geaerospace.png",
     fallbackCertificateUrl: "/ge2.png",
   },
@@ -276,8 +276,8 @@ export const mentorshipData = [
     title: "Bright Network Internship Experiences",
     description: "Engaged with industry leaders in technology consulting, gaining insights into IoT and digital operations.",
     icon: "💻",
-    imageUrl: blob("web-pics/brightnetwork.jpeg"),
-    certificateUrl: blob("web-pics/brightnetwork-certificate.png"),
+    imageUrl: blob("web-pics/brightnetwork-lyb9K2GrgRYVgAQrlEzZDGwJRFWTRz.jpeg"),
+    certificateUrl: blob("web-pics/brightnetwork-certificate-Ipt60apM3KeBHCWFilRNRrZt1VdbiE.png"),
     fallbackImageUrl: "/brightnetwork.jpeg",
     fallbackCertificateUrl: "/brightnetwork-certificate.png",
   },

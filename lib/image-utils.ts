@@ -97,46 +97,91 @@ function normalizeBlobUrl(candidate: string): string {
   try {
     const parsed = new URL(candidate);
     const blobBase = getBlobBaseUrl();
-    let blobHost: string | null = null;
-
-    if (blobBase) {
-      try {
-        blobHost = new URL(blobBase).host;
-      } catch {
-        blobHost = null;
-      }
-    }
-
-    const isBlobHost = blobHost
-      ? parsed.host === blobHost
-      : parsed.hostname.endsWith('.blob.vercel-storage.com');
-
-    if (!isBlobHost) {
+    const normalizedPath = decodeURIComponent(stripLeadingSlashes(parsed.pathname));
+    if (!blobBase) {
       return candidate;
     }
-
-    const decodedPathname = decodeURIComponent(stripLeadingSlashes(parsed.pathname));
-    const segments = decodedPathname.split('/');
-    if (segments.length === 0) {
-      return candidate;
-    }
-
-    const filename = segments[segments.length - 1];
-    const hashedMatch = filename.match(/^(.*?)-([A-Za-z0-9]{6,})(\.[A-Za-z0-9]+)$/);
-    if (!hashedMatch) {
-      return candidate;
-    }
-
-    const sanitizedFilename = `${hashedMatch[1]}${hashedMatch[3]}`;
-    if (sanitizedFilename.length === 0) {
-      return candidate;
-    }
-
-    // Prefer serving from local fallback when hashed blob entries are referenced.
-    // This avoids 404 responses when temporary blob URLs expire or are deleted.
-    return `/${sanitizedFilename}`;
+    return `${blobBase.replace(/\/$/, '')}/${normalizedPath}`;
   } catch {
     return candidate;
+  }
+}
+
+export type MediaSourceType = 'blob' | 'fallback' | 'external' | 'unknown';
+
+function normalizeInput(value?: string | null): string {
+  if (!isNonEmptyString(value)) {
+    return '';
+  }
+  return value.trim();
+}
+
+export function getMediaSourceType(value?: string | null): MediaSourceType {
+  const input = normalizeInput(value);
+  if (input.length === 0) {
+    return 'unknown';
+  }
+
+  if (input.startsWith('data:')) {
+    return 'external';
+  }
+
+  if (isRemoteUrl(input)) {
+    try {
+      const parsed = new URL(input);
+      const host = parsed.host.toLowerCase();
+      if (host.endsWith('.blob.vercel-storage.com')) {
+        return 'blob';
+      }
+      const base = getBlobBaseUrl();
+      if (base) {
+        try {
+          const normalizedBase = new URL(base);
+          if (host === normalizedBase.host.toLowerCase()) {
+            return 'blob';
+          }
+          const normalizedHref = normalizedBase.href.replace(/\/$/, '');
+          if (input.startsWith(`${normalizedHref}/`)) {
+            return 'blob';
+          }
+        } catch {
+          if (input.startsWith(`${base.replace(/\/$/, '')}/`)) {
+            return 'blob';
+          }
+        }
+      }
+    } catch {
+      // If URL parsing fails, treat as external
+    }
+    return 'external';
+  }
+
+  if (input.startsWith('/')) {
+    return 'fallback';
+  }
+
+  const stripped = stripLeadingSlashes(input);
+  if (stripped.startsWith('web-pics/')) {
+    return 'blob';
+  }
+
+  if (!input.includes('://')) {
+    return 'fallback';
+  }
+
+  return 'external';
+}
+
+export function getMediaSourceDescription(source: MediaSourceType): string {
+  switch (source) {
+    case 'blob':
+      return 'Remote Blob';
+    case 'fallback':
+      return 'Local Fallback';
+    case 'external':
+      return 'External URL';
+    default:
+      return 'Not Set';
   }
 }
 

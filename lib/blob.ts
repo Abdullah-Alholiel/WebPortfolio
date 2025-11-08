@@ -1,21 +1,48 @@
 import { list, put, del, type PutBlobResult, type ListBlobResult } from '@vercel/blob';
 
-const DEFAULT_PREFIX = 'web-pics';
+const ENV_READ_WRITE_TOKEN = 'BLOB_READ_WRITE_TOKEN';
+const ENV_READ_ONLY_TOKEN = 'BLOB_READ_ONLY_TOKEN';
+const TOKEN_LOOKUP_REGEX = /_READ_(WRITE|ONLY)_TOKEN$/i;
 
-function resolveBlobToken(): string {
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
-    return process.env.BLOB_READ_WRITE_TOKEN;
+export const DEFAULT_PREFIX = 'web-pics';
+
+type TokenMode = 'readwrite' | 'readonly';
+
+function resolveEnvToken(mode: TokenMode): string | undefined {
+  const preferredKey = mode === 'readwrite' ? ENV_READ_WRITE_TOKEN : ENV_READ_ONLY_TOKEN;
+  const direct = process.env[preferredKey];
+  if (direct && direct.length > 0) return direct;
+
+  const dynamicKey = Object.keys(process.env).find((key) => {
+    if (!TOKEN_LOOKUP_REGEX.test(key)) return false;
+    const normalized = key.toLowerCase();
+    if (!normalized.includes('blob')) return false;
+    if (mode === 'readonly') {
+      return normalized.endsWith('_read_only_token');
+    }
+    return normalized.endsWith('_read_write_token');
+  });
+
+  return dynamicKey ? (process.env[dynamicKey] as string) : undefined;
+}
+
+function ensureToken(mode: TokenMode): string {
+  const token = resolveEnvToken(mode);
+  if (!token && mode === 'readonly') {
+    return ensureToken('readwrite');
   }
-
-  const dynamicKey = Object.keys(process.env).find((key) =>
-    /_READ_WRITE_TOKEN$/i.test(key) && key.toLowerCase().includes('blob'),
-  );
-
-  if (dynamicKey && process.env[dynamicKey]) {
-    return process.env[dynamicKey] as string;
+  if (!token) {
+    throw new Error(
+      'Vercel Blob token not found. Set BLOB_READ_WRITE_TOKEN (and optionally BLOB_READ_ONLY_TOKEN) in your environment.',
+    );
   }
-
-  throw new Error('Blob read/write token not found in environment variables.');
+  if (mode === 'readonly' && !process.env[ENV_READ_ONLY_TOKEN]) {
+    process.env[ENV_READ_ONLY_TOKEN] = token;
+  }
+  if (mode === 'readwrite' && !process.env[ENV_READ_WRITE_TOKEN]) {
+    process.env[ENV_READ_WRITE_TOKEN] = token;
+  }
+  return token;
 }
 
 interface UploadOptions {
@@ -61,7 +88,7 @@ export async function uploadToBlob(
     ? pathname.replace(/^\/+/, '')
     : `${basePath}/${Date.now()}-${sanitizedName}`;
 
-  const token = resolveBlobToken();
+  const token = ensureToken('readwrite');
 
   console.log('🟡 [blob] put()', {
     targetPath,
@@ -89,11 +116,38 @@ interface ListOptions {
 
 export async function listBlobs(options: ListOptions = {}): Promise<ListBlobResult> {
   const { prefix = DEFAULT_PREFIX, limit = 100, cursor = null } = options;
-  return list({ prefix, limit, cursor: cursor ?? undefined });
+  const token = ensureToken('readonly');
+  return list({ prefix, limit, cursor: cursor ?? undefined, token });
 }
 
 export async function deleteBlob(pathOrUrl: string): Promise<void> {
-  await del(pathOrUrl);
+  const token = ensureToken('readwrite');
+  await del(pathOrUrl, { token });
+}
+
+export async function listAllBlobs(options: Omit<ListOptions, 'limit' | 'cursor'> = {}): Promise<ListBlobResult['blobs']> {
+  const { prefix = DEFAULT_PREFIX } = options;
+  const token = ensureToken('readonly');
+  const blobs: ListBlobResult['blobs'] = [];
+  let cursor: string | undefined;
+
+  let attempts = 0;
+  do {
+    attempts += 1;
+    const result = await list({
+      prefix,
+      limit: 1000,
+      cursor,
+      token,
+    });
+    blobs.push(...result.blobs);
+    cursor = result.cursor ?? undefined;
+    if (cursor && attempts % 10 === 0) {
+      console.log(`[blob] Listed ${blobs.length} assets so far (cursor active)`);
+    }
+  } while (cursor);
+
+  return blobs;
 }
 
 export function sanitizePrefix(prefix?: string | null): string {
