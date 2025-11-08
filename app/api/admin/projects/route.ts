@@ -4,6 +4,9 @@ import { getKVData, setKVData, KV_KEYS } from '@/lib/kv';
 import { syncCacheFromUpstash } from '@/lib/data-sync';
 import { normalizeProjectMedia } from '@/lib/media-normalizer';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(request: NextRequest) {
   // Verify auth
   const auth = await checkAuth(request);
@@ -14,7 +17,14 @@ export async function GET(request: NextRequest) {
   try {
     const data = await getKVData<any[]>(KV_KEYS.PROJECTS);
     const normalized = Array.isArray(data) ? data.map(normalizeProjectMedia) : [];
-    return NextResponse.json({ data: normalized });
+    return NextResponse.json(
+      { data: normalized },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      },
+    );
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
   }
@@ -36,6 +46,13 @@ export async function POST(request: NextRequest) {
     // Prepend new project to the beginning (newest first)
     const updated = [project, ...existingNormalized];
     const success = await setKVData(KV_KEYS.PROJECTS, updated);
+    if (!success) {
+      console.error('Failed to persist project to Upstash');
+      return NextResponse.json(
+        { error: 'Failed to persist project to Upstash. Verify Upstash credentials.' },
+        { status: 500 },
+      );
+    }
     console.log('Save result:', success);
     
     // Sync cache in background (non-blocking)
@@ -63,7 +80,14 @@ export async function PUT(request: NextRequest) {
       ? existing.map(normalizeProjectMedia)
       : [];
     normalizedExisting[index] = normalizeProjectMedia(project);
-    await setKVData(KV_KEYS.PROJECTS, normalizedExisting);
+    const success = await setKVData(KV_KEYS.PROJECTS, normalizedExisting);
+    if (!success) {
+      console.error('Failed to update project in Upstash');
+      return NextResponse.json(
+        { error: 'Failed to persist project update. Verify Upstash credentials.' },
+        { status: 500 },
+      );
+    }
     
     // Sync cache in background (non-blocking)
     syncCacheFromUpstash().catch(() => {
@@ -86,7 +110,14 @@ export async function DELETE(request: NextRequest) {
     const { index } = await request.json();
     const existing = await getKVData<any[]>(KV_KEYS.PROJECTS) || [];
     const updated = existing.filter((_, i) => i !== index);
-    await setKVData(KV_KEYS.PROJECTS, updated);
+    const success = await setKVData(KV_KEYS.PROJECTS, updated);
+    if (!success) {
+      console.error('Failed to delete project from Upstash');
+      return NextResponse.json(
+        { error: 'Failed to delete project from Upstash. Verify Upstash credentials.' },
+        { status: 500 },
+      );
+    }
     
     // Sync cache in background (non-blocking)
     syncCacheFromUpstash().catch(() => {
@@ -96,6 +127,38 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  const auth = await checkAuth(request);
+  if (!auth.authenticated) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { projects } = await request.json();
+    if (!Array.isArray(projects)) {
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    }
+
+    const normalized = projects.map(normalizeProjectMedia);
+    const success = await setKVData(KV_KEYS.PROJECTS, normalized);
+    if (!success) {
+      console.error('Failed to reorder projects in Upstash');
+      return NextResponse.json(
+        { error: 'Failed to persist project order. Verify Upstash credentials.' },
+        { status: 500 },
+      );
+    }
+
+    syncCacheFromUpstash().catch(() => {
+      // Silently fail - cache sync is optional
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to reorder' }, { status: 500 });
   }
 }
 

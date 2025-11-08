@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getKVData, KV_KEYS } from '@/lib/kv';
+import { getKVData, setKVData, KV_KEYS } from '@/lib/kv';
 import { getFallbackData, isUpstashUnavailable } from '@/lib/data-fallback';
 import { syncCache } from '@/lib/data-sync';
+import { repairPortfolioMedia } from '@/lib/media-repair';
 
 // CRITICAL: Force dynamic rendering - always fetch fresh data from Upstash
 // This ensures admin changes appear immediately in production
@@ -119,9 +120,41 @@ export async function GET() {
       mentorship: Array.isArray(mentorship) ? mentorship : [],
     };
 
+    const repairResult = await repairPortfolioMedia(upstashData);
+
+    const repairedData = {
+      personal: repairResult.personal.data,
+      projects: repairResult.projects.data,
+      experiences: sanitizedExperiences,
+      skills: skills || {},
+      achievements: repairResult.achievements.data,
+      mentorship: repairResult.mentorship.data,
+    };
+
+    const persistOperations: Promise<unknown>[] = [];
+
+    if (repairResult.projects.changed && Array.isArray(projects)) {
+      persistOperations.push(setKVData(KV_KEYS.PROJECTS, repairResult.projects.data));
+    }
+    if (repairResult.achievements.changed && Array.isArray(achievements)) {
+      persistOperations.push(setKVData(KV_KEYS.ACHIEVEMENTS, repairResult.achievements.data));
+    }
+    if (repairResult.mentorship.changed && Array.isArray(mentorship)) {
+      persistOperations.push(setKVData(KV_KEYS.MENTORSHIP, repairResult.mentorship.data));
+    }
+    if (repairResult.personal.changed && personalInfo) {
+      persistOperations.push(setKVData(KV_KEYS.PERSONAL_INFO, repairResult.personal.data));
+    }
+
+    if (persistOperations.length > 0) {
+      Promise.allSettled(persistOperations).catch((error) => {
+        console.warn('Failed to persist repaired media references:', error);
+      });
+    }
+
     // Sync cache in the background (don't await - non-blocking)
     // This ensures fallback data is always up-to-date with remote database
-    syncCache(upstashData).catch((error) => {
+    syncCache(repairedData).catch((error) => {
       // Silently handle sync errors - caching is optional
       if (process.env.DEBUG_UPSTASH === 'true') {
         console.warn('Cache sync failed (non-critical):', error);
@@ -130,7 +163,7 @@ export async function GET() {
 
     // Return Upstash data with minimal caching to ensure fresh data
     // Reduced cache time so admin changes appear quickly
-    const response = NextResponse.json(upstashData, {
+    const response = NextResponse.json(repairedData, {
       headers: {
         // Short cache: 10 seconds max, no stale-while-revalidate to ensure freshness
         'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=0',

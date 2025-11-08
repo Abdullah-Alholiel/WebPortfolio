@@ -70,11 +70,6 @@ export function getProjectFallbackImage(options: {
     }
   }
 
-  const inferred = inferFromRemoteUrl(remoteUrl);
-  if (inferred) {
-    return inferred;
-  }
-
   return null;
 }
 

@@ -19,7 +19,7 @@ const defaultPersonalInfo = {
   contactEmail: 'a.alholaiel@gmail.com',
   linkedInUrl: 'https://www.linkedin.com/in/abdullah-alholaiel-74208a210/',
   githubUrl: 'https://www.github.com/Abdullah-Alholiel',
-  profileImageUrl: blob("web-pics/abdullah.jpg"),
+  profileImageUrl: blob("web-pics/abdullah-ivRTQ4jAdQIopvuw6XH8tlTCUvrxR1.jpg"),
 };
 
 /**

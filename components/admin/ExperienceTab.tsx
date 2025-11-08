@@ -18,6 +18,7 @@ export default function ExperienceTab() {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | string | null>(null);
+  const [reordering, setReordering] = useState(false);
   const [iconSearch, setIconSearch] = useState('');
   const [formData, setFormData] = useState<Experience>({
     title: '',
@@ -108,6 +109,69 @@ export default function ExperienceTab() {
     setEditing(index);
   };
 
+  const persistOrder = async (updatedExperiences: Experience[]) => {
+    try {
+      setReordering(true);
+      const response = await fetch('/api/admin/experience', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ experiences: updatedExperiences }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to reorder experiences');
+      }
+
+      toast.success('Experience order updated!');
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to reorder experiences';
+      toast.error(message);
+      throw error instanceof Error ? error : new Error(message);
+    } finally {
+      setReordering(false);
+    }
+  };
+
+  const handleMove = (index: number, direction: 'up' | 'down') => {
+    if (reordering) return;
+
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= experiences.length) return;
+
+    const previous = [...experiences];
+    const updated = [...experiences];
+    const [moved] = updated.splice(index, 1);
+    updated.splice(newIndex, 0, moved);
+    setExperiences(updated);
+
+    let editingChanged = false;
+    let nextEditing = editing;
+
+    if (typeof editing === 'number') {
+      if (editing === index) {
+        nextEditing = newIndex;
+      } else if (newIndex < index && editing >= newIndex && editing < index) {
+        nextEditing = editing + 1;
+      } else if (newIndex > index && editing > index && editing <= newIndex) {
+        nextEditing = editing - 1;
+      }
+
+      if (nextEditing !== editing) {
+        editingChanged = true;
+        setEditing(nextEditing);
+      }
+    }
+
+    persistOrder(updated).catch(() => {
+      setExperiences(previous);
+      if (editingChanged) {
+        setEditing(editing);
+      }
+    });
+  };
+
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (typeof editing !== 'number') return;
@@ -155,7 +219,10 @@ export default function ExperienceTab() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Experience</h2>
         <button
-          onClick={() => setEditing('new')}
+          onClick={() => {
+            resetForm();
+            setEditing('new');
+          }}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium"
         >
           + Add Experience
@@ -250,20 +317,41 @@ export default function ExperienceTab() {
       <div className="space-y-4">
         {experiences.map((exp, index) => (
           <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <div className="flex justify-between items-start">
-              <div>
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex-1">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 font-semibold mb-2">
+                  {index + 1}
+                </span>
                 <h3 className="text-xl font-semibold">{exp.title}</h3>
                 <p className="text-gray-600 dark:text-gray-400">{exp.location}</p>
                 <p className="text-sm text-gray-500 mt-2">{exp.date}</p>
                 <p className="mt-2">{exp.description}</p>
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => handleEdit(exp, index)} className="text-indigo-600 px-4 py-2 rounded-lg">
-                  Edit
-                </button>
-                <button onClick={() => handleDelete(index)} className="text-red-600 px-4 py-2 rounded-lg">
-                  Delete
-                </button>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleMove(index, 'up')}
+                    disabled={index === 0 || reordering}
+                    className="text-indigo-600 hover:text-indigo-700 disabled:text-gray-400 disabled:cursor-not-allowed px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-900"
+                  >
+                    Move Up
+                  </button>
+                  <button
+                    onClick={() => handleMove(index, 'down')}
+                    disabled={index === experiences.length - 1 || reordering}
+                    className="text-indigo-600 hover:text-indigo-700 disabled:text-gray-400 disabled:cursor-not-allowed px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-900"
+                  >
+                    Move Down
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => handleEdit(exp, index)} className="text-indigo-600 px-4 py-2 rounded-lg">
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(index)} className="text-red-600 px-4 py-2 rounded-lg">
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           </div>

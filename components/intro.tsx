@@ -83,7 +83,7 @@ export default function Intro() {
   const [profileFallbackUsed, setProfileFallbackUsed] = useState(false);
   const [profileImageSrc, setProfileImageSrc] = useState<string>(() => {
     const resolvedPrimary = resolveImageUrl({
-      url: personalInfo?.profileImageUrl || 'web-pics/abdullah-ofsfQSEwijx6Eofa11RdeYEw8Rqpnz.jpg',
+      url: personalInfo?.profileImageUrl || 'web-pics/abdullah-ivRTQ4jAdQIopvuw6XH8tlTCUvrxR1.jpg',
     });
     if (resolvedPrimary) {
       return resolvedPrimary;
@@ -95,7 +95,7 @@ export default function Intro() {
 
   useEffect(() => {
     const resolvedPrimary = resolveImageUrl({
-      url: personalInfo?.profileImageUrl || 'web-pics/abdullah-ofsfQSEwijx6Eofa11RdeYEw8Rqpnz.jpg',
+      url: personalInfo?.profileImageUrl || 'web-pics/abdullah-ivRTQ4jAdQIopvuw6XH8tlTCUvrxR1.jpg',
     });
     if (resolvedPrimary) {
       setProfileImageSrc(resolvedPrimary);

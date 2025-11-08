@@ -1,9 +1,14 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
-import { resolveImageUrl } from '@/lib/image-utils';
+import {
+  resolveImageUrl,
+  getMediaSourceDescription,
+  getMediaSourceType,
+  type MediaSourceType,
+} from '@/lib/image-utils';
 
 interface BlobItem {
   url: string;
@@ -39,19 +44,55 @@ export default function MediaPicker({
   const [mediaItems, setMediaItems] = useState<BlobItem[]>([]);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
+  const normalizedValue = typeof value === 'string' ? value : '';
+  const normalizedFallback = typeof fallbackValue === 'string' ? fallbackValue : undefined;
+  const trimmedPrimaryValue = normalizedValue.trim();
+  const trimmedFallbackValue = normalizedFallback ? normalizedFallback.trim() : '';
+
+  const mediaSourceClassNames = useMemo<Record<MediaSourceType, string>>(
+    () => ({
+      blob: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/70 dark:text-emerald-200',
+      fallback: 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-200',
+      external: 'bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-200',
+      unknown: 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+    }),
+    [],
+  );
+
+  const renderSourceBadge = useCallback(
+    (source: MediaSourceType) => (
+      <span
+        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${mediaSourceClassNames[source]}`}
+      >
+        {getMediaSourceDescription(source)}
+      </span>
+    ),
+    [mediaSourceClassNames],
+  );
+
+  const primarySource = useMemo<MediaSourceType>(
+    () => getMediaSourceType(trimmedPrimaryValue || undefined),
+    [trimmedPrimaryValue],
+  );
+
+  const fallbackSource = useMemo<MediaSourceType>(
+    () => getMediaSourceType(trimmedFallbackValue || undefined),
+    [trimmedFallbackValue],
+  );
+
   const selectedPathname = useMemo(() => {
-    if (!value) return '';
-    const match = mediaItems.find((item) => item.url === value || item.pathname === value);
+    if (!normalizedValue) return '';
+    const match = mediaItems.find((item) => item.url === normalizedValue || item.pathname === normalizedValue);
     if (match) return match.pathname;
-    if (value.startsWith('web-pics/')) return value;
-    if (value.startsWith('/')) return '';
+    if (normalizedValue.startsWith('web-pics/')) return normalizedValue;
+    if (normalizedValue.startsWith('/')) return '';
     try {
-      const parsed = new URL(value);
+      const parsed = new URL(normalizedValue);
       return parsed.pathname.replace(/^\/+/, '');
     } catch {
       return '';
     }
-  }, [value, mediaItems]);
+  }, [normalizedValue, mediaItems]);
 
   useEffect(() => {
     refreshMedia();
@@ -59,9 +100,9 @@ export default function MediaPicker({
   }, []);
 
   useEffect(() => {
-    const resolved = resolveImageUrl({ url: value, fallback: fallbackValue });
+    const resolved = resolveImageUrl({ url: normalizedValue, fallback: normalizedFallback });
     setPreviewSrc(resolved);
-  }, [value, fallbackValue]);
+  }, [normalizedValue, normalizedFallback]);
 
   const refreshMedia = async () => {
     setIsRefreshing(true);
@@ -184,7 +225,7 @@ export default function MediaPicker({
 
         <input
           type="text"
-          value={value || ''}
+          value={normalizedValue}
           onChange={(event) => onChange(event.target.value)}
           placeholder="https://... or /public/path.png"
           className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white"
@@ -193,16 +234,16 @@ export default function MediaPicker({
         {onFallbackChange && (
           <input
             type="text"
-            value={fallbackValue || ''}
+            value={normalizedFallback ?? ''}
             onChange={(event) => onFallbackChange(event.target.value)}
             placeholder="/public fallback path (e.g., /images/photo.png)"
             className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white"
           />
         )}
 
-        {previewSrc && (
-          <div className="flex items-center gap-3">
-            <div className="relative w-24 h-24 rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="flex items-start gap-3">
+          <div className="relative w-24 h-24 rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-50 dark:bg-gray-900">
+            {previewSrc ? (
               <Image
                 src={previewSrc}
                 alt="Selected preview"
@@ -217,15 +258,27 @@ export default function MediaPicker({
                   }
                 }}
               />
-            </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 break-all">
-              <p><strong>Primary:</strong> {value || '—'}</p>
-              {onFallbackChange && (
-                <p><strong>Fallback:</strong> {fallbackValue || '—'}</p>
-              )}
-            </div>
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                No Preview
+              </div>
+            )}
           </div>
-        )}
+          <div className="flex-1 text-xs text-gray-500 dark:text-gray-400 break-all space-y-1">
+            <p className="flex flex-wrap items-center gap-2">
+              <span className="font-semibold text-gray-600 dark:text-gray-300">Primary:</span>
+              <span className="font-mono text-gray-600 dark:text-gray-400">{trimmedPrimaryValue || '—'}</span>
+              {renderSourceBadge(primarySource)}
+            </p>
+            {onFallbackChange && (
+              <p className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-gray-600 dark:text-gray-300">Fallback:</span>
+                <span className="font-mono text-gray-600 dark:text-gray-400">{trimmedFallbackValue || '—'}</span>
+                {renderSourceBadge(fallbackSource)}
+              </p>
+            )}
+          </div>
+        </div>
 
         {helperText && (
           <p className="text-xs text-gray-500 dark:text-gray-400">{helperText}</p>
