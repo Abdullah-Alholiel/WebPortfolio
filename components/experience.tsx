@@ -60,7 +60,7 @@ export default function Experience() {
     if (typeof item.icon === 'function') {
       return item.icon;
     }
-    
+
     // Use the centralized icon utility to get icon from string name
     return getExperienceIcon(item.icon);
   };
@@ -95,7 +95,7 @@ export default function Experience() {
       <VerticalTimeline lineColor="" className="vertical-timeline-custom-line">
         {experiences.map((item, index) => {
           const IconComponent = getIcon(item);
-          
+
           return (
             <VerticalTimelineElement
               key={`${item.title}-${index}-${item.date}`}
@@ -116,17 +116,17 @@ export default function Experience() {
               }}
               date={item.date || ''}
               icon={
-                <StandardIcon 
-                  icon={item.icon} 
+                <StandardIcon
+                  icon={item.icon}
                   variant="timeline"
                   size="lg"
                 />
               }
               iconStyle={{
                 background:
-                  theme === "light" 
-                    ? "#fff" 
-                    : "rgba(255, 255, 255, 0.15)",
+                  theme === "light"
+                    ? "#fff"
+                    : "#1f2937",
                 width: "42px",
                 height: "42px",
                 minWidth: "42px",
@@ -138,8 +138,8 @@ export default function Experience() {
                 justifyContent: "center",
                 margin: 0,
                 padding: "8px",
-                boxShadow: theme === "light" 
-                  ? "0 0 0 3px #f3f4f6, inset 0 2px 0 rgba(0,0,0,.08), 0 3px 0 3px rgba(0,0,0,.05)" 
+                boxShadow: theme === "light"
+                  ? "0 0 0 3px #f3f4f6, inset 0 2px 0 rgba(0,0,0,.08), 0 3px 0 3px rgba(0,0,0,.05)"
                   : "0 0 0 3px rgba(255, 255, 255, 0.05), inset 0 2px 0 rgba(255,255,255,.08), 0 3px 0 3px rgba(0,0,0,.05)",
                 boxSizing: "border-box",
               }}
