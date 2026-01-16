@@ -3,6 +3,7 @@ import { getKVData, setKVData, KV_KEYS } from '@/lib/kv';
 import { getFallbackData, isUpstashUnavailable } from '@/lib/data-fallback';
 import { syncCache } from '@/lib/data-sync';
 import { repairPortfolioMedia, type PortfolioDataPayload } from '@/lib/media-repair';
+import { generateExperienceKey } from '@/lib/key-utils';
 
 // CRITICAL: Force dynamic rendering - always fetch fresh data from Upstash
 // This ensures admin changes appear immediately in production
@@ -53,10 +54,11 @@ function sanitizeIcon(icon: any): string {
  */
 function sanitizeExperiences(experiences: any): any[] {
   if (!experiences || !Array.isArray(experiences)) return [];
-  
+
   return experiences.map(exp => ({
     ...exp,
     icon: sanitizeIcon(exp.icon),
+    key: exp.key || generateExperienceKey(exp.title, exp.date),
   }));
 }
 

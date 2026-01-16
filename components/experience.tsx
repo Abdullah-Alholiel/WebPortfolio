@@ -10,6 +10,7 @@ import { useSectionInView } from "@/lib/hooks";
 import { useTheme } from "@/context/theme-context";
 import { usePortfolioData } from "@/context/portfolio-data-context";
 import { getExperienceIcon } from "@/lib/icon-utils";
+import { sortExperiencesByDate } from "@/lib/date-utils";
 import StandardIcon from "./standard-icon";
 import Loader from "@/components/ui/loader";
 
@@ -25,7 +26,33 @@ export default function Experience() {
   const { ref } = useSectionInView("Experience", 0.3);
   const { theme } = useTheme();
   const { data, loading: isLoading } = usePortfolioData();
-  const experiences: ExperienceItem[] = data.experiences || [];
+  const experiences: ExperienceItem[] = (data.experiences || []).sort((a, b) => {
+    const parseDate = (dateStr: string) => {
+      const parts = dateStr.split(' - ');
+      const startStr = parts[0]?.trim() || '';
+      const endStr = parts[1]?.trim() || '';
+
+      const parseMonthYear = (str: string) => {
+        const p = str.split('/');
+        const month = parseInt(p[0], 10) || 1;
+        const year = parseInt(p[1], 10) || new Date().getFullYear();
+        return new Date(year, month - 1, 1);
+      };
+
+      const start = parseMonthYear(startStr);
+      let end: Date | null = null;
+      if (endStr.toLowerCase() === 'present') {
+        end = new Date();
+      } else if (endStr) {
+        end = parseMonthYear(endStr);
+      }
+      return end ?? start;
+    };
+
+    const dateA = parseDate(a.date);
+    const dateB = parseDate(b.date);
+    return dateB.getTime() - dateA.getTime();
+  });
 
   // Function to get icon component from item (for VerticalTimeline which needs the component)
   const getIcon = (item: ExperienceItem) => {

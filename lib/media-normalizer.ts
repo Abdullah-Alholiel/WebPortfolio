@@ -37,6 +37,9 @@ export function normalizeProjectMedia(project: RecordWithMedia) {
   if ('fallbackImageUrl' in normalized) {
     normalized.fallbackImageUrl = normalizeFallback(normalized.fallbackImageUrl);
   }
+  if ('experienceKey' in normalized && normalized.experienceKey) {
+    normalized.experienceKey = String(normalized.experienceKey);
+  }
   if (!normalized.fallbackImageUrl) {
     const inferredFallback = getProjectFallbackImage({
       title: normalized.title ?? normalized.name,

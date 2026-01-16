@@ -11,7 +11,14 @@ export default function Projects() {
   const { ref } = useSectionInView("Projects", 0.1);
   const { data, loading: isLoading } = usePortfolioData();
   const projects = data.projects || [];
-  // Projects are already in newest-first order from API (prepended)
+  const experiences = data.experiences || [];
+
+  // Add static bio education options to experiences list
+  const allExperiences = [
+    ...experiences,
+    { title: "Bachelor's Degree", date: '2022', key: 'bio-bachelors-2022', type: 'bio-education' },
+    { title: "Master's Degree", date: '2024', key: 'bio-masters-2024', type: 'bio-education' },
+  ];
 
   if (isLoading) {
     return (
@@ -28,7 +35,7 @@ export default function Projects() {
       <div>
         {projects.map((project, index) => (
           <React.Fragment key={project.title || index}>
-            <Project {...project} />
+            <Project {...project} allExperiences={allExperiences} />
           </React.Fragment>
         ))}
       </div>

@@ -18,7 +18,6 @@ export default function ExperienceTab() {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | string | null>(null);
-  const [reordering, setReordering] = useState(false);
   const [iconSearch, setIconSearch] = useState('');
   const [formData, setFormData] = useState<Experience>({
     title: '',
@@ -28,14 +27,13 @@ export default function ExperienceTab() {
     icon: 'FaBriefcase',
   });
 
-  // Get professional/work-related icon options and filter by search
   const iconOptions = useMemo(() => {
-    const allOptions = getIconOptionsForSelect('experience'); // Only show professional icons
-    if (!iconSearch) return allOptions; // Show all professional icons by default
-    
+    const allOptions = getIconOptionsForSelect('experience');
+    if (!iconSearch) return allOptions;
+
     const searchLower = iconSearch.toLowerCase();
-    return allOptions.filter(opt => 
-      opt.value.toLowerCase().includes(searchLower) || 
+    return allOptions.filter(opt =>
+      opt.value.toLowerCase().includes(searchLower) ||
       opt.label.toLowerCase().includes(searchLower)
     );
   }, [iconSearch]);
@@ -70,7 +68,7 @@ export default function ExperienceTab() {
       });
 
       if (response.ok) {
-        toast.success('Experience saved!');
+        toast.success('Experience saved! (Auto-sorted by date)');
         setEditing(null);
         resetForm();
         loadExperiences();
@@ -109,73 +107,10 @@ export default function ExperienceTab() {
     setEditing(index);
   };
 
-  const persistOrder = async (updatedExperiences: Experience[]) => {
-    try {
-      setReordering(true);
-      const response = await fetch('/api/admin/experience', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ experiences: updatedExperiences }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to reorder experiences');
-      }
-
-      toast.success('Experience order updated!');
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Failed to reorder experiences';
-      toast.error(message);
-      throw error instanceof Error ? error : new Error(message);
-    } finally {
-      setReordering(false);
-    }
-  };
-
-  const handleMove = (index: number, direction: 'up' | 'down') => {
-    if (reordering) return;
-
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= experiences.length) return;
-
-    const previous = [...experiences];
-    const updated = [...experiences];
-    const [moved] = updated.splice(index, 1);
-    updated.splice(newIndex, 0, moved);
-    setExperiences(updated);
-
-    let editingChanged = false;
-    let nextEditing = editing;
-
-    if (typeof editing === 'number') {
-      if (editing === index) {
-        nextEditing = newIndex;
-      } else if (newIndex < index && editing >= newIndex && editing < index) {
-        nextEditing = editing + 1;
-      } else if (newIndex > index && editing > index && editing <= newIndex) {
-        nextEditing = editing - 1;
-      }
-
-      if (nextEditing !== editing) {
-        editingChanged = true;
-        setEditing(nextEditing);
-      }
-    }
-
-    persistOrder(updated).catch(() => {
-      setExperiences(previous);
-      if (editingChanged) {
-        setEditing(editing);
-      }
-    });
-  };
-
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (typeof editing !== 'number') return;
-    
+
     try {
       const response = await fetch('/api/admin/experience', {
         method: 'PUT',
@@ -187,7 +122,7 @@ export default function ExperienceTab() {
       });
 
       if (response.ok) {
-        toast.success('Experience updated!');
+        toast.success('Experience updated! (Auto-sorted by date)');
         setEditing(null);
         resetForm();
         loadExperiences();
@@ -217,7 +152,10 @@ export default function ExperienceTab() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Experience</h2>
+        <div>
+          <h2 className="text-2xl font-bold">Experience</h2>
+          <p className="text-sm text-gray-500 mt-1">Experiences are automatically sorted by date (newest first)</p>
+        </div>
         <button
           onClick={() => {
             resetForm();
@@ -264,7 +202,7 @@ export default function ExperienceTab() {
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
               className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white"
-              placeholder="Date (e.g., 01/2024 - Present)"
+              placeholder="Date (e.g., 06/2025 - Present)"
               required
             />
             <div>
@@ -327,31 +265,13 @@ export default function ExperienceTab() {
                 <p className="text-sm text-gray-500 mt-2">{exp.date}</p>
                 <p className="mt-2">{exp.description}</p>
               </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleMove(index, 'up')}
-                    disabled={index === 0 || reordering}
-                    className="text-indigo-600 hover:text-indigo-700 disabled:text-gray-400 disabled:cursor-not-allowed px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-900"
-                  >
-                    Move Up
-                  </button>
-                  <button
-                    onClick={() => handleMove(index, 'down')}
-                    disabled={index === experiences.length - 1 || reordering}
-                    className="text-indigo-600 hover:text-indigo-700 disabled:text-gray-400 disabled:cursor-not-allowed px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-900"
-                  >
-                    Move Down
-                  </button>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={() => handleEdit(exp, index)} className="text-indigo-600 px-4 py-2 rounded-lg">
-                    Edit
-                  </button>
-                  <button onClick={() => handleDelete(index)} className="text-red-600 px-4 py-2 rounded-lg">
-                    Delete
-                  </button>
-                </div>
+              <div className="flex gap-2">
+                <button onClick={() => handleEdit(exp, index)} className="text-indigo-600 hover:text-indigo-700 px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-900">
+                  Edit
+                </button>
+                <button onClick={() => handleDelete(index)} className="text-red-600 hover:text-red-700 px-4 py-2 rounded-lg border border-red-100 dark:border-red-900">
+                  Delete
+                </button>
               </div>
             </div>
           </div>
@@ -360,4 +280,3 @@ export default function ExperienceTab() {
     </div>
   );
 }
-

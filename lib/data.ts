@@ -1,6 +1,6 @@
 import React from "react";
 import { CgWorkAlt } from "react-icons/cg";
-import { FaReact, FaCloud, FaDatabase, FaCode, FaBrain, FaLightbulb, FaBalanceScale, FaPaperPlane, FaSitemap, FaTruck, FaChalkboardTeacher, FaGamepad, FaRobot, FaMapMarkedAlt } from "react-icons/fa";
+import { FaReact, FaCloud, FaDatabase, FaCode, FaBrain, FaLightbulb, FaBalanceScale, FaPaperPlane, FaSitemap, FaTruck, FaChalkboardTeacher, FaGamepad, FaRobot, FaMapMarkedAlt, FaGraduationCap } from "react-icons/fa";
 
 const BLOB_BASE = "https://amdwovffasfq8f6z.public.blob.vercel-storage.com";
 export const blob = (path: string) => `${BLOB_BASE}/${path.replace(/^\/+/, '')}`;
