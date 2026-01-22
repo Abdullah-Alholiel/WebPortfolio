@@ -42,9 +42,8 @@ export default function Project({
   const isBioEducation = experienceKey?.startsWith('bio-');
 
   // Get button text based on what's linked
-  const buttonText = isBioEducation ? 'View education in Bio' : 'View related experience';
+  const buttonText = isBioEducation ? 'Developed during "' + linkedExperience?.title + '" Studies' : 'Developed during "' + linkedExperience?.title + '" Experience';
   const targetSection = isBioEducation ? 'about' : 'experience';
-  const experienceTitle = linkedExperience?.title;
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -142,7 +141,7 @@ export default function Project({
       }}
       className="group mb-3 sm:mb-8 last:mb-0"
     >
-<section className="bg-gray-100 max-w-[42rem] border border-black/5 rounded-lg overflow-hidden sm:pr-8 relative min-h-[20rem] hover:bg-gray-200 transition sm:group-even:pl-8 dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
+      <section className="bg-gray-100 max-w-[42rem] border border-black/5 rounded-lg overflow-hidden sm:pr-8 relative min-h-[20rem] hover:bg-gray-200 transition sm:group-even:pl-8 dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
         <Image
           key={currentImageSrc}
           src={currentImageSrc}
@@ -180,19 +179,26 @@ export default function Project({
               </li>
             ))}
           </ul>
-          {experienceTitle && (
+          {experienceKey && (
             <button
               onClick={() => {
+                const targetId = experienceKey || '';
+                const targetElement = document.getElementById(targetId);
                 const targetSection = document.querySelector(`#${isBioEducation ? 'about' : 'experience'}`);
-                if (targetSection) {
+
+                if (targetElement) {
+                  targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  // Also push state but keep the hash as the section for cleaner URL or use the key if preferred
+                  history.pushState(null, '', `#${isBioEducation ? 'about' : 'experience'}`);
+                } else if (targetSection) {
                   targetSection.scrollIntoView({ behavior: 'smooth' });
                   history.pushState(null, '', `#${isBioEducation ? 'about' : 'experience'}`);
                 }
               }}
-              className="mt-4 inline-flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors"
+              className="group/btn mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-indigo-200/50 bg-indigo-50/50 px-4 py-2 text-xs font-medium text-indigo-700 backdrop-blur-sm transition-all hover:bg-indigo-100 hover:shadow-sm dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-300 dark:hover:bg-indigo-900/40 sm:text-sm"
             >
-              <span>{buttonText}</span>
-              <FaExternalLinkAlt className="text-xs" />
+              <span className="text-left">{buttonText}</span>
+              <FaExternalLinkAlt className="ml-1 text-[10px] transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5" />
             </button>
           )}
         </div>

@@ -19,6 +19,7 @@ interface ExperienceItem {
   location?: string;
   description: string;
   date: string;
+  key?: string;
   icon?: string | any;
 }
 
@@ -98,6 +99,7 @@ export default function Experience() {
 
           return (
             <VerticalTimelineElement
+              id={item.key}
               key={`${item.title}-${index}-${item.date}`}
               contentStyle={{
                 background:
