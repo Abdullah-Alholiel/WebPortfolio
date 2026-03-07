@@ -33,9 +33,8 @@ export default function Header() {
 
   return (
     <header className="z-[999] relative">
-      {/* Pill Navigation Container - Dark base like reactbits.dev */}
       <motion.div
-        className="fixed top-0 left-1/2 h-[4.5rem] w-full rounded-none sm:top-6 sm:h-[3.25rem] sm:w-auto sm:min-w-[42rem] sm:max-w-[95vw] sm:rounded-full shadow-lg flex items-center justify-center"
+        className="fixed top-0 left-1/2 h-[4.5rem] w-full rounded-none sm:top-6 sm:h-[3.25rem] sm:w-auto sm:min-w-[42rem] sm:max-w-[95vw] sm:rounded-full shadow-lg flex items-center justify-center z-[10]"
         initial={{ y: -100, x: "-50%", opacity: 0 }}
         animate={{ y: 0, x: "-50%", opacity: 1 }}
         transition={{
@@ -183,93 +182,27 @@ export default function Header() {
           </ul>
         </nav>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="sm:hidden fixed top-[0.15rem] right-4 h-12 w-12 rounded-full flex flex-col items-center justify-center gap-1.5 z-50"
-          style={{
-            backgroundColor: pillBgColor,
-          }}
-          onClick={toggleMobileMenu}
-          aria-label="Toggle menu"
-        >
-          <motion.span
-            className="w-5 h-0.5 rounded-full"
-            style={{
-              backgroundColor: activeTextColor,
-            }}
-            animate={{
-              rotate: isMobileMenuOpen ? 45 : 0,
-              y: isMobileMenuOpen ? 6 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-          />
-          <motion.span
-            className="w-5 h-0.5 rounded-full"
-            style={{
-              backgroundColor: activeTextColor,
-            }}
-            animate={{
-              rotate: isMobileMenuOpen ? -45 : 0,
-              y: isMobileMenuOpen ? -6 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-          />
-        </button>
+        {/* ===== Mobile: Centered nav with balanced spacers for hamburger ===== */}
+        <div className="sm:hidden flex items-center w-full h-full px-2">
+          {/* Left spacer — matches the space the hamburger occupies on the right */}
+          <div className="w-14 shrink-0" aria-hidden="true" />
 
-        {/* Mobile Navigation Links */}
-        <nav className="sm:hidden flex fixed top-[0.15rem] left-1/2 h-12 -translate-x-1/2 py-2">
-          <ul className="flex w-[22rem] flex-wrap items-center justify-center gap-y-1 text-[0.9rem] font-medium">
-            {links.slice(0, 4).map((link) => {
-              const isActive = activeSection === link.name;
-              return (
-                <motion.li
-                  key={link.hash}
-                  className="h-3/4 flex items-center justify-center relative"
-                  initial={{ y: -100, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                >
-                  <Link
-                    href={link.hash}
-                    className="flex w-full items-center justify-center px-3 py-3 rounded-full transition-all duration-200"
-                    style={{
-                      backgroundColor: isActive ? pillBgColor : "transparent",
-                      color: isActive ? activeTextColor : inactiveTextColor,
-                    }}
-                    onClick={() => {
-                      setActiveSection(link.name);
-                      setTimeOfLastClick(Date.now());
-                    }}
-                  >
-                    {link.name}
-                  </Link>
-                </motion.li>
-              );
-            })}
-          </ul>
-        </nav>
-      </motion.div>
-
-      {/* Mobile Menu Popover */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            className="sm:hidden fixed top-[4.5rem] left-4 right-4 z-[998] rounded-3xl shadow-2xl backdrop-blur-xl"
-            style={{
-              backgroundColor: baseColor,
-            }}
-            initial={{ opacity: 0, y: -20, scaleY: 0.95 }}
-            animate={{ opacity: 1, y: 0, scaleY: 1 }}
-            exit={{ opacity: 0, y: -20, scaleY: 0.95 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ul className="flex flex-col gap-[3px] p-[3px]">
-              {links.map((link) => {
+          {/* Centered nav links */}
+          <nav className="flex-1 flex items-center justify-center h-full">
+            <ul className="flex items-center justify-center gap-0.5 text-sm font-medium">
+              {links.filter(l => ["Home", "Projects", "Achievements", "Experience"].includes(l.name)).map((link, index) => {
                 const isActive = activeSection === link.name;
                 return (
-                  <li key={link.hash}>
+                  <motion.li
+                    key={link.hash}
+                    className="flex items-center justify-center"
+                    initial={{ y: -100, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
                     <Link
                       href={link.hash}
-                      className="block px-4 py-3 rounded-full text-base font-semibold uppercase tracking-[0.2px] transition-all duration-200"
+                      className="flex items-center justify-center px-2 py-1.5 rounded-full transition-all duration-200 whitespace-nowrap"
                       style={{
                         backgroundColor: isActive ? pillBgColor : "transparent",
                         color: isActive ? activeTextColor : inactiveTextColor,
@@ -277,16 +210,120 @@ export default function Header() {
                       onClick={() => {
                         setActiveSection(link.name);
                         setTimeOfLastClick(Date.now());
-                        setIsMobileMenuOpen(false);
                       }}
                     >
                       {link.name}
                     </Link>
-                  </li>
+                  </motion.li>
                 );
               })}
             </ul>
-          </motion.div>
+          </nav>
+
+          {/* Right spacer — matches left spacer */}
+          <div className="w-14 shrink-0" aria-hidden="true" />
+        </div>
+      </motion.div>
+
+      {/* Hamburger button — OUTSIDE motion.div so it stays above the blur */}
+      <button
+        className="sm:hidden fixed top-4 right-4 h-10 w-10 rounded-full flex flex-col items-center justify-center gap-1.5 z-[999]"
+        style={{
+          backgroundColor: pillBgColor,
+        }}
+        onClick={toggleMobileMenu}
+        aria-label="Toggle menu"
+      >
+        <motion.span
+          className="w-4 h-0.5 rounded-full"
+          style={{
+            backgroundColor: activeTextColor,
+          }}
+          animate={{
+            rotate: isMobileMenuOpen ? 45 : 0,
+            y: isMobileMenuOpen ? 5 : 0,
+          }}
+          transition={{ duration: 0.3 }}
+        />
+        <motion.span
+          className="w-4 h-0.5 rounded-full"
+          style={{
+            backgroundColor: activeTextColor,
+          }}
+          animate={{
+            rotate: isMobileMenuOpen ? -45 : 0,
+            y: isMobileMenuOpen ? -5 : 0,
+          }}
+          transition={{ duration: 0.3 }}
+        />
+      </button>
+
+      {/* Mobile Menu Popover with backdrop */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            {/* Backdrop overlay */}
+            <motion.div
+              className="sm:hidden fixed inset-0 z-[997] bg-black/30 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            {/* Menu panel */}
+            <motion.div
+              className="sm:hidden fixed top-[4.5rem] left-4 right-4 z-[998] rounded-3xl shadow-2xl backdrop-blur-xl overflow-hidden"
+              style={{
+                backgroundColor: baseColor,
+              }}
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{
+                type: "spring",
+                stiffness: 350,
+                damping: 30,
+              }}
+            >
+              <ul className="flex flex-col gap-[3px] p-[3px]">
+                {links.map((link, index) => {
+                  const isActive = activeSection === link.name;
+                  return (
+                    <motion.li
+                      key={link.hash}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 25,
+                        delay: index * 0.04,
+                      }}
+                    >
+                      <Link
+                        href={link.hash}
+                        className="block px-4 py-3 rounded-full text-base font-semibold uppercase tracking-[0.2px] transition-all duration-200"
+                        style={{
+                          backgroundColor: isActive ? pillBgColor : "transparent",
+                          color: isActive ? activeTextColor : inactiveTextColor,
+                        }}
+                        onClick={() => {
+                          setActiveSection(link.name);
+                          setTimeOfLastClick(Date.now());
+                          setIsMobileMenuOpen(false);
+                        }}
+                      >
+                        {link.name}
+                      </Link>
+                    </motion.li>
+                  );
+                })}
+              </ul>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </header>

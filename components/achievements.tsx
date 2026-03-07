@@ -32,18 +32,17 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
 
   return (
     <motion.div
-      className="group relative h-full"
+      className="group relative h-[320px] min-h-[320px]"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ delay: index * 0.1, duration: 0.4 }}
     >
       <div
-        className={`relative h-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300 ${
-          theme === 'dark'
+        className={`relative h-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300 ${theme === 'dark'
             ? 'bg-gray-800/50 border border-gray-700/50 hover:border-gray-600 hover:bg-gray-800'
             : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg'
-        }`}
+          }`}
         onClick={() => setIsFlipped(!isFlipped)}
       >
         <AnimatePresence mode="wait">
@@ -58,13 +57,12 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
               {/* Icon */}
               {Icon && (
                 <div className="mb-6">
-                  <div className={`inline-flex p-3 rounded-lg ${
-                    theme === 'dark' 
-                      ? 'bg-blue-500/10 text-blue-400' 
+                  <div className={`inline-flex p-3 rounded-lg ${theme === 'dark'
+                      ? 'bg-blue-500/10 text-blue-400'
                       : 'bg-blue-100 text-blue-600'
-                  }`}>
-                    <StandardIcon 
-                      icon={Icon} 
+                    }`}>
+                    <StandardIcon
+                      icon={Icon}
                       variant="card"
                       className="text-2xl"
                     />
@@ -74,25 +72,21 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
 
               {/* Content */}
               <div className="flex-1">
-                <h3 className={`text-xl font-semibold mb-3 leading-tight ${
-                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                }`}>
+                <h3 className={`text-xl font-semibold mb-3 leading-tight ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>
                   {title}
                 </h3>
-                <p className={`text-sm leading-relaxed ${
-                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                }`}>
+                <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
                   {description}
                 </p>
               </div>
 
               {/* Footer */}
-              <div className={`mt-6 pt-4 border-t ${
-                theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
-              }`}>
-                <div className={`flex items-center gap-2 text-xs font-medium ${
-                  theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+              <div className={`mt-6 pt-4 border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                 }`}>
+                <div className={`flex items-center gap-2 text-xs font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                  }`}>
                   <span>View Certificate</span>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -106,23 +100,39 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              className={`h-full p-4 flex items-center justify-center ${
-                theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
-              }`}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className={`h-full p-6 flex items-center justify-center rounded-xl overflow-hidden ${theme === 'dark' ? 'bg-gray-900/95 backdrop-blur-sm' : 'bg-gray-50/95 backdrop-blur-sm'
+                }`}
             >
-              <Image 
-                src={
-                  resolveImageUrl({
-                    url: certificateUrl,
-                    fallback: fallbackCertificateUrl ?? certificateUrl ?? undefined,
-                  }) || '/favicon.ico'
-                }
-                alt={`${title} certificate`} 
-                width={600} 
-                height={400} 
-                className="object-contain max-h-full max-w-full rounded-lg" 
-              />
+              {/* Subtle overlay gradient */}
+              <div className={`absolute inset-0 ${theme === 'dark'
+                  ? 'bg-gradient-to-br from-blue-900/10 via-transparent to-purple-900/10'
+                  : 'bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/30'
+                }`} />
+              <div className="relative w-full h-full flex items-center justify-center">
+                <Image
+                  src={
+                    resolveImageUrl({
+                      url: certificateUrl,
+                      fallback: fallbackCertificateUrl ?? certificateUrl ?? undefined,
+                    }) || '/favicon.ico'
+                  }
+                  alt={`${title} certificate`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-contain rounded-lg drop-shadow-lg"
+                />
+              </div>
+              {/* Tap to close hint */}
+              <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium ${theme === 'dark'
+                  ? 'bg-gray-800/60 text-gray-400 border border-gray-700/50'
+                  : 'bg-gray-100/60 text-gray-500 border border-gray-200/50'
+                } backdrop-blur-sm z-10`}>
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Tap to close
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -184,14 +194,12 @@ export default function Achievements() {
           transition={{ duration: 0.4 }}
           className="text-center mb-12"
         >
-          <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${
-            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-          }`}>
+          <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>
             Achievements
           </h2>
-          <p className={`text-base md:text-lg ${
-            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-          }`}>
+          <p className={`text-base md:text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
             Professional certifications and accomplishments
           </p>
         </motion.div>
@@ -218,11 +226,10 @@ export default function Achievements() {
                 {/* Arrows */}
                 <button
                   onClick={goToPrevious}
-                  className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 hidden lg:flex items-center justify-center w-10 h-10 rounded-full transition-all ${
-                    theme === 'dark'
+                  className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 hidden lg:flex items-center justify-center w-10 h-10 rounded-full transition-all ${theme === 'dark'
                       ? 'bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-300'
                       : 'bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 shadow-sm'
-                  }`}
+                    }`}
                   aria-label="Previous achievements"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -231,11 +238,10 @@ export default function Achievements() {
                 </button>
                 <button
                   onClick={goToNext}
-                  className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 hidden lg:flex items-center justify-center w-10 h-10 rounded-full transition-all ${
-                    theme === 'dark'
+                  className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 hidden lg:flex items-center justify-center w-10 h-10 rounded-full transition-all ${theme === 'dark'
                       ? 'bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-300'
                       : 'bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 shadow-sm'
-                  }`}
+                    }`}
                   aria-label="Next achievements"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -253,15 +259,14 @@ export default function Achievements() {
                       aria-label={`Go to page ${index + 1}`}
                     >
                       <motion.div
-                        className={`rounded-full transition-all ${
-                          currentPage === index
+                        className={`rounded-full transition-all ${currentPage === index
                             ? theme === 'dark'
                               ? 'bg-blue-500'
                               : 'bg-blue-600'
                             : theme === 'dark'
-                            ? 'bg-gray-700 hover:bg-gray-600'
-                            : 'bg-gray-300 hover:bg-gray-400'
-                        }`}
+                              ? 'bg-gray-700 hover:bg-gray-600'
+                              : 'bg-gray-300 hover:bg-gray-400'
+                          }`}
                         initial={false}
                         animate={{
                           width: currentPage === index ? 24 : 8,
