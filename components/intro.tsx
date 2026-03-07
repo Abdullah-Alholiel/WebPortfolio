@@ -234,7 +234,7 @@ export default function Intro() {
                 return (
                   <motion.h2
                     key={i}
-                    className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-normal text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 leading-relaxed sm:leading-loose tracking-wide"
+                    className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 leading-relaxed sm:leading-loose tracking-wide"
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: delay, duration: 0.5, ease: "easeOut" }}
