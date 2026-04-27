@@ -182,27 +182,24 @@ export default function Header() {
           </ul>
         </nav>
 
-        {/* ===== Mobile: Centered nav with balanced spacers for hamburger ===== */}
-        <div className="sm:hidden flex items-center w-full h-full px-2">
-          {/* Left spacer — matches the space the hamburger occupies on the right */}
-          <div className="w-14 shrink-0" aria-hidden="true" />
-
-          {/* Centered nav links */}
-          <nav className="flex-1 flex items-center justify-center h-full">
-            <ul className="flex items-center justify-center gap-0.5 text-sm font-medium">
+        {/* ===== Mobile: Left-aligned nav with room for hamburger ===== */}
+        <div className="sm:hidden flex items-center w-full h-full px-3">
+          {/* Nav links — left-aligned, flex-1 to fill available space */}
+          <nav className="flex-1 flex items-center h-full min-w-0">
+            <ul className="flex items-center gap-0.5 text-xs font-medium">
               {links.filter(l => ["Home", "Projects", "Achievements", "Experience"].includes(l.name)).map((link, index) => {
                 const isActive = activeSection === link.name;
                 return (
                   <motion.li
                     key={link.hash}
-                    className="flex items-center justify-center"
+                    className="flex items-center"
                     initial={{ y: -100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: index * 0.05 }}
                   >
                     <Link
                       href={link.hash}
-                      className="flex items-center justify-center px-2 py-1.5 rounded-full transition-all duration-200 whitespace-nowrap"
+                      className="flex items-center justify-center px-2.5 py-1.5 rounded-full transition-all duration-200 whitespace-nowrap"
                       style={{
                         backgroundColor: isActive ? pillBgColor : "transparent",
                         color: isActive ? activeTextColor : inactiveTextColor,
@@ -220,8 +217,8 @@ export default function Header() {
             </ul>
           </nav>
 
-          {/* Right spacer — matches left spacer */}
-          <div className="w-14 shrink-0" aria-hidden="true" />
+          {/* Right spacer — prevents overlap with fixed hamburger button */}
+          <div className="w-12 shrink-0" aria-hidden="true" />
         </div>
       </motion.div>
 
