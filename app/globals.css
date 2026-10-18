@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent decorative blobs from creating horizontal scroll on small
+   viewports. `clip` avoids turning the page into a scroll container
+   (keeps position: sticky working); `hidden` is the legacy fallback. */
+html,
+body {
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
 html {
   --line-color: #e5e7eb;
 }
