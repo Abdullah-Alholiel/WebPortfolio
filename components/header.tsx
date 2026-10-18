@@ -34,7 +34,7 @@ export default function Header() {
   return (
     <header className="z-[999] relative">
       <motion.div
-        className="fixed top-0 left-1/2 hidden h-[4.5rem] w-full rounded-none sm:top-6 sm:h-[3.25rem] sm:w-auto lg:min-w-[46rem] sm:max-w-[95vw] sm:rounded-full shadow-lg lg:flex items-center justify-center z-[10]"
+        className="fixed top-0 left-1/2 flex h-[4.5rem] w-full rounded-none sm:top-6 sm:hidden sm:h-[3.25rem] sm:w-auto lg:min-w-[46rem] sm:max-w-[95vw] sm:rounded-full shadow-lg lg:flex items-center justify-center z-[10]"
         initial={{ y: -100, x: "-50%", opacity: 0 }}
         animate={{ y: 0, x: "-50%", opacity: 1 }}
         transition={{
