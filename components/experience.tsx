@@ -122,6 +122,7 @@ export default function Experience() {
               <button
                 key={m.id}
                 type="button"
+                data-mode={m.id}
                 onClick={() => setMode(m.id)}
                 aria-pressed={active}
                 className={`min-h-[40px] rounded-full px-5 py-2 text-sm font-semibold transition-all ${

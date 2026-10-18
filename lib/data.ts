@@ -15,8 +15,8 @@ export const links = [
     hash: "#about",
   },
   {
-    name: "Ventures",
-    hash: "#ventures",
+    name: "Founder",
+    hash: "#founder",
   },
   {
     name: "Projects",
@@ -242,6 +242,7 @@ export const achievementsData = [
 export type VentureStage = "revenue" | "vc-targeted" | "hobby";
 export type VentureStatus = "in-development" | "coming-soon" | "archived";
 export type VentureChip = { label: string; tone: "violet" | "emerald" | "slate" };
+export type VentureProjectLink = { label: string; hash: string };
 
 export const venturesData: {
   name: string;
@@ -250,7 +251,7 @@ export const venturesData: {
   chips: VentureChip[];
   description: string;
   status: VentureStatus;
-  link?: string;
+  projectLink?: VentureProjectLink;
 }[] = [
   {
     name: "Plug & Play Video Analytics",
@@ -258,7 +259,7 @@ export const venturesData: {
     stageLabel: "Revenue generated",
     chips: [],
     description:
-      "Video analytics solution for local stores, sold as a plug-and-play product — from capture to actionable footfall and behaviour insights with no bespoke integration work.",
+      "Video analytics for local stores, packaged as a plug-and-play product. Stores get footfall and behaviour insights without any custom integration work.",
     status: "archived",
   },
   {
@@ -267,8 +268,12 @@ export const venturesData: {
     stageLabel: "VC targeted",
     chips: [{ label: "Ride hailing", tone: "slate" }],
     description:
-      "Ride-hailing venture with mapping and routing at its core — optimised driver–passenger matching and efficient urban path-finding (the engineering is showcased under Projects).",
+      "A ride-hailing venture built around mapping and routing. Smarter driver and passenger matching, with faster paths through busy city streets.",
     status: "archived",
+    projectLink: {
+      label: "See the engineering",
+      hash: "#project-ride-hailing-application",
+    },
   },
   {
     name: "AI Football Trivia",
@@ -276,8 +281,12 @@ export const venturesData: {
     stageLabel: "Hobby project",
     chips: [{ label: "RAG", tone: "violet" }],
     description:
-      "AI-powered football trivia game built on retrieval-augmented generation — questions grounded in real football knowledge with adaptive difficulty.",
+      "A football trivia game powered by retrieval-augmented generation. Every question is grounded in real football knowledge, with difficulty that adapts as you play.",
     status: "archived",
+    projectLink: {
+      label: "See the game",
+      hash: "#project-ai-powered-trivia-web-game",
+    },
   },
   {
     name: "SaudiEase",
@@ -285,9 +294,8 @@ export const venturesData: {
     stageLabel: "VC potential",
     chips: [],
     description:
-      "A digital companion for living in and visiting Saudi Arabia — services, attractions and essentials in one place.",
+      "A digital companion for life in Saudi Arabia. Services, attractions and everyday essentials, all in one place for residents and visitors.",
     status: "archived",
-    link: "https://github.com/Abdullah-Alholiel/SaudiEase",
   },
   {
     name: "Momentum",
@@ -295,9 +303,8 @@ export const venturesData: {
     stageLabel: "Hobby",
     chips: [{ label: "Revenue potential", tone: "emerald" }],
     description:
-      "A mutual-accountability PWA: friends co-own tasks, log completions and keep streaks alive together — installable, offline-friendly, with a Supabase-backed data foundation.",
+      "An accountability app for friends. You co-own tasks, log completions and keep each other's streaks alive, on any device you carry.",
     status: "archived",
-    link: "https://github.com/Abdullah-Alholiel/mutual-tasks-pwa-webapp",
   },
   {
     name: "KoraLink",
@@ -305,9 +312,8 @@ export const venturesData: {
     stageLabel: "VC & revenue potential",
     chips: [{ label: "In development", tone: "slate" }],
     description:
-      "A sports matchmaking platform connecting players, pitches and games — discover matches near you, organise games and grow a local football community.",
+      "A platform that connects players, pitches and games. Find a match near you, organise your own, and grow a local football community.",
     status: "in-development",
-    link: "https://github.com/Abdullah-Alholiel/KoraLink",
   },
   {
     name: "KnowStride",
@@ -318,14 +324,16 @@ export const venturesData: {
       { label: "In development", tone: "slate" },
     ],
     description:
-      "An enterprise AI upskilling platform for training agencies — adaptive learning journeys with verifiable quality, built alongside KoraLink as the newest venture.",
+      "An enterprise upskilling platform for training agencies. Adaptive learning journeys with quality you can verify, built as my newest venture.",
     status: "coming-soon",
   },
 ];
 
 export const venturesCta = {
-  text: "Think you'd be an addition if you got involved? I'd love to hear from you.",
-  ctaLabel: "Get in touch",
+  title: "Got an idea?",
+  text: "I am always open to building something new with the right people. If you think we would make a good team, I would love to hear from you.",
+  ctaLabel: "Let's talk",
+  journeyLabel: "Read the full story in my Entrepreneurial journey",
 };
 
 export const mentorshipData = [

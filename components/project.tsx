@@ -147,6 +147,8 @@ export default function Project({
   const visibleTags = tagsExpanded ? tags : tags.slice(0, VISIBLE_TAGS);
   const hiddenTagCount = tags.length - VISIBLE_TAGS;
   const targetHash = isBioEducation ? "about" : "experience";
+  // Stable anchor so founder-section cards can deep-link to this project
+  const anchorId = `project-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
 
   const scrollToExperience = () => {
     const targetElement = document.getElementById(experienceKey || "");
@@ -162,7 +164,8 @@ export default function Project({
 
   return (
     <motion.article
-      className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-black/5 bg-white shadow-sm transition-shadow duration-300 hover:shadow-lg dark:border-white/10 dark:bg-white/10"
+      id={anchorId}
+      className="group relative flex h-full scroll-mt-32 flex-col overflow-hidden rounded-xl border border-black/5 bg-white shadow-sm transition-shadow duration-300 hover:shadow-lg dark:border-white/10 dark:bg-white/10"
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}

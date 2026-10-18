@@ -1,17 +1,45 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SectionHeading from "./section-heading";
 import Project from "./project";
 import { useSectionInView } from "@/lib/hooks";
 import { usePortfolioData } from "@/context/portfolio-data-context";
+import { FaChevronDown } from "react-icons/fa";
 import Loader from "@/components/ui/loader";
+
+// Projects that already star in the Founder section. They stay behind the
+// "Show all" toggle so the grid doesn't repeat itself.
+const FOUNDER_PROJECT_TITLES = new Set([
+  "AI-Powered Trivia Web Game",
+  "Ride Hailing Application",
+]);
 
 export default function Projects() {
   const { ref } = useSectionInView("Projects", 0.1);
   const { data, loading: isLoading } = usePortfolioData();
   const projects = data.projects || [];
   const experiences = data.experiences || [];
+  const [showAll, setShowAll] = useState(false);
+
+  const founderCount = projects.filter((p) =>
+    FOUNDER_PROJECT_TITLES.has(p.title || "")
+  ).length;
+  const visibleProjects = showAll
+    ? projects
+    : projects.filter((p) => !FOUNDER_PROJECT_TITLES.has(p.title || ""));
+
+  // Arriving from a Founder card link (#project-...) must reveal the target.
+  useEffect(() => {
+    const revealIfDeepLink = () => {
+      if (window.location.hash.startsWith("#project-")) {
+        setShowAll(true);
+      }
+    };
+    revealIfDeepLink();
+    window.addEventListener("hashchange", revealIfDeepLink);
+    return () => window.removeEventListener("hashchange", revealIfDeepLink);
+  }, []);
 
   // Add static bio education options to experiences list
   const allExperiences = [
@@ -33,10 +61,26 @@ export default function Projects() {
     <section id="projects" ref={ref} className="scroll-mt-28 mb-28">
       <SectionHeading>Projects</SectionHeading>
       <div className="mx-auto grid max-w-[53rem] grid-cols-1 gap-5 sm:grid-cols-2 items-stretch">
-        {projects.map((project, index) => (
+        {visibleProjects.map((project, index) => (
           <Project key={project.title || index} {...project} allExperiences={allExperiences} />
         ))}
       </div>
+
+      {!showAll && founderCount > 0 && (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShowAll(true)}
+            aria-expanded={false}
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 shadow-sm transition-all hover:border-black/25 hover:shadow dark:border-white/15 dark:bg-white/10 dark:text-white/90 dark:hover:border-white/40"
+          >
+            <FaChevronDown className="text-xs opacity-60" aria-hidden />
+            {founderCount === 1
+              ? "Show 1 more from my products"
+              : `Show ${founderCount} more from my products`}
+          </button>
+        </div>
+      )}
     </section>
   );
 }
