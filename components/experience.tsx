@@ -28,6 +28,8 @@ type JourneyMode = "professional" | "entrepreneurial";
  * Mode classification for the Journey toggle.
  * Professional = employed / client engagements.
  * Entrepreneurial = self-directed ventures and founded initiatives.
+ * Any title containing "Founder"/"Co-Founder" is entrepreneurial by
+ * definition (covers future entries automatically).
  */
 const ENTREPRENEURIAL_TITLES = new Set([
   "Freelance E-commerce Specialist",
@@ -35,6 +37,7 @@ const ENTREPRENEURIAL_TITLES = new Set([
 ]);
 
 function modeOf(item: ExperienceItem): JourneyMode {
+  if (/founder/i.test(item.title)) return "entrepreneurial";
   return ENTREPRENEURIAL_TITLES.has(item.title) ? "entrepreneurial" : "professional";
 }
 
