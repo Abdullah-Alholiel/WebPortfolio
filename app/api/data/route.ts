@@ -76,6 +76,33 @@ function sanitizeAchievements(achievements: any): any[] {
 
 export async function GET() {
   try {
+    // Single-source-of-truth mode: when DATA_PROXY_URL is set (staging),
+    // serve the production API's response verbatim. Staging then always
+    // shows exactly what prod shows — same Upstash, zero local credentials.
+    // Falls through to the local source if the proxy is unreachable.
+    const proxyUrl = process.env.DATA_PROXY_URL;
+    if (proxyUrl) {
+      try {
+        const upstream = await fetch(
+          `${proxyUrl.replace(/\/$/, '')}/api/data`,
+          { cache: 'no-store' }
+        );
+        if (upstream.ok) {
+          const data = await upstream.json();
+          return NextResponse.json(data, {
+            headers: {
+              'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=0',
+              'X-Data-Timestamp': Date.now().toString(),
+              'X-Data-Source': 'upstash-via-prod-proxy',
+            },
+          });
+        }
+        console.warn(`Data proxy responded ${upstream.status}; using local source`);
+      } catch (proxyError) {
+        console.warn('Data proxy unreachable; using local source:', proxyError);
+      }
+    }
+
     // Fetch data from Redis - Upstash is the primary source
     const [
       projects,
