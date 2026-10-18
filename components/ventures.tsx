@@ -6,14 +6,13 @@ import { motion } from "framer-motion";
 import {
   FaRocket,
   FaGithub,
-  FaRegClock,
-  FaRegCheckCircle,
-  FaRegDotCircle,
 } from "react-icons/fa";
 import {
   venturesData,
   venturesCta,
   type VentureStage,
+  type VentureStatus,
+  type VentureChip,
 } from "@/lib/data";
 
 const STAGE_STYLES: Record<VentureStage, string> = {
@@ -22,19 +21,57 @@ const STAGE_STYLES: Record<VentureStage, string> = {
   hobby: "bg-amber-500 text-white",
 };
 
-const STATUS_META = {
-  live: { icon: FaRegCheckCircle, label: "Live", title: "Live and running" },
-  archived: {
-    icon: FaRegDotCircle,
-    label: "Archived · running",
-    title: "Archived but still running",
+/** Subtle tonal outline chips — quiet companions to the solid stage badge. */
+const CHIP_STYLES: Record<VentureChip["tone"], string> = {
+  slate:
+    "border-slate-200 bg-slate-50 text-slate-600 dark:border-white/15 dark:bg-white/10 dark:text-white/75",
+  violet:
+    "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-400/20 dark:bg-violet-500/10 dark:text-violet-300",
+  emerald:
+    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-300",
+};
+
+const STATUS_META: Record<
+  VentureStatus,
+  { dot: string; pulse?: boolean; label: string; title: string }
+> = {
+  "in-development": {
+    dot: "bg-indigo-500",
+    pulse: true,
+    label: "In development",
+    title: "Actively being developed",
   },
   "coming-soon": {
-    icon: FaRegClock,
+    dot: "bg-blue-500",
     label: "Coming soon",
-    title: "In development",
+    title: "Launching soon",
   },
-} as const;
+  archived: {
+    dot: "bg-gray-400 dark:bg-white/40",
+    label: "Archived · still running",
+    title: "Archived but still running",
+  },
+};
+
+function StatusDot({ status }: { status: VentureStatus }) {
+  const meta = STATUS_META[status];
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 text-[11px] font-medium text-gray-500 dark:text-white/60"
+      title={meta.title}
+    >
+      <span className="relative flex h-2 w-2">
+        {meta.pulse && (
+          <span
+            className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 motion-reduce:animate-none ${meta.dot}`}
+          />
+        )}
+        <span className={`relative inline-flex h-2 w-2 rounded-full ${meta.dot}`} />
+      </span>
+      {meta.label}
+    </span>
+  );
+}
 
 function VentureCard({
   venture,
@@ -44,8 +81,6 @@ function VentureCard({
   index: number;
 }) {
   const stageStyle = STAGE_STYLES[venture.stage];
-  const status = STATUS_META[venture.status];
-  const StatusIcon = status.icon;
 
   return (
     <motion.article
@@ -62,13 +97,7 @@ function VentureCard({
         >
           {venture.stageLabel}
         </span>
-        <span
-          className="inline-flex items-center gap-1.5 text-[11px] font-medium text-gray-500 dark:text-white/60"
-          title={status.title}
-        >
-          <StatusIcon aria-hidden />
-          {status.label}
-        </span>
+        <StatusDot status={venture.status} />
       </div>
 
       {/* Name */}
@@ -78,13 +107,13 @@ function VentureCard({
 
       {/* Optional chips */}
       {venture.chips.length > 0 && (
-        <ul className="mt-2 flex flex-wrap gap-1.5">
+        <ul className="mt-2.5 flex flex-wrap gap-1.5">
           {venture.chips.map((chip) => (
             <li
-              key={chip}
-              className="rounded-full border border-black/10 bg-black/[0.04] px-2.5 py-0.5 text-[11px] font-medium text-gray-700 dark:border-white/15 dark:bg-white/10 dark:text-white/80"
+              key={chip.label}
+              className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${CHIP_STYLES[chip.tone]}`}
             >
-              {chip}
+              {chip.label}
             </li>
           ))}
         </ul>

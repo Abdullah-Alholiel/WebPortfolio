@@ -240,14 +240,16 @@ export const achievementsData = [
 ] as const;
 
 export type VentureStage = "revenue" | "vc-targeted" | "hobby";
+export type VentureStatus = "in-development" | "coming-soon" | "archived";
+export type VentureChip = { label: string; tone: "violet" | "emerald" | "slate" };
 
 export const venturesData: {
   name: string;
   stage: VentureStage;
   stageLabel: string;
-  chips: string[];
+  chips: VentureChip[];
   description: string;
-  status: "live" | "archived" | "coming-soon";
+  status: VentureStatus;
   link?: string;
 }[] = [
   {
@@ -263,7 +265,7 @@ export const venturesData: {
     name: "Ogra",
     stage: "vc-targeted",
     stageLabel: "VC targeted",
-    chips: ["Ride hailing"],
+    chips: [{ label: "Ride hailing", tone: "slate" }],
     description:
       "Ride-hailing venture with mapping and routing at its core — optimised driver–passenger matching and efficient urban path-finding (the engineering is showcased under Projects).",
     status: "archived",
@@ -272,7 +274,7 @@ export const venturesData: {
     name: "AI Football Trivia",
     stage: "hobby",
     stageLabel: "Hobby project",
-    chips: ["RAG"],
+    chips: [{ label: "RAG", tone: "violet" }],
     description:
       "AI-powered football trivia game built on retrieval-augmented generation — questions grounded in real football knowledge with adaptive difficulty.",
     status: "archived",
@@ -291,7 +293,7 @@ export const venturesData: {
     name: "Momentum",
     stage: "hobby",
     stageLabel: "Hobby",
-    chips: ["Revenue potential"],
+    chips: [{ label: "Revenue potential", tone: "emerald" }],
     description:
       "A mutual-accountability PWA: friends co-own tasks, log completions and keep streaks alive together — installable, offline-friendly, with a Supabase-backed data foundation.",
     status: "archived",
@@ -301,17 +303,20 @@ export const venturesData: {
     name: "KoraLink",
     stage: "vc-targeted",
     stageLabel: "VC & revenue potential",
-    chips: [],
+    chips: [{ label: "In development", tone: "slate" }],
     description:
       "A sports matchmaking platform connecting players, pitches and games — discover matches near you, organise games and grow a local football community.",
-    status: "archived",
+    status: "in-development",
     link: "https://github.com/Abdullah-Alholiel/KoraLink",
   },
   {
     name: "KnowStride",
     stage: "vc-targeted",
     stageLabel: "VC potential",
-    chips: ["Enterprise", "In development"],
+    chips: [
+      { label: "Enterprise", tone: "slate" },
+      { label: "In development", tone: "slate" },
+    ],
     description:
       "An enterprise AI upskilling platform for training agencies — adaptive learning journeys with verifiable quality, built alongside KoraLink as the newest venture.",
     status: "coming-soon",
