@@ -15,6 +15,10 @@ export const links = [
     hash: "#about",
   },
   {
+    name: "Ventures",
+    hash: "#ventures",
+  },
+  {
     name: "Projects",
     hash: "#projects",
   },
@@ -234,6 +238,90 @@ export const achievementsData = [
     fallbackCertificateUrl: "/google-digital-marketing-garage-certificate1.png",
   },
 ] as const;
+
+export type VentureStage = "revenue" | "vc-targeted" | "hobby";
+
+export const venturesData: {
+  name: string;
+  stage: VentureStage;
+  stageLabel: string;
+  chips: string[];
+  description: string;
+  status: "live" | "archived" | "coming-soon";
+  link?: string;
+}[] = [
+  {
+    name: "Plug & Play Video Analytics",
+    stage: "revenue",
+    stageLabel: "Revenue generated",
+    chips: [],
+    description:
+      "Video analytics solution for local stores, sold as a plug-and-play product — from capture to actionable footfall and behaviour insights with no bespoke integration work.",
+    status: "archived",
+  },
+  {
+    name: "Ogra",
+    stage: "vc-targeted",
+    stageLabel: "VC targeted",
+    chips: ["Ride hailing"],
+    description:
+      "Ride-hailing venture with mapping and routing at its core — optimised driver–passenger matching and efficient urban path-finding (the engineering is showcased under Projects).",
+    status: "archived",
+  },
+  {
+    name: "AI Football Trivia",
+    stage: "hobby",
+    stageLabel: "Hobby project",
+    chips: ["RAG"],
+    description:
+      "AI-powered football trivia game built on retrieval-augmented generation — questions grounded in real football knowledge with adaptive difficulty.",
+    status: "archived",
+  },
+  {
+    name: "SaudiEase",
+    stage: "vc-targeted",
+    stageLabel: "VC potential",
+    chips: [],
+    description:
+      "A digital companion for living in and visiting Saudi Arabia — services, attractions and essentials in one place.",
+    status: "archived",
+    link: "https://github.com/Abdullah-Alholiel/SaudiEase",
+  },
+  {
+    name: "Momentum",
+    stage: "hobby",
+    stageLabel: "Hobby",
+    chips: ["Revenue potential"],
+    description:
+      "A mutual-accountability PWA: friends co-own tasks, log completions and keep streaks alive together — installable, offline-friendly, with a Supabase-backed data foundation.",
+    status: "archived",
+    link: "https://github.com/Abdullah-Alholiel/mutual-tasks-pwa-webapp",
+  },
+  {
+    name: "KoraLink",
+    stage: "vc-targeted",
+    stageLabel: "VC & revenue potential",
+    chips: [],
+    description:
+      "A sports matchmaking platform connecting players, pitches and games — discover matches near you, organise games and grow a local football community.",
+    status: "archived",
+    link: "https://github.com/Abdullah-Alholiel/KoraLink",
+  },
+  {
+    name: "KnowStride",
+    stage: "vc-targeted",
+    stageLabel: "VC potential",
+    chips: ["Enterprise", "In development"],
+    description:
+      "An enterprise AI upskilling platform for training agencies — adaptive learning journeys with verifiable quality, built alongside KoraLink as the newest venture.",
+    status: "coming-soon",
+  },
+];
+
+export const venturesCta = {
+  text: "Think you'd be an addition if you got involved? I'd love to hear from you.",
+  ctaLabel: "Get in touch",
+};
 
 export const mentorshipData = [
   {

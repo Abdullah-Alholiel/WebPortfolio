@@ -34,7 +34,7 @@ export default function Header() {
   return (
     <header className="z-[999] relative">
       <motion.div
-        className="fixed top-0 left-1/2 h-[4.5rem] w-full rounded-none sm:top-6 sm:h-[3.25rem] sm:w-auto sm:min-w-[42rem] sm:max-w-[95vw] sm:rounded-full shadow-lg flex items-center justify-center z-[10]"
+        className="fixed top-0 left-1/2 hidden h-[4.5rem] w-full rounded-none sm:top-6 sm:h-[3.25rem] sm:w-auto lg:min-w-[46rem] sm:max-w-[95vw] sm:rounded-full shadow-lg lg:flex items-center justify-center z-[10]"
         initial={{ y: -100, x: "-50%", opacity: 0 }}
         animate={{ y: 0, x: "-50%", opacity: 1 }}
         transition={{
@@ -48,7 +48,7 @@ export default function Header() {
         }}
       >
         {/* Desktop Navigation - All items styled as pills with animations */}
-        <nav className="hidden sm:flex h-[2.625rem] py-0 px-[3px] items-center overflow-hidden">
+        <nav className="hidden lg:flex h-[2.625rem] py-0 px-[3px] items-center overflow-hidden">
           <ul className="flex items-center gap-[3px] h-full">
             {links.map((link, index) => {
               const isActive = activeSection === link.name;
@@ -224,7 +224,7 @@ export default function Header() {
 
       {/* Hamburger button — OUTSIDE motion.div so it stays above the blur */}
       <button
-        className="sm:hidden fixed top-4 right-4 h-10 w-10 rounded-full flex flex-col items-center justify-center gap-1.5 z-[999]"
+        className="lg:hidden fixed top-4 right-4 h-10 w-10 rounded-full flex flex-col items-center justify-center gap-1.5 z-[999]"
         style={{
           backgroundColor: pillBgColor,
         }}
@@ -261,7 +261,7 @@ export default function Header() {
           <>
             {/* Backdrop overlay */}
             <motion.div
-              className="sm:hidden fixed inset-0 z-[997] bg-black/30 backdrop-blur-sm"
+              className="lg:hidden fixed inset-0 z-[997] bg-black/30 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -271,7 +271,7 @@ export default function Header() {
 
             {/* Menu panel */}
             <motion.div
-              className="sm:hidden fixed top-[4.5rem] left-4 right-4 z-[998] rounded-3xl shadow-2xl backdrop-blur-xl overflow-hidden"
+              className="lg:hidden fixed top-[4.5rem] left-4 right-4 z-[998] rounded-3xl shadow-2xl backdrop-blur-xl overflow-hidden"
               style={{
                 backgroundColor: baseColor,
               }}

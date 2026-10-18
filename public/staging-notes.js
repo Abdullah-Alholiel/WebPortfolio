@@ -23,6 +23,8 @@
   var panelOpen = false;
   var pending = null; // captured anchor awaiting note text
   var serverAvailable = true;
+  var resolved = {}; // id → { message, at } — "✓ Addressed" messages from Hermes
+  var resolvedSig = '';
 
   // ---- helpers -------------------------------------------------------
   function lsGet(k, fallback) {
@@ -121,6 +123,31 @@
   }
 
   // ---- server sync ----------------------------------------------------
+  function fetchResolved() {
+    if (!accessKey || !serverAvailable) return;
+    fetch(SYNC_BASE + '/resolved?key=' + encodeURIComponent(accessKey), {
+      cache: 'no-store',
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error('http ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        var list = (data && data.resolved) || [];
+        var next = {};
+        var sig = '';
+        list.forEach(function (r) {
+          next[r.id] = r;
+          sig += r.id + ':' + r.message + '|';
+        });
+        var changed = sig !== resolvedSig;
+        resolved = next;
+        resolvedSig = sig;
+        if (changed && panelOpen) renderPanel();
+      })
+      .catch(function () {});
+  }
+
   function syncFromServer() {
     if (!accessKey || !serverAvailable) return;
     fetch(SYNC_BASE + '?key=' + encodeURIComponent(accessKey), { cache: 'no-store' })
@@ -348,7 +375,10 @@
       panelOpen = !panelOpen;
       renderToggle();
       renderPanel();
-      if (panelOpen) syncFromServer();
+      if (panelOpen) {
+        syncFromServer();
+        fetchResolved();
+      }
     });
     document.body.appendChild(t);
     renderToggle();
@@ -392,8 +422,14 @@
 
     var items = notes
       .map(function (n) {
+        var res = resolved[n.id];
+        var resHtml = res
+          ? '<div class="stg-res">✓ ' +
+            esc(res.message) +
+            '</div>'
+          : '';
         return (
-          '<div class="stg-item" data-id="' + esc(n.id) + '">' +
+          '<div class="stg-item' + (res ? ' stg-item-res' : '') + '" data-id="' + esc(n.id) + '">' +
           '  <div class="stg-item-head">' +
           '    <span class="stg-badge">' + esc(n.section) + '</span>' +
           '    <span class="stg-comp">' + esc(n.component) + '</span>' +
@@ -407,6 +443,7 @@
             ? '<div class="stg-target">' + esc(n.element) + '</div>'
             : '') +
           '  <div class="stg-note">' + esc(n.note) + '</div>' +
+          resHtml +
           '</div>'
         );
       })
@@ -539,6 +576,12 @@
       'margin:2px 0;word-break:break-all;}' +
       '.stg-note{font-size:13px;line-height:1.5;margin-top:4px;' +
       'word-break:break-word;white-space:pre-wrap;}' +
+      '.stg-res{margin-top:8px;padding:7px 10px;border-radius:8px;font-size:12px;' +
+      'line-height:1.45;font-weight:600;background:rgba(5,150,105,.1);color:#047857;' +
+      'border:1px solid rgba(5,150,105,.25);word-break:break-word;}' +
+      '.dark .stg-res{background:rgba(16,185,129,.12);color:#34d399;' +
+      'border-color:rgba(16,185,129,.3);}' +
+      '.stg-item-res{opacity:.75;}' +
       '.stg-empty{text-align:center;opacity:.55;padding:36px 12px;font-size:13px;' +
       'line-height:1.6;}' +
       '.stg-panel-foot{display:flex;align-items:center;gap:8px;padding:10px 14px;' +
@@ -591,7 +634,12 @@
       accessKey = storedKey;
     }
     renderToggle();
-    if (accessKey) syncFromServer();
+    if (accessKey) {
+      syncFromServer();
+      fetchResolved();
+      // Keep "✓ Addressed" messages fresh while the page stays open
+      setInterval(fetchResolved, 30000);
+    }
   }
 
   if (document.readyState === 'loading') {

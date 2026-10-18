@@ -1,6 +1,5 @@
-import { NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { NextRequest, NextResponse } from 'next/server';
+import { readNotes, writeNotes, type StagingNote } from '@/lib/staging-store';
 
 /**
  * Staging notes API — stores Abdullah's component feedback notes as JSON.
@@ -8,21 +7,14 @@ import path from 'path';
  * Auth: shared access key. Set STAGING_NOTES_KEY env var in real use;
  * falls back to 'staging-notes' for local staging only.
  *
- * Storage: <project>/.staging/notes.json (gitignored — data lives on the
- * staging host, not in the repo).
+ * Storage: <project>/.staging/notes.json via lib/staging-store (gitignored —
+ * data lives on the staging host, not in the repo).
  *
  * Endpoints:
  *   GET    /api/staging-notes?key=KEY              → { notes: [...] }
  *   POST   /api/staging-notes { key, note }        → { ok, count }
  *   DELETE /api/staging-notes?key=KEY&id=NOTE_ID   → { ok, count }
  */
-
-// Store outside .next so the store survives rebuilds. Use an explicit
-// override first (useful if the process CWD ever differs), else project root.
-const STORE_DIR =
-  process.env.STAGING_NOTES_DIR ||
-  path.join(process.cwd(), '.staging');
-const STORE_FILE = path.join(STORE_DIR, 'notes.json');
 
 const FALLBACK_KEY = 'staging-notes';
 
@@ -32,39 +24,6 @@ function expectedKey(): string {
 
 function isAuthorized(key: string | null): boolean {
   return Boolean(key) && key === expectedKey();
-}
-
-type StagingNote = {
-  id: string;
-  kind?: 'text' | 'element';
-  section?: string;
-  component?: string;
-  quote?: string;
-  element?: string;
-  note: string;
-  path?: string;
-  seq?: number;
-  createdAt: string;
-};
-
-async function readStore(): Promise<{ seq: number; notes: StagingNote[] }> {
-  try {
-    const raw = await fs.readFile(STORE_FILE, 'utf-8');
-    const parsed = JSON.parse(raw);
-    return {
-      seq: Number(parsed.seq) || 0,
-      notes: Array.isArray(parsed.notes) ? parsed.notes : [],
-    };
-  } catch {
-    return { seq: 0, notes: [] };
-  }
-}
-
-async function writeStore(store: { seq: number; notes: StagingNote[] }) {
-  await fs.mkdir(STORE_DIR, { recursive: true });
-  const tmp = STORE_FILE + '.tmp';
-  await fs.writeFile(tmp, JSON.stringify(store, null, 2), 'utf-8');
-  await fs.rename(tmp, STORE_FILE);
 }
 
 function unauthorized() {
@@ -78,7 +37,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   if (!isAuthorized(searchParams.get('key'))) return unauthorized();
 
-  const store = await readStore();
+  const store = await readNotes();
   const notes = [...store.notes].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
@@ -111,7 +70,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const store = await readStore();
+  const store = await readNotes();
 
   // Dedup on client-generated id (retries / double submits).
   const existingIdx = store.notes.findIndex((n) => n.id === note.id);
@@ -136,7 +95,7 @@ export async function POST(request: Request) {
   }
   store.seq = seq;
 
-  await writeStore(store);
+  await writeNotes(store);
   return NextResponse.json({ ok: true, count: store.notes.length, note: clean });
 }
 
@@ -149,10 +108,10 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'id required' }, { status: 400 });
   }
 
-  const store = await readStore();
+  const store = await readNotes();
   const before = store.notes.length;
   store.notes = store.notes.filter((n) => n.id !== id);
-  await writeStore(store);
+  await writeNotes(store);
   return NextResponse.json({
     ok: true,
     removed: before - store.notes.length,

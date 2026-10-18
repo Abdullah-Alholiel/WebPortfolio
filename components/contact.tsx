@@ -37,8 +37,21 @@ export default function Contact() {
         Please contact me directly at{" "}
         <a className="underline" href="mailto:a.alholaiel@gmail.com">
           a.alholaiel@gmail.com
+        </a>
+        , prefer WhatsApp or a call? Reach me directly at{" "}
+        <a
+          className="underline"
+          href="https://wa.me/966556989484"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          WhatsApp
         </a>{" "}
-        or through this form.
+        or{" "}
+        <a className="underline" href="tel:+966556989484">
+          +966 55 698 9484
+        </a>{" "}
+        — or through this form.
       </p>
 
       <form
