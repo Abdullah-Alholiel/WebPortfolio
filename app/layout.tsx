@@ -1,4 +1,5 @@
 import "./globals.css";
+import Script from "next/script";
 import ClientLayout from "@/components/client-layout";
 
 const themeInitializer = `(() => {
@@ -32,6 +33,9 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{ __html: themeInitializer }}
         />
+        {process.env.NEXT_PUBLIC_STAGING_NOTES === "on" && (
+          <Script src="/staging-notes.js" strategy="afterInteractive" />
+        )}
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

@@ -38,3 +38,6 @@ next-env.d.ts
 
 # data cache (synced from Upstash)
 data-cache.json
+
+# staging notes store (runtime data, not repo content)
+/.staging/
