@@ -11,6 +11,12 @@ import {
   type VentureStatus,
   type VentureChip,
 } from "@/lib/data";
+import { usePortfolioData } from "@/context/portfolio-data-context";
+
+/** Derive the #project-… anchor id the same way project.tsx builds it. */
+export function projectAnchorId(title: string): string {
+  return `project-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+}
 
 const STAGE_STYLES: Record<VentureStage, string> = {
   revenue: "bg-emerald-600 text-white",
@@ -78,6 +84,14 @@ function VentureCard({
   index: number;
 }) {
   const stageStyle = STAGE_STYLES[venture.stage];
+  // Resolve the project link against LIVE project titles (regex match).
+  const { data } = usePortfolioData();
+  const matchedProject = venture.projectLink
+    ? (data.projects || []).find((p: { title?: string }) =>
+        new RegExp(venture.projectLink!.match, "i").test(p.title || "")
+      )
+    : null;
+  const linkHref = matchedProject ? `#${projectAnchorId(matchedProject.title!)}` : null;
 
   return (
     <motion.article
@@ -121,13 +135,13 @@ function VentureCard({
         {venture.description}
       </p>
 
-      {/* Link to the project card */}
-      {venture.projectLink && (
+      {/* Link to the project card (only when a live project matches) */}
+      {linkHref && (
         <a
-          href={venture.projectLink.hash}
+          href={linkHref}
           className="mt-4 inline-flex min-h-[36px] w-fit items-center gap-2 rounded-full border border-black/10 px-3.5 py-1.5 text-xs font-semibold text-gray-800 transition-colors hover:border-black/40 dark:border-white/20 dark:text-white/90 dark:hover:border-white/50"
         >
-          {venture.projectLink.label}
+          {venture.projectLink!.label}
           <FaArrowRight className="text-[9px] transition-transform group-hover:translate-x-0.5" aria-hidden />
         </a>
       )}

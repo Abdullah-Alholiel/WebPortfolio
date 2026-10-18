@@ -242,7 +242,8 @@ export const achievementsData = [
 export type VentureStage = "revenue" | "vc-targeted" | "hobby";
 export type VentureStatus = "in-development" | "coming-soon" | "archived";
 export type VentureChip = { label: string; tone: "violet" | "emerald" | "slate" };
-export type VentureProjectLink = { label: string; hash: string };
+/** match = regex source tested against live project titles (hash is derived). */
+export type VentureProjectLink = { label: string; match: string };
 
 export const venturesData: {
   name: string;
@@ -261,6 +262,10 @@ export const venturesData: {
     description:
       "Video analytics for local stores, packaged as a plug-and-play product. Stores get footfall and behaviour insights without any custom integration work.",
     status: "archived",
+    projectLink: {
+      label: "See the scripts",
+      match: "video analytics",
+    },
   },
   {
     name: "Ogra",
@@ -272,7 +277,7 @@ export const venturesData: {
     status: "archived",
     projectLink: {
       label: "See the engineering",
-      hash: "#project-ride-hailing-application",
+      match: "hailing|ogra",
     },
   },
   {
@@ -285,7 +290,7 @@ export const venturesData: {
     status: "archived",
     projectLink: {
       label: "See the game",
-      hash: "#project-ai-powered-trivia-web-game",
+      match: "trivia",
     },
   },
   {

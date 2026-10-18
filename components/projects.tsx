@@ -8,12 +8,10 @@ import { usePortfolioData } from "@/context/portfolio-data-context";
 import { FaChevronDown } from "react-icons/fa";
 import Loader from "@/components/ui/loader";
 
-// Projects that already star in the Founder section. They stay behind the
-// "Show all" toggle so the grid doesn't repeat itself.
-const FOUNDER_PROJECT_TITLES = new Set([
-  "AI-Powered Trivia Web Game",
-  "Ride Hailing Application",
-]);
+// Projects that already star in the Founder section stay behind the
+// "Show all" toggle so the grid doesn't repeat itself. Matching is
+// keyword-based so it survives title edits in the admin.
+const FOUNDER_PROJECT_MATCHERS = [/trivia/i, /hailing|ogra/i, /video analytics/i];
 
 export default function Projects() {
   const { ref } = useSectionInView("Projects", 0.1);
@@ -22,12 +20,13 @@ export default function Projects() {
   const experiences = data.experiences || [];
   const [showAll, setShowAll] = useState(false);
 
-  const founderCount = projects.filter((p) =>
-    FOUNDER_PROJECT_TITLES.has(p.title || "")
-  ).length;
+  const isFounderProject = (title?: string) =>
+    Boolean(title) && FOUNDER_PROJECT_MATCHERS.some((re) => re.test(title!));
+
+  const founderCount = projects.filter((p) => isFounderProject(p.title)).length;
   const visibleProjects = showAll
     ? projects
-    : projects.filter((p) => !FOUNDER_PROJECT_TITLES.has(p.title || ""));
+    : projects.filter((p) => !isFounderProject(p.title));
 
   // Arriving from a Founder card link (#project-...) must reveal the target.
   useEffect(() => {
@@ -76,8 +75,8 @@ export default function Projects() {
           >
             <FaChevronDown className="text-xs opacity-60" aria-hidden />
             {founderCount === 1
-              ? "Show 1 more from my products"
-              : `Show ${founderCount} more from my products`}
+              ? "Show 1 more project"
+              : `Show ${founderCount} more projects`}
           </button>
         </div>
       )}
