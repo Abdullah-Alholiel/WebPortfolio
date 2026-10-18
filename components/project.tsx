@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
+import { FaPlus, FaMinus, FaExternalLinkAlt } from "react-icons/fa";
 import { resolveImageUrl } from "@/lib/image-utils";
 import { getProjectFallbackImage } from "@/lib/project-fallbacks";
-import { FaExternalLinkAlt } from "react-icons/fa";
 
 type ExperienceItem = {
   title: string;
@@ -14,7 +14,22 @@ type ExperienceItem = {
   date: string;
   icon?: string;
   key?: string;
-  type?: 'experience' | 'education' | 'bio-education';
+  type?: "experience" | "education" | "bio-education";
+};
+
+/** Product stage for founded products (future section). Absent = no badge. */
+export type ProjectStage = "hobby" | "exited" | "vc-targeted";
+
+const STAGE_STYLES: Record<ProjectStage, string> = {
+  hobby: "bg-amber-500/90 text-white",
+  exited: "bg-emerald-600/90 text-white",
+  "vc-targeted": "bg-violet-600/90 text-white",
+};
+
+const STAGE_LABELS: Record<ProjectStage, string> = {
+  hobby: "Hobby product",
+  exited: "Exited",
+  "vc-targeted": "VC-targeted",
 };
 
 type ProjectProps = {
@@ -24,8 +39,11 @@ type ProjectProps = {
   imageUrl?: string;
   fallbackImageUrl?: string;
   experienceKey?: string;
+  stage?: ProjectStage;
   allExperiences?: ExperienceItem[];
 };
+
+const VISIBLE_TAGS = 4;
 
 export default function Project({
   title,
@@ -34,25 +52,24 @@ export default function Project({
   imageUrl,
   fallbackImageUrl,
   experienceKey,
+  stage,
   allExperiences,
 }: ProjectProps) {
-  const linkedExperience = allExperiences?.find(exp => exp.key === experienceKey);
+  const linkedExperience = allExperiences?.find((exp) => exp.key === experienceKey);
+  const isBioEducation = experienceKey?.startsWith("bio-");
+  const buttonText = isBioEducation
+    ? 'Developed during "' + linkedExperience?.title + '" Studies'
+    : 'Developed during "' + linkedExperience?.title + '" Experience';
 
-  // Determine if it's a bio education or work experience
-  const isBioEducation = experienceKey?.startsWith('bio-');
+  const [tagsExpanded, setTagsExpanded] = useState(false);
 
-  // Get button text based on what's linked
-  const buttonText = isBioEducation ? 'Developed during "' + linkedExperience?.title + '" Studies' : 'Developed during "' + linkedExperience?.title + '" Experience';
-  const targetSection = isBioEducation ? 'about' : 'experience';
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["0 1", "1.33 1"],
-  });
-  const scaleProgess = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
-  const opacityProgess = useTransform(scrollYProgress, [0, 1], [0.6, 1]);
   const titleFallback = useMemo(
-    () => getProjectFallbackImage({ title, remoteUrl: imageUrl, fallbackCandidate: fallbackImageUrl }),
+    () =>
+      getProjectFallbackImage({
+        title,
+        remoteUrl: imageUrl,
+        fallbackCandidate: fallbackImageUrl,
+      }),
     [title, imageUrl, fallbackImageUrl]
   );
   const resolvedPrimary = useMemo(() => resolveImageUrl({ url: imageUrl }), [imageUrl]);
@@ -67,12 +84,8 @@ export default function Project({
   }, [titleFallback]);
   const [imageFallbackUsed, setImageFallbackUsed] = useState(false);
   const [currentImageSrc, setCurrentImageSrc] = useState<string>(() => {
-    if (resolvedPrimary) {
-      return resolvedPrimary;
-    }
-    if (resolvedFallback) {
-      return resolvedFallback;
-    }
+    if (resolvedPrimary) return resolvedPrimary;
+    if (resolvedFallback) return resolvedFallback;
     return "/favicon.ico";
   });
 
@@ -98,7 +111,6 @@ export default function Project({
     }
 
     if (typeof window === "undefined") {
-      // During SSR fall back immediately to avoid hydration mismatch
       applyFallback();
       return () => {
         cancelled = true;
@@ -132,77 +144,111 @@ export default function Project({
     }
   };
 
+  const visibleTags = tagsExpanded ? tags : tags.slice(0, VISIBLE_TAGS);
+  const hiddenTagCount = tags.length - VISIBLE_TAGS;
+  const targetHash = isBioEducation ? "about" : "experience";
+
+  const scrollToExperience = () => {
+    const targetElement = document.getElementById(experienceKey || "");
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      document
+        .querySelector(`#${targetHash}`)
+        ?.scrollIntoView({ behavior: "smooth" });
+    }
+    history.pushState(null, "", `#${targetHash}`);
+  };
+
   return (
-    <motion.div
-      ref={ref}
-      style={{
-        scale: scaleProgess,
-        opacity: opacityProgess,
-      }}
-      className="group mb-3 sm:mb-8 last:mb-0"
+    <motion.article
+      className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-black/5 bg-white shadow-sm transition-shadow duration-300 hover:shadow-lg dark:border-white/10 dark:bg-white/10"
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <section className="bg-gray-100 max-w-[42rem] border border-black/5 rounded-lg overflow-hidden sm:pr-8 relative min-h-[20rem] hover:bg-gray-200 transition sm:group-even:pl-8 dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
+      {/* Stage badge (founded products) */}
+      {stage && (
+        <span
+          className={`absolute left-3 top-3 z-10 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider shadow-sm backdrop-blur-sm ${STAGE_STYLES[stage]}`}
+        >
+          {STAGE_LABELS[stage]}
+        </span>
+      )}
+
+      {/* Image */}
+      <div className="relative h-40 w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
         <Image
           key={currentImageSrc}
           src={currentImageSrc}
-          alt="Project I worked on"
-          quality={95}
-          width={904}
-          height={600}
-          className="relative w-full h-auto rounded-t-lg shadow-2xl mb-4
-        sm:absolute sm:top-8 sm:-right-40 sm:w-[28.25rem] sm:mb-0
-        sm:group-hover:scale-[1.04]
-        sm:group-hover:-translate-x-3
-        sm:group-hover:translate-y-3
-        sm:group-hover:-rotate-2
-
-        sm:group-even:group-hover:translate-x-3
-        sm:group-even:group-hover:translate-y-3
-        sm:group-even:group-hover:rotate-2
-
-        sm:group-even:right-[initial] sm:group-even:-left-40"
+          alt={`${title} preview`}
+          quality={90}
+          fill
+          sizes="(max-width: 640px) 100vw, 26rem"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           onError={handleImageError}
         />
+      </div>
 
-        <div className="pt-4 pb-7 px-5 sm:pl-10 sm:pr-2 sm:pt-10 sm:max-w-[50%] flex flex-col justify-center sm:group-even:ml-[18rem]">
-          <h3 className="text-xl sm:text-2xl font-semibold">{title}</h3>
-          <p className="mt-2 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-white/70">
-            {description}
-          </p>
-          <ul className="flex flex-wrap mt-4 gap-2">
-            {tags.map((tag, index) => (
-              <li
-                className="bg-black/[0.7] px-2 py-1 text-[0.65rem] sm:text-[0.7rem] uppercase tracking-wider text-white rounded-full dark:text-white/70"
-                key={index}
-              >
-                {tag}
-              </li>
-            ))}
-          </ul>
-          {experienceKey && (
-            <button
-              onClick={() => {
-                const targetId = experienceKey || '';
-                const targetElement = document.getElementById(targetId);
-                const targetSection = document.querySelector(`#${isBioEducation ? 'about' : 'experience'}`);
+      {/* Body */}
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="text-lg font-semibold leading-snug text-gray-900 dark:text-white">
+          {title}
+        </h3>
+        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-700 dark:text-white/70">
+          {description}
+        </p>
 
-                if (targetElement) {
-                  targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  // Also push state but keep the hash as the section for cleaner URL or use the key if preferred
-                  history.pushState(null, '', `#${isBioEducation ? 'about' : 'experience'}`);
-                } else if (targetSection) {
-                  targetSection.scrollIntoView({ behavior: 'smooth' });
-                  history.pushState(null, '', `#${isBioEducation ? 'about' : 'experience'}`);
-                }
-              }}
-              className="group/btn mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-indigo-200/50 bg-indigo-50/50 px-4 py-2 text-xs font-medium text-indigo-700 backdrop-blur-sm transition-all hover:bg-indigo-100 hover:shadow-sm dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-300 dark:hover:bg-indigo-900/40 sm:text-sm"
+        {/* Tags — first 4 + expandable rest */}
+        <ul className="mt-3 flex flex-wrap gap-1.5">
+          {visibleTags.map((tag, index) => (
+            <li
+              className="rounded-full bg-black/[0.7] px-2.5 py-1 text-[0.65rem] uppercase tracking-wider text-white dark:bg-white/15 dark:text-white/80"
+              key={`${tag}-${index}`}
             >
-              <span className="text-left">{buttonText}</span>
-              <FaExternalLinkAlt className="ml-1 text-[10px] transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5" />
-            </button>
+              {tag}
+            </li>
+          ))}
+          {tags.length > VISIBLE_TAGS && (
+            <li>
+              <button
+                type="button"
+                onClick={() => setTagsExpanded((v) => !v)}
+                aria-expanded={tagsExpanded}
+                aria-label={
+                  tagsExpanded
+                    ? `Show fewer tags for ${title}`
+                    : `Show ${hiddenTagCount} more tags for ${title}`
+                }
+                className="inline-flex min-h-[28px] items-center gap-1 rounded-full border border-dashed border-black/30 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-gray-700 transition-colors hover:border-black/60 hover:bg-black/5 dark:border-white/30 dark:text-white/80 dark:hover:border-white/60 dark:hover:bg-white/10"
+              >
+                {tagsExpanded ? (
+                  <FaMinus className="text-[8px]" aria-hidden />
+                ) : (
+                  <FaPlus className="text-[8px]" aria-hidden />
+                )}
+                {tagsExpanded ? "less" : `${hiddenTagCount}`}
+              </button>
+            </li>
           )}
-        </div>
-      </section>
-    </motion.div>
+        </ul>
+
+        {/* Experience link */}
+        {experienceKey && (
+          <button
+            type="button"
+            onClick={scrollToExperience}
+            className="group/btn mt-4 inline-flex w-fit items-center gap-1.5 rounded-full border border-indigo-200/60 bg-indigo-50/60 px-3 py-1.5 text-xs font-medium text-indigo-700 transition-all hover:bg-indigo-100 dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-300 dark:hover:bg-indigo-900/40"
+          >
+            <span className="text-left leading-tight">{buttonText}</span>
+            <FaExternalLinkAlt
+              className="text-[9px] transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"
+              aria-hidden
+            />
+          </button>
+        )}
+      </div>
+    </motion.article>
   );
 }

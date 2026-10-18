@@ -84,9 +84,10 @@ const MentorshipCard = ({ title, description, icon, imageUrl, fallbackImageUrl, 
     large: 'col-span-1 md:col-span-2 lg:col-span-2 row-span-1 md:row-span-2',
   };
 
-  // Fixed heights per card size to prevent layout shift on flip
+  // Fixed heights per card size to prevent layout shift on flip.
+  // Non-large cards share ONE height so mixed-size rows keep aligned bottoms.
   const sizeHeights: Record<string, string> = {
-    small: 'min-h-[280px] h-[280px]',
+    small: 'min-h-[320px] h-[320px]',
     medium: 'min-h-[320px] h-[320px]',
     large: 'min-h-[420px] h-[420px] md:min-h-[480px] md:h-[480px]',
   };

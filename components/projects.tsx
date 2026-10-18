@@ -23,7 +23,7 @@ export default function Projects() {
   if (isLoading) {
     return (
       <section id="projects" ref={ref} className="scroll-mt-28 mb-28">
-        <SectionHeading>My projects</SectionHeading>
+        <SectionHeading>Projects</SectionHeading>
         <Loader className="w-full justify-center" label="Loading projects" />
       </section>
     );
@@ -31,15 +31,12 @@ export default function Projects() {
 
   return (
     <section id="projects" ref={ref} className="scroll-mt-28 mb-28">
-      <SectionHeading>My projects</SectionHeading>
-      <div>
+      <SectionHeading>Projects</SectionHeading>
+      <div className="mx-auto grid max-w-[53rem] grid-cols-1 gap-5 sm:grid-cols-2 items-stretch">
         {projects.map((project, index) => (
-          <React.Fragment key={project.title || index}>
-            <Project {...project} allExperiences={allExperiences} />
-          </React.Fragment>
+          <Project key={project.title || index} {...project} allExperiences={allExperiences} />
         ))}
       </div>
     </section>
   );
 }
-

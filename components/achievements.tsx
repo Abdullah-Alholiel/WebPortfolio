@@ -19,6 +19,7 @@ interface Achievement {
 const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCertificateUrl, index }: Achievement & { index: number }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const { theme } = useTheme();
+  const hasCertificate = Boolean(certificateUrl || fallbackCertificateUrl);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -39,11 +40,23 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
       transition={{ delay: index * 0.1, duration: 0.4 }}
     >
       <div
-        className={`relative h-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300 ${theme === 'dark'
+        className={`relative h-full rounded-xl overflow-hidden transition-all duration-300 ${hasCertificate ? 'cursor-pointer' : 'cursor-default'} ${theme === 'dark'
             ? 'bg-gray-800/50 border border-gray-700/50 hover:border-gray-600 hover:bg-gray-800'
             : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg'
           }`}
-        onClick={() => setIsFlipped(!isFlipped)}
+        onClick={() => {
+          if (hasCertificate) setIsFlipped(!isFlipped);
+        }}
+        role={hasCertificate ? 'button' : undefined}
+        tabIndex={hasCertificate ? 0 : undefined}
+        aria-label={hasCertificate ? `${title} — view certificate` : title}
+        onKeyDown={(e) => {
+          if (!hasCertificate) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsFlipped(!isFlipped);
+          }
+        }}
       >
         <AnimatePresence mode="wait">
           {!isFlipped ? (
@@ -71,7 +84,7 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
               )}
 
               {/* Content */}
-              <div className="flex-1">
+              <div className="flex-1 min-h-0">
                 <h3 className={`text-xl font-semibold mb-3 leading-tight ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                   }`}>
                   {title}
@@ -82,16 +95,26 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
                 </p>
               </div>
 
-              {/* Footer */}
-              <div className={`mt-6 pt-4 border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+              {/* Footer — certificate-aware, anchored to bottom with guaranteed gap */}
+              <div className={`mt-auto pt-5 border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                 }`}>
-                <div className={`flex items-center gap-2 text-xs font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
-                  }`}>
-                  <span>View Certificate</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
+                {hasCertificate ? (
+                  <div className={`flex items-center gap-2 text-xs font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                    }`}>
+                    <span>View Certificate</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                ) : (
+                  <div className={`flex items-center gap-2 text-xs ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400/80'
+                    }`}>
+                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Certificate available on request</span>
+                  </div>
+                )}
               </div>
             </motion.div>
           ) : (

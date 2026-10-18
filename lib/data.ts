@@ -162,13 +162,13 @@ export const skillsData = {
   "Programming Languages & Frameworks": [
     "C#", ".NET (Core, MVC, Entity Framework)", "Java", "JavaScript", "Python", "TypeScript",
     "MongoDB", "MySQL (SQL)", "Node.js", "Express", "React", "Vue", "Redux", "jQuery", 
-    "NoSQL", "GraphQL", "Graph Databases", "Git", "OOP", "Design Patterns", "FatsAPI", "Nest.js" ,  "Uvicorn" , "Django", 
+    "NoSQL", "GraphQL", "Graph Databases", "Git", "OOP", "Design Patterns", "FastAPI", "Nest.js" ,  "Uvicorn" , "Django", 
     "Flask", "PHP", "HTML5/CSS3", "RESTful API", "GRPC", "SOAP", "ERD - Cross Data Modelling", "Chakra UI", "Material UI", "Tailwind CSS", "Bootstrap", "SASS", "PASS"
   ],
   "AI & Advanced Technologies": [
     "LangChain","CrewAI", "PhiData", "OpenRouter API", "Langserve", "Pydantic", "OpenAI API", "Vector Databases", "RAG (Retrieval Augmented Generation)",
-    "Embeddings", "Prompt Engineering", "AI Voice Assitants and Chatbots" ,"LLM Fine-tuning", "Multi-agent Systems", "AI Orchestration",
-    , "System Mapping", "Algorithm Optimization", "WebSockets", "Real-time Systems"
+    "Embeddings", "Prompt Engineering", "AI Voice Assistants and Chatbots" ,"LLM Fine-tuning", "Multi-agent Systems", "AI Orchestration",
+    "System Mapping", "Algorithm Optimization", "WebSockets", "Real-time Systems"
   ],
   "Cloud Computing & Services": [
     "Azure (Functions, Cosmos DB, Logic Apps)", "AWS (S3, EC2, Lambda)", 
