@@ -33,6 +33,12 @@ export default function Projects() {
     const revealIfDeepLink = () => {
       if (window.location.hash.startsWith("#project-")) {
         setShowAll(true);
+        // The card mounts after the reveal — wait a frame, then scroll.
+        window.setTimeout(() => {
+          document
+            .getElementById(window.location.hash.slice(1))
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 300);
       }
     };
     revealIfDeepLink();
