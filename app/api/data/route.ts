@@ -103,6 +103,7 @@ export async function GET() {
         headers: {
           'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=0',
           'X-Data-Timestamp': Date.now().toString(),
+          'X-Data-Source': 'fallback',
         },
       });
     }
@@ -178,6 +179,8 @@ export async function GET() {
         'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=0',
         // Add timestamp to help with cache busting
         'X-Data-Timestamp': Date.now().toString(),
+        // Which source served this response — parity check between environments
+        'X-Data-Source': 'upstash',
       },
     });
 
@@ -193,6 +196,7 @@ export async function GET() {
       headers: {
         'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=0',
         'X-Data-Timestamp': Date.now().toString(),
+        'X-Data-Source': 'fallback',
       },
     });
   }

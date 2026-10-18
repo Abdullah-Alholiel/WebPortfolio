@@ -62,7 +62,7 @@ export const experiencesData = [
     date: "01/2023 - 01/2024",
   },
   {
-    title: "Digital Consultant",
+    title: "Data Consultant",
     location: "CLO, Riyadh, Saudi Arabia",
     description:
       "Executed data-driven digital strategies that increased business outcomes for tourism and F&B sectors. Conducted comprehensive market research and provided actionable recommendations based on analytical insights.",
