@@ -6,12 +6,22 @@ import {
   VerticalTimelineElement,
 } from "react-vertical-timeline-component";
 import "react-vertical-timeline-component/style.min.css";
+import {
+  FaVideo,
+  FaFutbol,
+  FaMapMarkedAlt,
+  FaTasks,
+  FaRunning,
+  FaGraduationCap,
+} from "react-icons/fa";
 import { useSectionInView } from "@/lib/hooks";
 import { useTheme } from "@/context/theme-context";
 import { usePortfolioData } from "@/context/portfolio-data-context";
 import { getExperienceIcon } from "@/lib/icon-utils";
 import StandardIcon from "./standard-icon";
 import Loader from "@/components/ui/loader";
+
+type JourneyMode = "professional" | "entrepreneurial";
 
 interface ExperienceItem {
   title: string;
@@ -22,14 +32,78 @@ interface ExperienceItem {
   icon?: string | any;
 }
 
-type JourneyMode = "professional" | "entrepreneurial";
+/**
+ * Founder timeline entries: the founded products from the Founder section
+ * also live in the Entrepreneurial journey.
+ *
+ * Dates: SaudiEase / Momentum / KoraLink are GitHub-anchored (repo created);
+ * the rest follow the founder order as adequate estimates.
+ * Ventures that already have a live founder entry (e.g. "Ogra Founder")
+ * are skipped at runtime, so nothing duplicates.
+ */
+const FOUNDER_TIMELINE: ExperienceItem[] = [
+  {
+    title: "Plug & Play Video Analytics",
+    location: "Self-founded",
+    description:
+      "Founded and sold a plug-and-play video analytics product for local stores, turning camera feeds into footfall and behaviour insights without custom integration work.",
+    date: "01/2022 - 12/2022",
+    icon: FaVideo,
+    key: "founder-video-analytics",
+  },
+  {
+    title: "AI Football Trivia",
+    location: "Self-founded",
+    description:
+      "Founded a football trivia game powered by retrieval-augmented generation, with questions grounded in real football knowledge and adaptive difficulty.",
+    date: "01/2025 - 04/2025",
+    icon: FaFutbol,
+    key: "founder-ai-football-trivia",
+  },
+  {
+    title: "SaudiEase",
+    location: "Self-founded",
+    description:
+      "Founded a digital companion for life in Saudi Arabia: services, attractions and everyday essentials in one place for residents and visitors.",
+    date: "05/2025 - 10/2025",
+    icon: FaMapMarkedAlt,
+    key: "founder-saudiease",
+  },
+  {
+    title: "Momentum",
+    location: "Self-founded",
+    description:
+      "Founded an accountability app where friends co-own tasks, log completions and keep each other's streaks alive across devices.",
+    date: "11/2025 - 05/2026",
+    icon: FaTasks,
+    key: "founder-momentum",
+  },
+  {
+    title: "KoraLink",
+    location: "Self-founded",
+    description:
+      "Founded a sports matchmaking platform connecting players, pitches and games, and currently leading its development.",
+    date: "03/2026 - Present",
+    icon: FaRunning,
+    key: "founder-koralink",
+  },
+  {
+    title: "KnowStride",
+    location: "Self-founded",
+    description:
+      "Founding an enterprise upskilling platform for training agencies, with adaptive learning journeys and verifiable quality.",
+    date: "07/2026 - Present",
+    icon: FaGraduationCap,
+    key: "founder-knowstride",
+  },
+];
 
 /**
  * Mode classification for the Journey toggle.
  * Professional = employed / client engagements.
  * Entrepreneurial = self-directed ventures and founded initiatives.
- * Any title containing "Founder"/"Co-Founder" is entrepreneurial by
- * definition (covers future entries automatically).
+ * Anything with "founder" in the title, or one of the founder- timeline
+ * keys above, is entrepreneurial by definition.
  */
 const ENTREPRENEURIAL_TITLES = new Set([
   "Freelance E-commerce Specialist",
@@ -37,6 +111,7 @@ const ENTREPRENEURIAL_TITLES = new Set([
 ]);
 
 function modeOf(item: ExperienceItem): JourneyMode {
+  if (item.key?.startsWith("founder-")) return "entrepreneurial";
   if (/founder/i.test(item.title)) return "entrepreneurial";
   return ENTREPRENEURIAL_TITLES.has(item.title) ? "entrepreneurial" : "professional";
 }
@@ -52,7 +127,26 @@ export default function Experience() {
   const { data, loading: isLoading } = usePortfolioData();
   const [mode, setMode] = useState<JourneyMode>("professional");
 
-  const experiences: ExperienceItem[] = (data.experiences || [])
+  // Merge founder venture entries with live data, skipping anything live
+  // already covers (e.g. "Ogra Founder"), then classify + sort.
+  const liveExperiences: ExperienceItem[] = data.experiences || [];
+  const liveKeys = new Set(
+    liveExperiences.map((e) => e.key?.toLowerCase()).filter(Boolean) as string[]
+  );
+  const liveTitles = new Set(
+    liveExperiences.map((e) => e.title.toLowerCase().replace(/[^a-z0-9]+/g, ""))
+  );
+  const founderEntries = FOUNDER_TIMELINE.filter((venture) => {
+    const slug = venture.title.toLowerCase().replace(/[^a-z0-9]+/g, "");
+    if (liveKeys.has(venture.key!.toLowerCase())) return false;
+    // Live title contains the venture name (e.g. "Ogra Founder" covers "Ogra")
+    for (const t of Array.from(liveTitles)) {
+      if (t.includes(slug) || slug.includes(t)) return false;
+    }
+    return true;
+  });
+
+  const experiences: ExperienceItem[] = [...liveExperiences, ...founderEntries]
     .filter((item) => modeOf(item) === mode)
     .sort((a, b) => {
       const parseDate = (dateStr: string) => {
