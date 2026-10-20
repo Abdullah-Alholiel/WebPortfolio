@@ -158,7 +158,14 @@ export default function MediaPicker({
 
       const blob = await response.json();
       toast.success('File uploaded successfully');
-      const nextValue = blob.pathname || blob.url;
+      // Prefer the full URL, fall back to the raw pathname. If the upload
+      // response is malformed, stop instead of silently writing "undefined".
+      const nextValue = blob?.url || blob?.pathname;
+      if (!nextValue || typeof nextValue !== 'string') {
+        toast.error('Upload response was invalid — not saving an empty image URL');
+        await refreshMedia();
+        return;
+      }
       onChange(nextValue);
       await refreshMedia();
     } catch (error) {
