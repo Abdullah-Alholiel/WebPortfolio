@@ -1,12 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import Loader from '@/components/ui/loader';
 import { useTheme } from '@/context/theme-context';
 import MediaPicker from './MediaPicker';
 
 const MEDIA_PREFIX = process.env.NEXT_PUBLIC_BLOB_MEDIA_PREFIX ?? 'web-pics';
+
+// The image the site shows when the record has no profileImageUrl.
+// Used to seed the form so the field is never silently absent.
+const DEFAULT_PROFILE_IMAGE = 'web-pics/abdullah-ivRTQ4jAdQIopvuw6XH8tlTCUvrxR1.jpg';
 
 interface PersonalInfo {
   cvLink: string;
@@ -30,6 +34,8 @@ export default function PersonalTab() {
     profileImageUrl: '',
   });
   const [loading, setLoading] = useState(true);
+  // Latest upload value awaiting a full save (instant-save dedup window)
+  const pendingUploadRef = useRef<{ value: string; busy: boolean } | null>(null);
   
   // Theme-aware input styles - force white in light mode
   const inputStyle = theme === 'dark' 
@@ -46,11 +52,58 @@ export default function PersonalTab() {
       const data = await response.json();
       if (response.ok && data.data) {
         setPersonalInfo(data.data);
+      } else {
+        // Seed the image field with the effective default so a later full
+        // save always carries an explicit profileImageUrl.
+        setPersonalInfo((prev) => ({
+          ...prev,
+          profileImageUrl: prev.profileImageUrl || DEFAULT_PROFILE_IMAGE,
+        }));
       }
     } catch (error) {
       console.error('Error loading personal info:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Partial save used after uploads: only the changed field is sent, the
+  // API merges server-side, so a stale form can never wipe other fields.
+  const saveProfileImage = async (url: string) => {
+    const pending = pendingUploadRef.current;
+    if (pending?.busy) {
+      pending.value = url; // coalesce rapid uploads into one save
+      return;
+    }
+    pendingUploadRef.current = { value: url, busy: true };
+    try {
+      const response = await fetch('/api/admin/personal', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profileImageUrl: url }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        toast.error(data.error || 'Failed to save profile image');
+      }
+    } catch (error) {
+      toast.error('Failed to save profile image');
+    } finally {
+      const p = pendingUploadRef.current;
+      if (p && p.value === url) {
+        pendingUploadRef.current = null;
+      } else if (p) {
+        const next = p.value;
+        pendingUploadRef.current = null;
+        void saveProfileImage(next); // save the newer upload that arrived mid-flight
+      }
+    }
+  };
+
+  const handleProfileImageChange = (url: string) => {
+    setPersonalInfo((prev) => ({ ...prev, profileImageUrl: url }));
+    if (url && url.trim().length > 0) {
+      void saveProfileImage(url.trim());
     }
   };
 
@@ -82,10 +135,10 @@ export default function PersonalTab() {
       <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-6">
         <div>
           <MediaPicker
-            label="Profile Image"
+            label="Profile Image (saves instantly)"
             value={personalInfo.profileImageUrl}
-            onChange={(url) => setPersonalInfo({ ...personalInfo, profileImageUrl: url })}
-            helperText="This image appears on the home section."
+            onChange={handleProfileImageChange}
+            helperText="Upload or pick an image and it saves right away — no need to press Save Changes. Save Changes still stores all fields together."
             prefix={MEDIA_PREFIX}
           />
         </div>
