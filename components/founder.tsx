@@ -138,6 +138,12 @@ function InviteCard() {
 export default function Founder() {
   const { ref } = useSectionInView("Founder", 0.2);
   const [open, setOpen] = useState(false);
+  // Live ventures from Upstash (admin-editable); static defaults as fallback
+  const { data } = usePortfolioData();
+  const ventures: (typeof venturesData)[number][] =
+    Array.isArray(data.ventures) && data.ventures.length > 0
+      ? data.ventures
+      : venturesData;
 
   return (
     <section id="founder" ref={ref} className="scroll-mt-28 mb-28">
@@ -179,7 +185,7 @@ export default function Founder() {
             className="overflow-hidden"
           >
             <div className="mx-auto grid max-w-[53rem] grid-cols-1 gap-5 pt-10 sm:grid-cols-2 items-stretch">
-              {venturesData.map((venture, index) => (
+              {ventures.map((venture, index) => (
                 <VentureCard key={venture.name} venture={venture} index={index} />
               ))}
               <InviteCard />

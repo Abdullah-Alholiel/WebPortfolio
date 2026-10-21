@@ -50,6 +50,8 @@ export const KV_KEYS = {
   ACHIEVEMENTS: 'portfolio:achievements',
   MENTORSHIP: 'portfolio:mentorship',
   PERSONAL_INFO: 'portfolio:personal_info',
+  VENTURES: 'portfolio:ventures',
+  FOUNDER_SEED: 'portfolio:founder_seed_v1',
   ADMIN_SESSION: 'admin:session', // for sessions
   ADMIN_TOKEN: 'admin:token', // for magic link tokens
 } as const;

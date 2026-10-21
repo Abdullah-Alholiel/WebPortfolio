@@ -86,6 +86,9 @@ const MentorshipCard = ({ title, description, icon, imageUrl, fallbackImageUrl, 
 
   // Fixed heights per card size to prevent layout shift on flip.
   // Non-large cards share ONE height so mixed-size rows keep aligned bottoms.
+  // `h-` (not `min-h-` only) is kept here deliberately: the bento grid spans
+  // rows explicitly, so the tile must fill its track; the INNER content is what
+  // is clamped (card-title/card-desc), so text can never overlap the footer.
   const sizeHeights: Record<string, string> = {
     small: 'min-h-[320px] h-[320px]',
     medium: 'min-h-[320px] h-[320px]',
@@ -153,33 +156,45 @@ const MentorshipCard = ({ title, description, icon, imageUrl, fallbackImageUrl, 
             {icon === "💻" && <span>💻</span>}
           </div>
 
-          {/* Content based on size */}
-          {size === 'large' ? (
+          {/* Content based on size.
+                  Every size shares ONE vertical alignment contract:
+                  icon → title → description → certificate, all centred, with
+                  a fixed gap scale and a clamped title/description. Previously
+                  each size had its own mb-* values and only the smallest card
+                  clamped its text, which is why the "British Airways" card did
+                  not line up with its neighbours. */}
+              {size === 'large' ? (
             <>
-              <div className="flex-1 flex flex-col items-center justify-center">
+              <div className="card-body items-center justify-center text-center">
                 <motion.div
-                  className="relative mb-6"
+                  className="relative mb-5 shrink-0"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ duration: 0.3 }}
                 >
                   <Image
                     src={currentImageSrc}
                     alt={`${title} logo`}
-                    width={200}
-                    height={200}
-                    className="rounded-full shadow-xl border-4 border-white/20"
+                    width={160}
+                    height={160}
+                    className="rounded-full shadow-xl border-4 border-white/20 w-32 h-32 md:w-40 md:h-40 object-cover"
                     onError={handleImageError}
                   />
                 </motion.div>
-                <h3 className={`text-2xl md:text-3xl font-bold mb-3 text-center ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                  }`}>
+                <h3 className={`card-title text-xl md:text-2xl text-center ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}
+                  style={{ ['--card-title-lines' as string]: '2' }}
+                >
                   {title}
                 </h3>
-                <p className={`text-base md:text-lg text-center leading-relaxed mb-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                  }`}>
+                <p className={`card-desc text-sm md:text-base text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}
+                  style={{ ['--card-desc-lines' as string]: '3' }}
+                >
                   {description}
                 </p>
-                {/* Certificate Indicator */}
+              </div>
+              {/* Certificate indicator — consistent row, pinned below the body */}
+              <div className="mt-4 flex justify-center">
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${theme === 'dark'
                   ? 'bg-gray-700/50 border border-gray-600/50'
                   : 'bg-gray-100/80 border border-gray-200/50'
@@ -198,30 +213,35 @@ const MentorshipCard = ({ title, description, icon, imageUrl, fallbackImageUrl, 
             </>
           ) : size === 'medium' ? (
             <>
-              <div className="flex-1 flex flex-col items-center justify-center">
+              <div className="card-body items-center justify-center text-center">
                 <motion.div
-                  className="relative mb-4"
+                  className="relative mb-4 shrink-0"
                   whileHover={{ scale: 1.1 }}
                   transition={{ duration: 0.3 }}
                 >
                   <Image
                     src={currentImageSrc}
                     alt={`${title} logo`}
-                    width={150}
-                    height={150}
-                    className="rounded-full shadow-lg border-4 border-white/20"
+                    width={120}
+                    height={120}
+                    className="rounded-full shadow-lg border-4 border-white/20 w-24 h-24 md:w-28 md:h-28 object-cover"
                     onError={handleImageError}
                   />
                 </motion.div>
-                <h3 className={`text-xl md:text-2xl font-bold mb-2 text-center ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                  }`}>
+                <h3 className={`card-title text-lg md:text-xl text-center ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}
+                  style={{ ['--card-title-lines' as string]: '2' }}
+                >
                   {title}
                 </h3>
-                <p className={`text-sm md:text-base text-center mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                  }`}>
+                <p className={`card-desc text-sm text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}
+                  style={{ ['--card-desc-lines' as string]: '2' }}
+                >
                   {description}
                 </p>
-                {/* Certificate Indicator */}
+              </div>
+              <div className="mt-4 flex justify-center">
                 <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${theme === 'dark'
                   ? 'bg-gray-700/50 border border-gray-600/50'
                   : 'bg-gray-100/80 border border-gray-200/50'
@@ -240,29 +260,34 @@ const MentorshipCard = ({ title, description, icon, imageUrl, fallbackImageUrl, 
             </>
           ) : (
             <>
-              <div className="flex-1 flex flex-col justify-center items-center">
+              <div className="card-body items-center justify-center text-center">
                 <motion.div
-                  className="relative mb-3"
+                  className="relative mb-3 shrink-0"
                   whileHover={{ scale: 1.1 }}
                   transition={{ duration: 0.3 }}
                 >
                   <Image
                     src={currentImageSrc}
                     alt={`${title} logo`}
-                    width={100}
-                    height={100}
-                    className="rounded-full shadow-md border-2 border-white/20"
+                    width={96}
+                    height={96}
+                    className="rounded-full shadow-md border-2 border-white/20 w-20 h-20 md:w-24 md:h-24 object-cover"
                     onError={handleImageError}
                   />
                 </motion.div>
-                <h3 className={`text-lg font-bold mb-2 text-center ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                  }`}>
+                <h3 className={`card-title text-base md:text-lg text-center ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}
+                  style={{ ['--card-title-lines' as string]: '2' }}
+                >
                   {title}
                 </h3>
-                <p className={`text-xs md:text-sm text-center mb-3 line-clamp-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                  }`}>
+                <p className={`card-desc text-xs md:text-sm text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}
+                  style={{ ['--card-desc-lines' as string]: '3' }}
+                >
                   {description}
                 </p>
+              </div>
                 {/* Certificate Indicator */}
                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${theme === 'dark'
                   ? 'bg-gray-700/50 border border-gray-600/50'
@@ -278,7 +303,6 @@ const MentorshipCard = ({ title, description, icon, imageUrl, fallbackImageUrl, 
                     Tap to view
                   </span>
                 </div>
-              </div>
             </>
           )}
         </motion.div>

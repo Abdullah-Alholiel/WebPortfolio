@@ -19,6 +19,7 @@ interface PortfolioData {
   skills: any;
   achievements: any[];
   mentorship: any[];
+  ventures: any[];
 }
 
 interface PortfolioDataContextType {
@@ -38,6 +39,7 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
     skills: {},
     achievements: [],
     mentorship: [],
+    ventures: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -87,6 +89,10 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
         skills: result.skills || {},
         achievements: result.achievements || [],
         mentorship: result.mentorship || [],
+        // Ventures power the Founder section. It was declared in the context
+        // type and initial state but never assigned here, so the section
+        // silently fell back to static defaults and admin edits never showed.
+        ventures: result.ventures || [],
       });
       setLastFetchTime(now);
     } catch (err) {

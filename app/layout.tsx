@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./card-anatomy.css";
 import Script from "next/script";
 import ClientLayout from "@/components/client-layout";
 

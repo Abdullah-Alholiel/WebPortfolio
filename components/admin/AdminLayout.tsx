@@ -10,8 +10,10 @@ import AchievementsTab from '../admin/AchievementsTab';
 import MentorshipTab from '../admin/MentorshipTab';
 import PersonalTab from '../admin/PersonalTab';
 import MediaLibraryTab from '../admin/MediaLibraryTab';
+import VenturesTab from '../admin/VenturesTab';
 
 const tabs = [
+  { id: 'founder', name: 'Founder Products', icon: '🚀' },
   { id: 'projects', name: 'Projects', icon: '📁' },
   { id: 'media', name: 'Media Library', icon: '🖼️' },
   { id: 'experience', name: 'Experience', icon: '💼' },
@@ -124,6 +126,7 @@ export default function AdminLayout() {
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {activeTab === 'founder' && <VenturesTab />}
         {activeTab === 'projects' && <ProjectsTab />}
         {activeTab === 'media' && <MediaLibraryTab />}
         {activeTab === 'experience' && <ExperienceTab />}

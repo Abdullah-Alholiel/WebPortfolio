@@ -31,9 +31,12 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
     return () => clearTimeout(timeout);
   }, [isFlipped]);
 
+  // min-height only — a fixed height here made a 3-line title collide with
+  // the footer (the "View Certificate" overlap). The card grows with content
+  // and the footer is pinned by .card-footer (see card-anatomy.css).
   return (
     <motion.div
-      className="group relative h-[320px] min-h-[320px]"
+      className="group relative min-h-[320px] md:min-h-[352px]"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
@@ -65,7 +68,7 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
               initial={{ opacity: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="p-6 md:p-8 h-full flex flex-col"
+              className="card-shell"
             >
               {/* Icon */}
               {Icon && (
@@ -84,19 +87,20 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
               )}
 
               {/* Content */}
-              <div className="flex-1 min-h-0">
-                <h3 className={`text-xl font-semibold mb-3 leading-tight ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              <div className="card-body">
+                <h3 className={`card-title text-xl ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                   }`}>
                   {title}
                 </h3>
-                <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                <p className={`card-desc ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                   }`}>
                   {description}
                 </p>
               </div>
 
-              {/* Footer — certificate-aware, anchored to bottom with guaranteed gap */}
-              <div className={`mt-auto pt-5 border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+              {/* Footer — pinned to the bottom by the flex column, so a long
+                  title can never overlap it */}
+              <div className={`card-footer border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                 }`}>
                 {hasCertificate ? (
                   <div className={`flex items-center gap-2 text-xs font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'

@@ -1,0 +1,142 @@
+/**
+ * CARD ANATOMY CONTRACT (design tokens, D2 gate)
+ *
+ * Root cause this exists for: cards across Achievements / Mentorship /
+ * Projects each hardcoded their own height + footer, using a *fixed* height
+ * (h-[320px]) with a `mt-auto` footer. When a title wrapped to 3 lines, the
+ * body text grew into the footer row and "View Certificate" overlapped the
+ * last description line while the `border-t` rule struck through the text.
+ *
+ * The contract below replaces per-card improvisation with ONE anatomy:
+ *
+ *   [icon]                     fixed, never competes for vertical space
+ *   [title]                    clamped to N lines (never pushes the footer)
+ *   [description]              clamped, flex-grows into the free space
+ *   ────────────────────────── hairline
+ *   [footer / CTA]             ALWAYS last row, always fully visible
+ *
+ * Rules enforced by these classes:
+ *  1. `min-h-*` never `h-*` on the card — cards grow with content instead of
+ *     overflowing their box.
+ *  2. The footer is `mt-auto`, so it sits at the bottom of the *flex column*
+ *     and cannot collide with the clamped description.
+ *  3. Title and description clamp to a fixed number of lines, so card heights
+ *     stay visually consistent across a row even with different content.
+ *  4. Grid rows stretch children to the tallest sibling, so all cards in a row
+ *     share a bottom edge.
+ */
+
+/* --- primitive tokens ------------------------------------------------- */
+:root {
+  /* Card vertical rhythm */
+  --card-pad: 1.5rem;          /* p-6 */
+  --card-pad-lg: 2rem;         /* md:p-8 */
+  --card-gap-title: 0.75rem;   /* mb-3  title → description */
+  --card-gap-footer: 1.25rem;  /* pt-5  description → footer rule */
+  --card-radius: 0.75rem;      /* rounded-xl */
+  --card-radius-lg: 1rem;      /* rounded-2xl */
+
+  /* Type clamps: line count is the contract, not pixel height */
+  --card-title-lines: 3;
+  --card-desc-lines: 4;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --card-pad: var(--card-pad-lg);
+  }
+}
+
+/* --- card shell ------------------------------------------------------- */
+.card-shell {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  /* NOTE: min-height only. A fixed `height` here is what caused the overlap. */
+  min-height: 20rem;          /* 320px floor, shared by every card */
+  padding: var(--card-pad);
+}
+
+@media (min-width: 768px) {
+  .card-shell {
+    min-height: 22rem;        /* 352px once padding grows */
+  }
+}
+
+/* The body region takes the slack between title and footer. */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  /* min-height:0 is REQUIRED on a flex child that clamps, otherwise the
+     child refuses to shrink and pushes the footer out of the card. */
+  min-height: 0;
+}
+
+/* --- clamped text ----------------------------------------------------- */
+.card-title {
+  margin: 0 0 var(--card-gap-title);
+  font-weight: 600;
+  line-height: 1.25;
+  /* clamp so a 3-line title can never steal the footer's space */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--card-title-lines);
+  line-clamp: var(--card-title-lines);
+  overflow: hidden;
+  /* long single words (URLs, "AZ-900/104/204") must not force overflow */
+  overflow-wrap: anywhere;
+}
+
+.card-desc {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 0.875rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--card-desc-lines);
+  line-clamp: var(--card-desc-lines);
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+/* --- footer ----------------------------------------------------------- */
+.card-footer {
+  /* mt-auto pins the footer to the bottom of the flex column, so the
+     description can never overlap it no matter the title length. */
+  margin-top: auto;
+  padding-top: var(--card-gap-footer);
+  border-top: 1px solid transparent; /* colour set by theme rule below */
+}
+
+/* Dark mode footer hairline */
+.dark .card-footer {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+/* --- variant helpers -------------------------------------------------- */
+/* Cards whose content is short (bento "small") share the same floor height
+   so a mixed-size row keeps aligned bottoms. */
+.card-shell--tall {
+  min-height: 26rem;
+}
+
+@media (min-width: 768px) {
+  .card-shell--tall {
+    min-height: 30rem;
+  }
+}
+
+/* Reduced motion: clamp animations are layout-safe, but honour the setting
+   for anything that animates opacity. */
+@media (prefers-reduced-motion: reduce) {
+  .card-shell,
+  .card-body,
+  .card-title,
+  .card-desc,
+  .card-footer {
+    animation: none !important;
+    transition: none !important;
+  }
+}

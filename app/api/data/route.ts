@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getKVData, KV_KEYS } from '@/lib/kv';
 import { getFallbackData, isUpstashUnavailable } from '@/lib/data-fallback';
+import { venturesData } from '@/lib/data';
 import { syncCache } from '@/lib/data-sync';
 import type { PortfolioDataPayload } from '@/lib/media-repair';
 import { generateExperienceKey } from '@/lib/key-utils';
@@ -110,7 +111,8 @@ export async function GET() {
       skills,
       achievements,
       mentorship,
-      personalInfo
+      personalInfo,
+      ventures
     ] = await Promise.all([
       getKVData(KV_KEYS.PROJECTS),
       getKVData(KV_KEYS.EXPERIENCES),
@@ -118,6 +120,7 @@ export async function GET() {
       getKVData(KV_KEYS.ACHIEVEMENTS),
       getKVData(KV_KEYS.MENTORSHIP),
       getKVData(KV_KEYS.PERSONAL_INFO),
+      getKVData('portfolio:ventures'),
     ]);
 
     // Check if Upstash is completely unavailable
@@ -170,7 +173,8 @@ export async function GET() {
       skills: upstashData.skills,
       achievements: upstashData.achievements,
       mentorship: upstashData.mentorship,
-    };
+      ventures: Array.isArray(ventures) && ventures.length > 0 ? ventures : venturesData,
+    } as PortfolioDataPayload;
 
     // Sync cache in the background (don't await - non-blocking)
     // This ensures fallback data is always up-to-date with remote database

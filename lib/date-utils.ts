@@ -4,6 +4,14 @@ export interface Experience {
   description: string;
   date: string;
   icon?: string;
+  /**
+   * Stable identity. Required for safe edits: the admin API addresses
+   * entries by key, never by array index, so a date re-sort can never make
+   * an update or delete hit the wrong record.
+   */
+  key?: string;
+  /** Provenance marker for entries written by the founder seed migration. */
+  source?: 'founder-seed' | 'admin';
 }
 
 export function parseExperienceDate(dateStr: string): { start: Date; end: Date | null } {
@@ -30,7 +38,7 @@ function parseMonthYear(str: string): Date {
   return new Date(year, month - 1, 1);
 }
 
-export function sortExperiencesByDate(experiences: Experience[]): Experience[] {
+export function sortExperiencesByDate<T extends Experience>(experiences: T[]): T[] {
   return [...experiences].sort((a, b) => {
     const dateA = parseExperienceDate(a.date);
     const dateB = parseExperienceDate(b.date);
