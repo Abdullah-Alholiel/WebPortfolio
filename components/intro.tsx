@@ -161,20 +161,6 @@ export default function Intro() {
                 onError={handleProfileImageError}
               />
             </motion.div>
-
-            <motion.span
-              className="absolute -bottom-1 -right-1 text-5xl sm:text-6xl drop-shadow-lg"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                type: "spring",
-                stiffness: 125,
-                delay: 0.15,
-                duration: 0.7,
-              }}
-            >
-              🇸🇦
-            </motion.span>
           </div>
         </div>
 
