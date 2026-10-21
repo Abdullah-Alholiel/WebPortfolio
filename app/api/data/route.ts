@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getKVData, KV_KEYS } from '@/lib/kv';
 import { getFallbackData, isUpstashUnavailable } from '@/lib/data-fallback';
 import { syncCache } from '@/lib/data-sync';
-import { repairPortfolioMedia, type PortfolioDataPayload } from '@/lib/media-repair';
+import type { PortfolioDataPayload } from '@/lib/media-repair';
 import { generateExperienceKey } from '@/lib/key-utils';
 
 // CRITICAL: Force dynamic rendering - always fetch fresh data from Upstash
@@ -157,33 +157,24 @@ export async function GET() {
       mentorship: Array.isArray(mentorship) ? mentorship : [],
     };
 
-    const repairResult = await repairPortfolioMedia(upstashData);
-
-    const repairedData = {
-      personal: repairResult.personal.data,
-      projects: repairResult.projects.data,
+    // Serve the RAW Upstash data. Read-time URL rewriting is disabled:
+    // Vercel Blob serves uploads at suffixed URLs (…-<hash>.jpg) and the
+    // old repair pass stripped those suffixes in the SERVED response,
+    // handing visitors 404s even when Upstash held the canonical URL.
+    // Admin uploads are the single writer (merge path) and store the
+    // exact canonical URL the blob API returned — nothing to "repair".
+    const servedData: PortfolioDataPayload = {
+      personal: upstashData.personal,
+      projects: upstashData.projects,
       experiences: sanitizedExperiences,
-      skills: skills || {},
-      achievements: repairResult.achievements.data,
-      mentorship: repairResult.mentorship.data,
+      skills: upstashData.skills,
+      achievements: upstashData.achievements,
+      mentorship: upstashData.mentorship,
     };
-
-    // NEVER write repairs back to Upstash. Vercel Blob serves uploads at
-    // suffixed URLs (…-<hash>.jpg); the suffix-less rewrite this once produced
-    // 404s and clobbered freshly-uploaded profile images within seconds.
-    // Repair results are still returned to visitors — they're just not persisted.
-    if (process.env.DEBUG_MEDIA_REPAIR === 'true') {
-      console.log('[media-repair] would-persist (debug only):', {
-        personal: repairResult.personal.changed,
-        projects: repairResult.projects.changed,
-        achievements: repairResult.achievements.changed,
-        mentorship: repairResult.mentorship.changed,
-      });
-    }
 
     // Sync cache in the background (don't await - non-blocking)
     // This ensures fallback data is always up-to-date with remote database
-    syncCache(repairedData).catch((error) => {
+    syncCache(servedData).catch((error) => {
       // Silently handle sync errors - caching is optional
       if (process.env.DEBUG_UPSTASH === 'true') {
         console.warn('Cache sync failed (non-critical):', error);
@@ -192,7 +183,7 @@ export async function GET() {
 
     // Return Upstash data with minimal caching to ensure fresh data
     // Reduced cache time so admin changes appear quickly
-    const response = NextResponse.json(repairedData, {
+    const response = NextResponse.json(servedData, {
       headers: {
         // Short cache: 10 seconds max, no stale-while-revalidate to ensure freshness
         'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=0',
