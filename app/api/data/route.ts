@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getKVData, setKVData, KV_KEYS } from '@/lib/kv';
+import { getKVData, KV_KEYS } from '@/lib/kv';
 import { getFallbackData, isUpstashUnavailable } from '@/lib/data-fallback';
 import { syncCache } from '@/lib/data-sync';
 import { repairPortfolioMedia, type PortfolioDataPayload } from '@/lib/media-repair';
@@ -140,24 +140,16 @@ export async function GET() {
       mentorship: repairResult.mentorship.data,
     };
 
-    const persistOperations: Promise<unknown>[] = [];
-
-    if (repairResult.projects.changed && Array.isArray(projects)) {
-      persistOperations.push(setKVData(KV_KEYS.PROJECTS, repairResult.projects.data));
-    }
-    if (repairResult.achievements.changed && Array.isArray(achievements)) {
-      persistOperations.push(setKVData(KV_KEYS.ACHIEVEMENTS, repairResult.achievements.data));
-    }
-    if (repairResult.mentorship.changed && Array.isArray(mentorship)) {
-      persistOperations.push(setKVData(KV_KEYS.MENTORSHIP, repairResult.mentorship.data));
-    }
-    if (repairResult.personal.changed && personalInfo) {
-      persistOperations.push(setKVData(KV_KEYS.PERSONAL_INFO, repairResult.personal.data));
-    }
-
-    if (persistOperations.length > 0) {
-      Promise.allSettled(persistOperations).catch((error) => {
-        console.warn('Failed to persist repaired media references:', error);
+    // NEVER write repairs back to Upstash. Vercel Blob serves uploads at
+    // suffixed URLs (…-<hash>.jpg); the suffix-less rewrite this once produced
+    // 404s and clobbered freshly-uploaded profile images within seconds.
+    // Repair results are still returned to visitors — they're just not persisted.
+    if (process.env.DEBUG_MEDIA_REPAIR === 'true') {
+      console.log('[media-repair] would-persist (debug only):', {
+        personal: repairResult.personal.changed,
+        projects: repairResult.projects.changed,
+        achievements: repairResult.achievements.changed,
+        mentorship: repairResult.mentorship.changed,
       });
     }
 
