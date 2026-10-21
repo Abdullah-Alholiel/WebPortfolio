@@ -5,7 +5,19 @@ import { getRedis } from '@/lib/kv';
 
 const redis = getRedis();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy Resend client: constructing at module scope throws when
+// RESEND_API_KEY is missing, which breaks `next build` page-data
+// collection for this route in environments without the key (staging).
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured');
+    }
+    _resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return _resend;
+}
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
 
 export async function POST(request: NextRequest) {
@@ -96,7 +108,7 @@ export async function POST(request: NextRequest) {
     console.log('Sending email to:', email);
     
     try {
-      const emailResult = await resend.emails.send({
+      const emailResult = await getResend().emails.send({
         from: 'Admin Login <onboarding@resend.dev>',
         to: email,
         subject: 'Login to Portfolio Admin',
