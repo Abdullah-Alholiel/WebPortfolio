@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import SectionHeading from "./section-heading";
+import { resolveCopy } from "@/lib/site-copy";
 import Project from "./project";
 import { useSectionInView } from "@/lib/hooks";
 import { usePortfolioData } from "@/context/portfolio-data-context";
@@ -56,7 +57,7 @@ export default function Projects() {
   if (isLoading) {
     return (
       <section id="projects" ref={ref} className="scroll-mt-28 mb-28">
-        <SectionHeading>Projects</SectionHeading>
+        <SectionHeading>{resolveCopy(data.siteCopy, 'projects.title', 'Projects')}</SectionHeading>
         <Loader className="w-full justify-center" label="Loading projects" />
       </section>
     );
@@ -64,7 +65,7 @@ export default function Projects() {
 
   return (
     <section id="projects" ref={ref} className="scroll-mt-28 mb-28">
-      <SectionHeading>Projects</SectionHeading>
+      <SectionHeading>{resolveCopy(data.siteCopy, 'projects.title', 'Projects')}</SectionHeading>
       <div className="mx-auto grid max-w-[53rem] grid-cols-1 gap-5 sm:grid-cols-2 items-stretch">
         {visibleProjects.map((project, index) => (
           <Project key={project.title || index} {...project} allExperiences={allExperiences} />

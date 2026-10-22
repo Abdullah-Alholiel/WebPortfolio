@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useTheme } from '@/context/theme-context';
 import { usePortfolioData } from '@/context/portfolio-data-context';
 import { useSectionInView } from '@/lib/hooks';
+import { resolveCopy } from '@/lib/site-copy';
 import StandardIcon from './standard-icon';
 import Loader from '@/components/ui/loader';
 import { resolveImageUrl } from '@/lib/image-utils';
@@ -16,7 +17,7 @@ interface Achievement {
   fallbackCertificateUrl?: string;
 }
 
-const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCertificateUrl, index }: Achievement & { index: number }) => {
+const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCertificateUrl, index, copy }: Achievement & { index: number; copy?: Record<string, string> }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const { theme } = useTheme();
   const hasCertificate = Boolean(certificateUrl || fallbackCertificateUrl);
@@ -105,7 +106,7 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
                 {hasCertificate ? (
                   <div className={`flex items-center gap-2 text-xs font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
                     }`}>
-                    <span>View Certificate</span>
+                    <span>{resolveCopy(copy, 'achievements.card.viewCertificate', 'View Certificate')}</span>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -116,7 +117,7 @@ const AchievementCard = ({ title, description, Icon, certificateUrl, fallbackCer
                     <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Certificate available on request</span>
+                    <span>{resolveCopy(copy, 'achievements.card.unavailable', 'Certificate available on request')}</span>
                   </div>
                 )}
               </div>
@@ -223,11 +224,11 @@ export default function Achievements() {
         >
           <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
             }`}>
-            Achievements
+            {resolveCopy(data.siteCopy, 'achievements.title')}
           </h2>
           <p className={`text-base md:text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
             }`}>
-            Professional certifications and accomplishments
+            {resolveCopy(data.siteCopy, 'achievements.subtitle')}
           </p>
         </motion.div>
 
@@ -242,6 +243,7 @@ export default function Achievements() {
                     key={`${achievement.title}-${currentIndex + idx}`}
                     {...achievement}
                     index={idx}
+                    copy={data.siteCopy}
                   />
                 ))}
               </AnimatePresence>

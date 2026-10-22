@@ -5,6 +5,7 @@ import { venturesData } from '@/lib/data';
 import { syncCache } from '@/lib/data-sync';
 import type { PortfolioDataPayload } from '@/lib/media-repair';
 import { generateExperienceKey } from '@/lib/key-utils';
+import { SITE_COPY_DEFAULTS, type SiteCopy } from '@/lib/site-copy';
 
 // CRITICAL: Force dynamic rendering - always fetch fresh data from Upstash
 // This ensures admin changes appear immediately in production
@@ -90,7 +91,14 @@ export async function GET() {
         );
         if (upstream.ok) {
           const data = await upstream.json();
-          return NextResponse.json(data, {
+          // The proxied (prod) payload may predate newer fields. Merge the
+          // site-copy defaults so staging always serves a complete payload;
+          // any values prod already carries win over defaults.
+          const merged = {
+            ...data,
+            siteCopy: { ...SITE_COPY_DEFAULTS, ...(data.siteCopy || {}) },
+          };
+          return NextResponse.json(merged, {
             headers: {
               'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=0',
               'X-Data-Timestamp': Date.now().toString(),
@@ -112,7 +120,8 @@ export async function GET() {
       achievements,
       mentorship,
       personalInfo,
-      ventures
+      ventures,
+      siteCopy
     ] = await Promise.all([
       getKVData(KV_KEYS.PROJECTS),
       getKVData(KV_KEYS.EXPERIENCES),
@@ -121,6 +130,7 @@ export async function GET() {
       getKVData(KV_KEYS.MENTORSHIP),
       getKVData(KV_KEYS.PERSONAL_INFO),
       getKVData('portfolio:ventures'),
+      getKVData<SiteCopy>('portfolio:site_copy'),
     ]);
 
     // Check if Upstash is completely unavailable
@@ -174,6 +184,7 @@ export async function GET() {
       achievements: upstashData.achievements,
       mentorship: upstashData.mentorship,
       ventures: Array.isArray(ventures) && ventures.length > 0 ? ventures : venturesData,
+      siteCopy: { ...SITE_COPY_DEFAULTS, ...(siteCopy || {}) },
     } as PortfolioDataPayload;
 
     // Sync cache in the background (don't await - non-blocking)

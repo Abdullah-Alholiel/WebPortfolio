@@ -2,7 +2,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import SectionHeading from "./section-heading";
 import { useSectionInView } from "@/lib/hooks";
-import { usePortfolioData } from "@/context/portfolio-data-context";
+import { usePortfolioData } from '@/context/portfolio-data-context';
+import { resolveCopy } from '@/lib/site-copy';
 import { motion } from "framer-motion";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import Loader from "@/components/ui/loader";
@@ -178,7 +179,7 @@ export default function Skills() {
         ref={ref}
         className="mb-20 max-w-[53rem] scroll-mt-28 text-center sm:mb-8"
       >
-        <SectionHeading>Skills</SectionHeading>
+        <SectionHeading>{resolveCopy(data.siteCopy, 'skills.title', 'Skills')}</SectionHeading>
         <div className="mt-8 flex justify-center">
           <Loader label="Loading skills" />
         </div>
@@ -192,7 +193,7 @@ export default function Skills() {
       ref={ref}
       className="mb-20 max-w-[53rem] scroll-mt-28 text-center sm:mb-8"
     >
-      <SectionHeading>Skills</SectionHeading>
+      <SectionHeading>{resolveCopy(data.siteCopy, 'skills.title', 'Skills')}</SectionHeading>
       {Object.entries(skills).map(([category, categorySkills], index) => {
         const skillsArray = Array.isArray(categorySkills)
           ? categorySkills.filter(

@@ -9,6 +9,7 @@ import "react-vertical-timeline-component/style.min.css";
 import { useSectionInView } from "@/lib/hooks";
 import { useTheme } from "@/context/theme-context";
 import { usePortfolioData } from "@/context/portfolio-data-context";
+import { resolveCopy } from "@/lib/site-copy";
 import { getExperienceIcon } from "@/lib/icon-utils";
 import StandardIcon from "./standard-icon";
 import Loader from "@/components/ui/loader";
@@ -51,9 +52,9 @@ function modeOf(item: ExperienceItem): JourneyMode {
   return ENTREPRENEURIAL_TITLES.has(item.title) ? "entrepreneurial" : "professional";
 }
 
-const MODES: { id: JourneyMode; label: string }[] = [
-  { id: "professional", label: "Professional" },
-  { id: "entrepreneurial", label: "Entrepreneurial" },
+const MODES: { id: JourneyMode; copyKey: string; label: string }[] = [
+  { id: "professional", copyKey: "experience.mode.professional", label: "Professional" },
+  { id: "entrepreneurial", copyKey: "experience.mode.entrepreneurial", label: "Entrepreneurial" },
 ];
 
 export default function Experience() {
@@ -110,7 +111,7 @@ export default function Experience() {
   if (isLoading) {
     return (
       <section id="experience" ref={ref} className="scroll-mt-28 mb-28 sm:mb-40">
-        <SectionHeading>Professional Journey</SectionHeading>
+        <SectionHeading>{resolveCopy(data.siteCopy, 'experience.title.professional')}</SectionHeading>
         <div className="flex flex-col items-center py-12 gap-4">
           <Loader className="justify-center" label="Loading experiences" />
           <p className="text-gray-600 dark:text-gray-400">Loading experiences...</p>
@@ -121,7 +122,14 @@ export default function Experience() {
 
   return (
     <section id="experience" ref={ref} className="scroll-mt-28 mb-28 sm:mb-40">
-      <SectionHeading>{mode === "professional" ? "Professional Journey" : "Entrepreneurial Journey"}</SectionHeading>
+      <SectionHeading>
+        {resolveCopy(
+          data.siteCopy,
+          mode === "professional"
+            ? "experience.title.professional"
+            : "experience.title.entrepreneurial"
+        )}
+      </SectionHeading>
 
       {/* Journey mode toggle */}
       <div className="mb-12 flex justify-center">
@@ -145,7 +153,7 @@ export default function Experience() {
                     : "text-gray-600 hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/10"
                 }`}
               >
-                {m.label}
+                {resolveCopy(data.siteCopy, m.copyKey, m.label)}
               </button>
             );
           })}

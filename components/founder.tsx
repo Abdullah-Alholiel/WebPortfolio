@@ -17,6 +17,7 @@ import {
   type VentureStatus,
 } from "@/lib/data";
 import { usePortfolioData } from "@/context/portfolio-data-context";
+import { resolveCopy } from "@/lib/site-copy";
 
 /** Derive the #project-… anchor id the same way project.tsx builds it. */
 export function projectAnchorId(title: string): string {
@@ -147,7 +148,7 @@ export default function Founder() {
 
   return (
     <section id="founder" ref={ref} className="scroll-mt-28 mb-28">
-      <SectionHeading>Founder</SectionHeading>
+      <SectionHeading>{resolveCopy(data.siteCopy, 'founder.title', 'Founder')}</SectionHeading>
 
       {/* Collapsed summary: the whole section in two lines */}
       <div className="mx-auto -mt-5 max-w-[53rem]">

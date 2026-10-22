@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useTheme } from '@/context/theme-context';
 import { usePortfolioData } from '@/context/portfolio-data-context';
 import { useSectionInView } from '@/lib/hooks';
+import { resolveCopy } from '@/lib/site-copy';
 import { resolveImageUrl } from '@/lib/image-utils';
 import Loader from '@/components/ui/loader';
 
@@ -400,11 +401,11 @@ export default function Mentorship() {
         >
           <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
             }`}>
-            Mentorship Experiences
+            {resolveCopy(data.siteCopy, 'mentorship.title')}
           </h2>
           <p className={`text-lg md:text-xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
             }`}>
-            Real-world simulations and professional development opportunities
+            {resolveCopy(data.siteCopy, 'mentorship.subtitle')}
           </p>
         </motion.div>
 

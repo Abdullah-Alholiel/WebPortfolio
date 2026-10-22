@@ -20,6 +20,8 @@ interface PortfolioData {
   achievements: any[];
   mentorship: any[];
   ventures: any[];
+  /** Admin-editable section headings/subtitles (lib/site-copy.ts). */
+  siteCopy: Record<string, string>;
 }
 
 interface PortfolioDataContextType {
@@ -40,6 +42,7 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
     achievements: [],
     mentorship: [],
     ventures: [],
+    siteCopy: {},
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -93,6 +96,7 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
         // type and initial state but never assigned here, so the section
         // silently fell back to static defaults and admin edits never showed.
         ventures: result.ventures || [],
+        siteCopy: result.siteCopy || {},
       });
       setLastFetchTime(now);
     } catch (err) {

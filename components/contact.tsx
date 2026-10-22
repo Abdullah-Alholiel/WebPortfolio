@@ -8,9 +8,12 @@ import { sendEmail } from "@/actions/sendEmail";
 import SubmitBtn from "./submit-btn";
 import toast from "react-hot-toast";
 import { useTheme } from '@/context/theme-context'; // Import useTheme to access the current theme
+import { usePortfolioData } from '@/context/portfolio-data-context';
+import { resolveCopy } from '@/lib/site-copy';
 
 export default function Contact() {
   const { ref } = useSectionInView("Contact", 0.3);
+  const { data } = usePortfolioData();
   const { theme } = useTheme(); // Use the theme context
 
   return (
@@ -31,7 +34,7 @@ export default function Contact() {
         once: true,
       }}
     >
-      <SectionHeading>Contact me</SectionHeading>
+      <SectionHeading>{resolveCopy(data.siteCopy, 'contact.title', 'Contact me')}</SectionHeading>
 
       <p className={`-mt-6`}>
         Please contact me directly at{" "}
